@@ -1,0 +1,285 @@
+<?php
+// session_start();
+
+include 'connection.php';
+include('auth_check.php');
+
+// // Check if the user is logged in
+// if (!isset($_SESSION['username'])) {
+//     header("Location: adminlogin.php");
+//     exit();
+// }
+
+$username = $_SESSION['username'];
+$sql_user = "SELECT avatar FROM users WHERE username = '$username' LIMIT 1";
+$result_user = $conn->query($sql_user);
+$avatar = '../avatars/default_avatar.png';
+if ($result_user && $row_user = $result_user->fetch_assoc()) {
+    if (!empty($row_user['avatar']) && file_exists('../avatars/' . $row_user['avatar'])) {
+        $avatar = '../avatars/' . $row_user['avatar'];
+    }
+}
+
+
+// Fetch unique years from the incident_date column
+$sql_years = "SELECT DISTINCT YEAR(incident_date) AS year FROM fire_incident_reports ORDER BY year";
+$result_years = $conn->query($sql_years);
+
+$year1 = isset($_GET['year1']) && is_numeric($_GET['year1']) ? intval($_GET['year1']) : null;
+$year2 = isset($_GET['year2']) && is_numeric($_GET['year2']) ? intval($_GET['year2']) : null;
+
+
+$whereClause = '';
+if ($year1 && $year2) {
+    $whereClause = "WHERE YEAR(incident_date) IN ($year1, $year2)";
+}
+
+$sql_table_data = "
+    SELECT 
+        MONTHNAME(incident_date) AS month,
+        SUM(CASE WHEN YEAR(incident_date) = ? THEN 1 ELSE 0 END) AS year1_total_incidents,
+        SUM(CASE WHEN YEAR(incident_date) = ? THEN 1 ELSE 0 END) AS year2_total_incidents
+    FROM fire_incident_reports
+    WHERE YEAR(incident_date) IN (?, ?)
+    GROUP BY MONTH(incident_date)
+    ORDER BY MONTH(incident_date);
+";
+
+$stmt = $conn->prepare($sql_table_data);
+$stmt->bind_param('iiii', $year1, $year2, $year1, $year2);
+$stmt->execute();
+$result_table_data = $stmt->get_result();
+
+$table_data = [];
+while ($row = $result_table_data->fetch_assoc()) {
+    $table_data[] = [
+        'month' => $row['month'],
+        'year1_total_incidents' => $row['year1_total_incidents'],
+        'year2_total_incidents' => $row['year2_total_incidents']
+    ];
+}
+
+
+$total_year1_incidents = 0;
+$total_year2_incidents = 0;
+
+foreach ($table_data as $row) {
+    // Sum up incidents for both years
+    $total_year1_incidents += $row['year1_total_incidents'];
+    $total_year2_incidents += $row['year2_total_incidents'];
+}
+
+// Add a row with total incidents
+$table_data[] = [
+    'month' => 'Total',
+    'year1_total_incidents' => $total_year1_incidents,
+    'year2_total_incidents' => $total_year2_incidents
+];
+
+
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../js/libs/Chart.min.js"></script>
+    <link rel="stylesheet" href="reportstyle.css">
+    <link rel="stylesheet" href="../css/all.min.css">
+    <link rel="stylesheet" href="../css/fontawesome.min.css">
+    <link rel="icon" type="image/png" href="../REPORT.png">
+    <title>Year-to-Year Comparison</title>
+    <style>
+.show {display: block;}
+.date select, .date button{
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid #003D73;
+    border-radius: 5px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+}
+
+.date button{
+    background-color: #bd000a;
+    border: 1px hidden;
+    color: white;
+}
+
+.date button:hover{
+    background-color: #810000;
+    border: 1px hidden;
+    color: white;
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+     <aside class="sidebar">
+        <nav>
+            <ul>
+                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
+                <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li class = "archive-text"><p>Archives</p></li>
+                <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
+                <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
+            
+                <li class="report-dropdown">
+                    <a href="#" class="report-dropdown-toggle">
+                        <i class="fa-solid fa-box-archive"></i>
+                        <span>Reports</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                    <ul class="report-dropdown-content">
+                        <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
+                        <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
+                        <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+        <div class="main-content">
+       <header class="header">
+    <button id="toggleSidebar" class="toggle-sidebar-btn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+    <div class="header-right">
+        <div class="dropdown">
+            <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
+                <!-- Add avatar image here -->
+                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+            </a>
+            <div id="profileDropdown" class="dropdown-content">
+                <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
+                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+    <div class="card">
+    <div class = "top-controls">
+        <button onclick="printTable()" class="create-new-button">Print Reports</button>
+    </div>
+    <h3>Year-to-Year Comparison Table</h3>
+    <hr>
+    <form method="GET" id="yearFilterForm">
+
+    <div class = "date">
+        <label for="year1">Select First Year:</label>
+        <select name="year1" id="year1">
+            <?php while ($row = $result_years->fetch_assoc()): ?>
+                <option value="<?php echo $row['year']; ?>" <?php echo isset($_GET['year1']) && $_GET['year1'] == $row['year'] ? 'selected' : ''; ?>>
+                    <?php echo $row['year']; ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+        <label for="year2">Select Second Year:</label>
+        <select name="year2" id="year2">
+            <?php foreach ($result_years as $row): ?>
+                <option value="<?php echo $row['year']; ?>" <?php echo isset($_GET['year2']) && $_GET['year2'] == $row['year'] ? 'selected' : ''; ?>>
+                    <?php echo $row['year']; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+    </div>
+
+    <table class="archive-table">
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th><?php echo htmlspecialchars($year1); ?> Total Incidents</th>
+            <th><?php echo htmlspecialchars($year2); ?> Total Incidents</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($table_data as $row): ?>
+            <tr>
+                <td class = "total" style = "font-weight: bold";><?php echo htmlspecialchars($row['month']); ?></td>
+                <td><?php echo htmlspecialchars($row['year1_total_incidents']); ?></td>
+                <td><?php echo htmlspecialchars($row['year2_total_incidents']); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src = "../js/archivescript.js">
+    </script>
+    <script src = "../js/reportscript.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const toggles = document.querySelectorAll('.report-dropdown-toggle');
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            const dropdown = this.closest('.report-dropdown');
+            dropdown.classList.toggle('show');
+
+            // Close other dropdowns
+            document.querySelectorAll('.report-dropdown').forEach(item => {
+                if (item !== dropdown) {
+                    item.classList.remove('show');
+                }
+            });
+        });
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', event => {
+        if (!event.target.closest('.report-dropdown')) {
+            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+});
+
+function printTable() {
+        const table = document.querySelector('.archive-table').outerHTML;
+        const newWin = window.open('', '', 'width=800, height=600');
+        newWin.document.write(`
+            <html>
+            <head>
+                <title>Print Table</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid black; padding: 8px; text-align: center; }
+                    th { background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                <h3>Year-to-Year Comparison Table</h3>
+                ${table}
+                <script>
+                    window.onload = function() {
+                        window.print();
+                        window.onafterprint = function() { window.close(); }
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        newWin.document.close();
+    }
+
+    </script>
+</body>
+</html>

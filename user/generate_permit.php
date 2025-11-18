@@ -69,17 +69,6 @@ $html = <<<EOD
 <p><strong>Building Construction:</strong> {$row['building_construction']}</p>
 <p><strong>Possible Problems during Fire:</strong> {$row['possible_problems']}</p>
 <p><strong>Hazardous/Flammable Materials:</strong> {$row['hazardous_materials']}</p>
-<h4>Fire Safety Measures</h4>
-<ul>
-    <li>Fire Alarms: {$row['fire_alarms']}</li>
-    <li>Fire Extinguishers: {$row['fire_extinguishers']}</li>
-    <li>Emergency Exits: {$row['emergency_exits']}</li>
-    <li>Sprinkler Systems: {$row['sprinkler_systems']}</li>
-    <li>Fire Drills: {$row['fire_drills']}</li>
-    <li>Exit Signs: {$row['exit_signs']}</li>
-    <li>Electrical Wiring (Safe): {$row['electrical_wiring']}</li>
-    <li>Emergency Evacuations: {$row['emergency_evacuations']}</li>
-</ul>
 <p><strong>Inspected By:</strong> {$row['inspected_by']}</p>
 EOD;
 $pdf->writeHTML($html, true, false, true, false, '');

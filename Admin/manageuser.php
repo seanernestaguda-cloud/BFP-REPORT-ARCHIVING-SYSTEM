@@ -203,7 +203,15 @@ $result = $stmt->get_result();
             color: #888;
             pointer-events: none;
             }
-
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
@@ -261,12 +269,13 @@ $result = $stmt->get_result();
     </div>
 </header>
     <div class = "card">
+        <h3>Manage Users</h3> 
+        <p> List of Users </p>
+        <hr class="section-separator full-bleed">
         <div class="top-controls">
-            <button onclick="window.location.href='create_manager.php'" class="create-new-button">Create New</button>
+            <button onclick="window.location.href='create_manager.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i>Create New</button>
         </div>
-
-        <h3>List of Users</h3>
-        <hr>
+        <hr class="section-separator full-bleed">
             <br>
         <table class = "archive-table">
       <div class="entries-right">

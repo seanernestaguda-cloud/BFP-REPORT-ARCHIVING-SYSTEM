@@ -41,6 +41,15 @@ $stmt->close();
     transform: translateY(-6px) scale(1.03);
     box-shadow: 0 8px 24px rgba(44,62,80,0.13);
 }
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
         </style>
 </head>
 <body>

@@ -3,7 +3,7 @@
 
 // // Check if the user is logged in
 // if (!isset($_SESSION['username'])) {
-//     header("Location: userlogin.php");
+//     header("Location: adminlogin.php");
 // }
 
 include('connection.php');
@@ -206,7 +206,7 @@ textarea {
     border-bottom: 1px solid #444;
 }
 
-button[type = "submit"]{
+button[type = "submit"], button[type="button"].btn-primary {
     background-color: #003D73; /* BFP Blue */
     color: white;
     border: none;
@@ -383,6 +383,146 @@ input[type="file"] {
     background: #e3f2fd;
     border-color: #003D73;
 }
+
+.card{
+    max-width: 900px;     /* change to desired max width (e.g. 700px for smaller) */
+    width: 90%;           /* responsive width */
+    margin: 90px auto 40px; /* center and control vertical spacing */
+    padding: 18px;        /* inner spacing */
+    box-sizing: border-box;
+    border-radius: 8px;   /* match existing look */
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.form-step { display: none; }
+.form-step:first-child { display: block; }
+
+/* Stepper styles */
+.stepper-container {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+}
+.circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #003D73;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 6px;
+    border: 2px solid #e0e0e0;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.label {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+}
+.line {
+    width: 60px;
+    height: 3px;
+    background: #e0e0e0;
+    margin: 0 4px;
+    border-radius: 2px;
+}
+.stepper-container {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+}
+.circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #003D73;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 6px;
+    border: 2px solid #e0e0e0;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.label {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+}
+.line {
+    width: 60px;
+    height: 3px;
+    background: #e0e0e0;
+    margin: 0 4px;
+    border-radius: 2px;
+}
+.step.active .circle, .step.completed .circle {
+    background: #003D73;
+    color: #fff;
+    border: 2px solid #003D73;
+}
+.step.active .label, .step.completed .label {
+    color: #003D73;
+}
+.step.completed .circle {
+    background: #fff;
+    color: #003D73;
+    border: 2px solid #003D73;
+    position: relative;
+}
+.step.completed .circle::after {
+    content: '✔';
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #003D73;
+    font-size: 18px;
+}
+.step.completed .circle {
+    background: #fff;
+}
+.step.completed .circle > * {
+    display: none;
+}
+.step.completed .circle::after {
+    display: block;
+}
+.line.active {
+    background: #003D73;
+}
 </style>
 <body>
 
@@ -437,9 +577,8 @@ input[type="file"] {
         </div>
     </div>
 </header>
-    <br>
     <div class = "card">
-    <div class = "form-header"> <h2>Fire Incident Report</h2></div>
+    <div class = "form-header"> <h2>Create Fire Incident Report</h2></div>
             <?php if (isset($success_message)) { ?>
             <div class="alert alert-success"><?php echo $success_message; ?></div>
         <?php } ?>
@@ -447,43 +586,67 @@ input[type="file"] {
             <div class="alert alert-danger"><?php echo $error_message; ?></div>
         <?php } ?>
 <!-- Fire Incident Report Form -->
-<form method="POST" action="create_fire_incident_report.php" enctype="multipart/form-data">
-
-<fieldset>
-  <legend>Incident Details</legend>
-  <div class="form-row">
-   
-    <div class="form-group" style="width: 48%; display: inline-block;">
-      <label for="report_title">Report Title</label>
-      <input type="text" id="report_title" name="report_title" required placeholder="Report Name">
+<div class="stepper-container">
+    <div class="stepper">
+        <div class="step" id="stepper-1">
+            <div class="circle">1</div>
+            <div class="label">Fill up the form</div>
+        </div>
+        <div class="line"></div>
+        <div class="step" id="stepper-2">
+            <div class="circle">2</div>
+            <div class="label">Add photos of the scene</div>
+        </div>
+        <div class="line"></div>
+        <div class="step" id="stepper-3">
+            <div class="circle">3</div>
+            <div class="label">Upload Documents</div>
+        </div>
+        <div class="line"></div>
+        <div class="step" id="stepper-4">
+            <div class="circle">4</div>
+            <div class="label">Confirm and Submit</div>
+        </div>
     </div>
-    <div class="form-group" style="width: 48%; display: inline-block;">
+</div>
+<form method="POST" action="create_fire_incident_report.php" enctype="multipart/form-data" id="fireIncidentForm">
+
+<!-- STEP 1: Incident Details -->
+<div class="form-step" id="step-1">
+    <fieldset>
+        <legend>Incident Details</legend>
+        <!-- ...all your incident detail fields here... -->
+        <div class="form-group" style="width: 45%; display: inline-block;">
+            <label for="report_title">Report Title</label>
+            <input type="text" id="report_title" name="report_title" required placeholder="Report Name">
+        </div>
+      <div class="form-group" style="width: 45%; display: inline-block;">
       <label for="caller_name">Name of the Caller</label>
       <input type="text" id="caller_name" name="caller_name" required placeholder="Caller Name">
     </div>
-  </div>
       <div class="form-group-container"></div>
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="responding_team">Responding Team</label>
         <input type="text" id="responding_team" name="responding_team" class="form-control" placeholder="Responding Team" required>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="establishment">Establishment Burned</label>
         <input type="text" id="establishment" name="establishment" class="form-control" placeholder="Name of the Establishment" required>
     </div>
-
-<h4> Fire Location </h4>
-<div class="form-group" style="width: 48%; display: inline-block;">
+<hr class="section-separator full-bleed">
+<h4 style = "text-align: center;"> Fire Location </h4>
+<hr class="section-separator full-bleed">
+<div class="form-group" style="width: 45%; display: inline-block;">
         <label for="street">Street</label>
         <input type="text" id="street" name="street" class="form-control" placeholder="street" required>
     </div>
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="purok">Purok</label>
         <input type="text" id="purok" name="purok" class="form-control" placeholder="purok" required>
     </div>
 <div class="form-group-container">
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="fire_location">Barangay</label>
                 <select id="fire_location" name="fire_location" class="form-control" required>
                     <option value="" disabled selected>Select Barangay</option>
@@ -495,13 +658,13 @@ input[type="file"] {
 
         
     
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="municipality">Municipality</label>
         <input type="text" id="municipality" name="municipality" class="form-control" placeholder="municipality" required>
     </div>
-
-<h4> Time and Date </h4>
-<br>
+<hr class="section-separator full-bleed">
+<h4 style="text-align: center;"> Time and Date </h4>
+<hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
         <label for="incident_date">Time and Date Reported</label>
@@ -517,9 +680,9 @@ input[type="file"] {
         <label for="fireout_time">Time of Fire Out</label>
         <input type="time" id="fireout_time" name="fireout_time" class="form-control" placeholder="Time of Fire Out" required>
     </div>
-    <h4></h4>
+  <hr class="section-separator full-bleed">
 <div class="form-group-container">
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="alarm_status">Alarm Status</label>
         <select id="alarm_status" name="alarm_status" class="form-control" required>
             <option value="" disabled selected>Select Alarm Status</option>
@@ -531,7 +694,7 @@ input[type="file"] {
         </select>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="occupancy_type">Type of Occupancy</label>
         <select id="occupancy_type" name="occupancy_type" class="form-control" required>
             <option value="" disabled selected>Select Type of Occupancy</option>
@@ -547,12 +710,12 @@ input[type="file"] {
 
 
 <div class="form-group-container">
-<div class="form-group" style="width: 48%; display: inline-block;">
+<div class="form-group" style="width: 45%; display: inline-block;">
         <label for="property_damage"> Estimated Damage to Property (₱)</label>
         <input type = "text" id="property_damage" name="property_damage" class="form-control" placeholder= "Amount of Damage to Property" required></i>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="fire_type">Cause of Fire</label>
     <select name="fire_types" id="fire_type">
         <option value="">Select Cause of Fire</option>
@@ -563,38 +726,54 @@ input[type="file"] {
         <?php endwhile; ?>
     </select>
 </div>
-
-    <h4> Injured/Casualties </h4><br>
-    <div class="form-group" style="width: 48%; display: inline-block;">
+<hr class="section-separator full-bleed">
+    <h4 style="text-align: center;"> Injured/Casualties </h4>
+    <hr class="section-separator full-bleed">
+    <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="victims">Civilians</label><br>
     <textarea id="victims" name="victims" rows="10" cols="30" placeholder="Enter each victim on a new line" onfocus="addFirstNumber()" oninput="autoNumber()" style="border-bottom: 1px solid #444;"></textarea><br><br>
 </div>
 
- <div class="form-group" style="width: 48%; display: inline-block;">
+ <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="firefighters">Firefighters</label><br>
     <textarea id="victims" name="firefighters" rows="10" cols="30" placeholder="Enter each firefighter on a new line" onfocus="addFirstNumber()" oninput="autoNumber()" style="border-bottom: 1px solid #444;"></textarea><br><br>
 </div>
         </fieldset>
-
-
-<fieldset>
-    <legend> Photos of the Scene </legend>
-<div class="form-group">
-    <label for = "documentation_photos" style = "font-weight:bold;">Upload Photos of the Scene</label>
-    <div class="custom-file-upload" id="customFileUploadPhotos">
-        <div class="drop-area" id="dropAreaPhotos">
-            <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
-            <span>Drop images here, or click below!</span>
-            <input type="file" id="documentation_photos" name="documentation_photos[]" multiple accept="image/*" style="display:none;">
-        </div>
-        <button type="button" class="upload-btn" onclick="document.getElementById('documentation_photos').click();">Upload</button>
-        <div class="max-size-info">You can upload images up to a maximum of 2 GB.</div>
-        <div id="file-list-photos"></div>
+    <div class="form-actions">
+        <a href="fire_incident_report.php" class="btn btn-cancel">Cancel</a>
+        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
     </div>
 </div>
-</fieldset>
-<br>
-<fieldset>
+
+<!-- STEP 2: Photos -->
+<div class="form-step" id="step-2" style="display:none;">
+    <fieldset>
+        <legend>Photos of the Scene</legend>
+        <!-- ...photo upload fields... -->
+        <div class="form-group">
+            <label for="documentation_photos" style="font-weight:bold;">Add Photos of the Scene</label>
+            <hr class="section-separator full-bleed">
+            <div class="custom-file-upload" id="customFileUploadPhotos">
+                <div class="drop-area" id="dropAreaPhotos">
+                    <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                    <span>Drop images here, or click below!</span>
+                    <input type="file" id="documentation_photos" name="documentation_photos[]" multiple accept="image/*" style="display:none;">
+                </div>
+                <button type="button" class="upload-btn" onclick="document.getElementById('documentation_photos').click();">Upload</button>
+                <div class="max-size-info">You can upload images up to a maximum of 2 GB.</div>
+                <div id="file-list-photos"></div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-actions">
+        <button type="button" class="btn btn-cancel" onclick="prevStep(1)">Previous</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next</button>
+    </div>
+</div>
+
+<!-- STEP 3: Required Attachments -->
+<div class="form-step" id="step-3" style="display:none;">
+    <fieldset>
 <legend> Required Attachments</legend>
 <!-- Substantiating Documents Dropdown -->
 <div class="form-group" style="margin-bottom: 0;">
@@ -652,11 +831,23 @@ input[type="file"] {
     </div>
 </div>
 </fieldset>
-
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <a href="fire_incident_report.php" class="btn btn-cancel">Cancel</a>
+  <div class="form-actions">
+        <button type="button" class="btn btn-cancel" onclick="prevStep(2)">Previous</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(4)">Next</button>
     </div>
+</div>
+ <div class="form-step" id="step-4" style="display:none;">
+    <fieldset>
+        <legend>Confirm and Submit</legend>
+        <p style="text-align: center;">Please review all information before submitting your report.</p>
+        <!-- Optionally, show a summary of entered data here -->
+    </fieldset>
+    <div class="form-actions">
+        <button type="button" class="btn btn-cancel" onclick="prevStep(3)">Previous</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</div>
+</div>
 </form>
 
 </div>
@@ -669,6 +860,23 @@ input[type="file"] {
 </div>
 
 <script>
+
+// Update nextStep/prevStep for 4 steps
+function nextStep(step) {
+    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+    updateStepper(step);
+}
+function prevStep(step) {
+    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+    updateStepper(step);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateStepper(1);
+});
 // Documentation Photos Drag & Drop
 const dropAreaPhotos = document.getElementById('dropAreaPhotos');
 const fileInputPhotos = document.getElementById('documentation_photos');
@@ -872,5 +1080,34 @@ function showTab(type) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('.tab-btn[onclick="showTab(\''+type+'\')"]').classList.add('active');
 }
+function updateStepper(step) {
+    for (let i = 1; i <= 4; i++) {
+        const stepElem = document.getElementById('stepper-' + i);
+        stepElem.classList.remove('active', 'completed');
+        if (i < step) stepElem.classList.add('completed');
+        else if (i === step) stepElem.classList.add('active');
+    }
+    // Update lines
+    document.querySelectorAll('.stepper .line').forEach((line, idx) => {
+        if (idx < step - 1) line.classList.add('active');
+        else line.classList.remove('active');
+    });
+}
 
+// Call updateStepper in your nextStep/prevStep functions:
+function nextStep(step) {
+    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+    updateStepper(step);
+}
+function prevStep(step) {
+    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+    updateStepper(step);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateStepper(1);
+});
     </script>

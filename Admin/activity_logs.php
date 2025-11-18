@@ -172,6 +172,15 @@ $stmt->close();
     color: #003D73;
     font-weight: bold;
 }
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
         </style>
     </head> 
     <body>
@@ -232,7 +241,7 @@ $stmt->close();
     <div class="card">
         <section class="archive-section">
     <h3>Activity Logs</h3>
-    <hr><br>
+<hr class="section-separator full-bleed">
     <div class = "entries-search">
     <div class = "entries-right">
 <div class="search-input-container">

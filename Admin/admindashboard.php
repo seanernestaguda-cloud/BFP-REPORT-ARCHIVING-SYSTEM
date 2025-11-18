@@ -355,6 +355,15 @@ h4{
     color: #888;
     font-style: italic;
 }
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
@@ -412,6 +421,7 @@ h4{
    <div class="card">
     <div class="dashboard-header">
     <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
+    <hr class="section-separator full-bleed">
     <p class="dashboard-subtitle">Overview & Statistics</p>
 </div>
 <div class="card-container dashboard-grid">

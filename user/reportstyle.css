@@ -707,7 +707,7 @@ body {
     /* Top controls flex container */
     .top-controls {
         display: flex;
-        justify-content: flex-end; /* Aligns items to the right */
+        justify-content: flex-start; /* Aligns items to the right */
         align-items: center; /* Center vertically */
         margin-bottom: 20px; /* Space below */
     }
@@ -924,7 +924,6 @@ background-color: #011e38;
 h4{
     text-align: left;
     padding-bottom: 10px;
-    border-bottom:1px solid #444;
     margin-top: 20px;
 }
 
@@ -1188,4 +1187,13 @@ fieldset {
 
 input[type="search"]{
     border-radius: 20px;
+}
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.436), rgba(0,0,0,0.436), rgba(0,0,0,0.436));
+    border: none;
+    margin: 12px 0 10px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
 }

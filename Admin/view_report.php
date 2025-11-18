@@ -313,6 +313,16 @@ mysqli_close($conn);
 .btn-delete:hover {
     background: #c0392b;
 }
+.card{
+    max-width: 900px;     /* change to desired max width (e.g. 700px for smaller) */
+    width: 90%;           /* responsive width */
+    margin: 30px auto 40px; /* center and control vertical spacing */
+    padding: 18px;        /* inner spacing */
+    box-sizing: border-box;
+    border-radius: 8px;   /* match existing look */
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
     </style>
 </head>
 <body>
@@ -388,43 +398,45 @@ mysqli_close($conn);
         <!-- Fire Incident Report Form -->
         <form method="POST" action="view_report.php?report_id=<?php echo $report_id; ?>" enctype="multipart/form-data">
             <div class="form-group-container">
-            <div class="form-group" style="width: 48%; display: inline-block;">
+            <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="report_title">Report Title:</label>
                 <input type="text" id="report_title" name="report_title" value="<?php echo htmlspecialchars($report['report_title']); ?>" class="form-control" required>
             </div>
 
-            <div class="form-group" style="width: 48%; display: inline-block;">
+            <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="caller_name">Name of Caller</label>
                 <input type="text" id="caller_name" name="caller_name" value="<?php echo htmlspecialchars($report['caller_name']); ?>" class="form-control" required>
             </div>
-
-            <div class="form-group" style="width: 48%; display: inline-block;">
+      <div class="form-group-container">
+            <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="responding_team">Responding Team</label>
                 <input type="text" id="responding_team" name="responding_team" value="<?php echo htmlspecialchars($report['responding_team']); ?>" class="form-control" required>
             </div>
-            <div class="form-group" style="width: 48%; display: inline-block;">
+            <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="establishment">Establishment Name:</label>
                 <input type="text" id="establishment" name="establishment" value="<?php echo htmlspecialchars($report['establishment']); ?>" class="form-control" required>
             </div>
-<h4> Fire Location </h4>
-
+            </div>
+            <hr class="section-separator full-bleed">
+<h4 style = "text-align:center ;"> Fire Location </h4>
+<hr class="section-separator full-bleed">
 <div class = "form-group-container">
-            <div class="form-group" style="width: 48%; display: inline-block;">
+            <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="street">Street:</label>
     <input type="text" id="street" name="street" value="<?php echo htmlspecialchars($report['street'] ?? ''); ?>" class="form-control" required>
 </div>
 
 
-<div class="form-group" style="width: 48%; display: inline-block;">
+<div class="form-group" style="width: 45%; display: inline-block;">
     <label for="purok">Purok:</label>
     <input type="text" id="purok" name="purok" value="<?php echo htmlspecialchars($report['purok'] ?? ''); ?>" class="form-control" required>
 </div>
-<div class="form-group" style="width: 48%; display: inline-block;">
+<div class="form-group" style="width: 45%; display: inline-block;">
     <label for="municipality">Municipality:</label>
     <input type="text" id="municipality" name="municipality" value="<?php echo htmlspecialchars($report['municipality'] ?? ''); ?>" class="form-control" required>
 </div>
 
-<div class="form-group" style="width: 48%; display: inline-block;">
+<div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="fire_location">Barangay:</label>
                 <select id="fire_location" name="fire_location" class="form-control" required>
                     <option value="" disabled selected>Select Barangay</option>
@@ -437,8 +449,9 @@ mysqli_close($conn);
                 </select>
             </div>
             </div>
-
-<h4> Date and Time </h4>
+<hr class="section-separator full-bleed">
+<h4 style = "text-align: center;"> Date and Time </h4>
+<hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
                 <label for="incident_date">Time and Date Reported:</label>
@@ -454,28 +467,14 @@ mysqli_close($conn);
             </div>
             </div>
 
-<h4> Injured/Casualties </h4>
-<br>
-<div class="form-group-container">
-<div class="form-group" style="width: 48%; display: inline-block;">
-                <label for="victims">Civilians:</label>
-                <textarea id="victims" name="victims" rows="10" class="form-control"><?php echo htmlspecialchars($report['victims']); ?></textarea>
-            </div>
-
-            <div class="form-group" style="width: 48%; display: inline-block;">
-                <label for="firefighters">Firefighters:</label>
-                <textarea id="victims" name="firefighters" rows="10" class="form-control"><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
-            </div>
-            </div>
-
-<h4></h4>
+<hr class="section-separator full-bleed">
 <div class = "form-group-container"></div>
-            <div class="form-group" style="width: 48%; display: inline-block;">
+            <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="property_damage">Damage to Property (₱):</label>
                 <input type="text" id="property_damage" name="property_damage" value="<?php echo htmlspecialchars($report['property_damage']); ?>" class="form-control" required>
             </div>
 
-<div class="form-group" style="width: 48%; display: inline-block;">
+<div class="form-group" style="width: 45%; display: inline-block;">
     <label for="alarm_status">Alarm Status:</label>
     <select id="alarm_status" name="alarm_status" class="form-control" required>
         <option value="" disabled>Select Alarm Status</option>
@@ -488,7 +487,7 @@ mysqli_close($conn);
 </div>
 </div>
 <div class = "form-group-container">
-<div class="form-group" style="width: 48%; display: inline-block;">
+<div class="form-group" style="width: 45%; display: inline-block;">
     <label for="occupancy_type">Type of Occupancy:</label>
     <select id="occupancy_type" name="occupancy_type" class="form-control" required>
         <option value="" disabled>Select Type of Occupancy</option>
@@ -501,7 +500,7 @@ mysqli_close($conn);
     </select>
 </div>
  
-            <div class="form-group" style="width: 48%; display: inline-block;">
+            <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="fire_types">Cause of Fire:</label>
                 <select id="fire_types" name="fire_types" class="form-control" >
                     <option value="" disabled selected>Select Fire Cause</option>
@@ -512,6 +511,20 @@ mysqli_close($conn);
                         </option>
                     <?php } ?>
                 </select>
+            </div>
+            <hr class="section-separator full-bleed">
+<h4 style = "text-align: center;"> Injured/Casualties </h4>
+<hr class="section-separator full-bleed">
+<div class="form-group-container">
+<div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="victims">Civilians:</label>
+                <textarea id="victims" name="victims" rows="10" class="form-control"><?php echo htmlspecialchars($report['victims']); ?></textarea>
+            </div>
+
+            <div class="form-group" style="width: 45%; display: inline-block; margin-bottom: 20px;">
+                <label for="firefighters">Firefighters:</label>
+                <textarea id="victims" name="firefighters" rows="10" class="form-control"><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
+            </div>
             </div>
 </fieldset>
 <br>

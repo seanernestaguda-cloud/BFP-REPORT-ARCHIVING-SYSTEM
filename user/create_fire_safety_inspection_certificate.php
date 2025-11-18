@@ -183,7 +183,7 @@ textarea {
     border-bottom: 1px solid #444;
 }
 
-button[type = "submit"]{
+button[type = "submit"], button[type="button"].btn-primary {
     background-color: #003D73; /* BFP Blue */
     color: white;
     border: none;
@@ -360,6 +360,83 @@ input[type="file"] {
     background: #e3f2fd;
     border-color: #003D73;
 }
+.form-step { display: none; }
+.form-step:first-child { display: block; }
+/* Stepper styles (reuse from previous answer) */
+.stepper-container {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+}
+.circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #003D73;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 6px;
+    border: 2px solid #e0e0e0;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.label {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+}
+.line {
+    width: 60px;
+    height: 3px;
+    background: #e0e0e0;
+    margin: 0 4px;
+    border-radius: 2px;
+}
+.step.active .circle, .step.completed .circle {
+    background: #003D73;
+    color: #fff;
+    border: 2px solid #003D73;
+}
+.step.active .label, .step.completed .label {
+    color: #003D73;
+}
+.step.completed .circle {
+    background: #fff;
+    color: #003D73;
+    border: 2px solid #003D73;
+    position: relative;
+}
+.step.completed .circle::after {
+    content: '✔';
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #003D73;
+    font-size: 18px;
+}
+.step.completed .circle > * {
+    display: none;
+}
+.line.active {
+    background: #003D73;
+}
 </style>
 </head>
 
@@ -387,8 +464,8 @@ input[type="file"] {
                         <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                     </ul>
                 </li>
-<!--                 
-                <li class="archive-text"><span>Maintenance</span></li>
+                
+                <!-- <li class="archive-text"><span>Maintenance</span></li>
                 <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
@@ -426,9 +503,27 @@ input[type="file"] {
             <div class="alert alert-danger"><?php echo $error_message; ?></div>
         <?php } ?>
 
-
+<div class="stepper-container">
+    <div class="stepper">
+        <div class="step" id="stepper-1">
+            <div class="circle">1</div>
+            <div class="label">Fill up the form</div>
+        </div>
+        <div class="line"></div>
+        <div class="step" id="stepper-2">
+            <div class="circle">2</div>
+            <div class="label">Upload Documents</div>
+        </div>
+        <div class="line"></div>
+        <div class="step" id="stepper-3">
+            <div class="circle">3</div>
+            <div class="label">Confirm and Submit</div>
+        </div>
+    </div>
+</div>
 <form method="POST" action="create_fire_safety_inspection_certificate.php" enctype="multipart/form-data">
-   <fieldset>
+   <div class="form-step" id="step-1">
+    <fieldset>
     <legend> Inspection Details </legend>
 <div class="form-group-container">
       <div class="form-group" style="width: 48%; display: inline-block;">
@@ -450,9 +545,10 @@ input[type="file"] {
     <div class="form-group" style="width: 48%; display: inline-block;">
         <label for="contact_number">Contact Number:</label>
         <input type="number" id="contact_number" name="contact_number" class="form-control" placeholder="Contact Number" required>
-    </div><br>
-<h4> Establishment Details </h4>
-<br>
+        </div>
+        <hr class="section-separator full-bleed">
+<h4 style="text-align: center;"> Establishment Details </h4>
+<hr class="section-separator full-bleed">
       <div class="form-group" style="width: 48%; display: inline-block;">
         <label for="inspection_establishment">Establishment Name:</label>
         <input type="text" id="inspection_establishment" name="inspection_establishment" class="form-control" placeholder="Establishment" required>
@@ -505,10 +601,10 @@ input[type="file"] {
     <div class="form-group" style="width: 48%; display: inline-block;">
         <label for="building_construction">Building Construction:</label>
         <input type="text" id="building_construction" name="building_construction" class="form-control" placeholder="Building Construction" required>
-    </div><br>
-
-   <h4> Inspection Details </h4>
-   <br>
+    </div>
+ <hr class="section-separator full-bleed">
+   <h4 style="text-align: center;"> Inspection Details </h4>
+ <hr class="section-separator full-bleed">
 
         <div class="form-group-container">
     <div class="form-group" style="width: 48%; display: inline-block;">
@@ -550,68 +646,19 @@ input[type="file"] {
     </div>
     </div>
 </fieldset>
-<br>
-<fieldset>
-    <legend>Fire Safety Measures</legend>
-    <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
-        <thead>
-            <tr>
-                <th>Measure</th>
-                <th>Yes</th>
-                <th>No</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td style = "text-align: left;">Fire Alarms</td>
-                <td><input type="radio" id="fire_alarms_yes" name="fire_alarms" value="1"></td>
-                <td><input type="radio" id="fire_alarms_no" name="fire_alarms" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Fire Extinguishers</td>
-                <td><input type="radio" id="fire_extinguishers_yes" name="fire_extinguishers" value="1"></td>
-                <td><input type="radio" id="fire_extinguishers_no" name="fire_extinguishers" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Emergency Exits</td>
-                <td><input type="radio" id="emergency_exits_yes" name="emergency_exits" value="1"></td>
-                <td><input type="radio" id="emergency_exits_no" name="emergency_exits" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Sprinkler Systems</td>
-                <td><input type="radio" id="sprinkler_systems_yes" name="sprinkler_systems" value="1"></td>
-                <td><input type="radio" id="sprinkler_systems_no" name="sprinkler_systems" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Fire Drills</td>
-                <td><input type="radio" id="fire_drills_yes" name="fire_drills" value="1"></td>
-                <td><input type="radio" id="fire_drills_no" name="fire_drills" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Exit Signs</td>
-                <td><input type="radio" id="exit_signs_yes" name="exit_signs" value="1"></td>
-                <td><input type="radio" id="exit_signs_no" name="exit_signs" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Electrical Wiring (Safe)</td>
-                <td><input type="radio" id="electrical_wiring_yes" name="electrical_wiring" value="1"></td>
-                <td><input type="radio" id="electrical_wiring_no" name="electrical_wiring" value="0" ></td>
-            </tr>
-            <tr>
-                <td style = "text-align: left;">Emergency Evacuations</td>
-                <td><input type="radio" id="emergency_evacuations_yes" name="emergency_evacuations" value="1"></td>
-                <td><input type="radio" id="emergency_evacuations_no" name="emergency_evacuations" value="0" ></td>
-            </tr>
-        </tbody>
-    </table>
-</fieldset>
-<br>
+    <div class="form-actions">
+        <a href="fire_safety_inspection_certificate.php" class="btn btn-cancel">Cancel</a>
+        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
+    </div>
+</div>
 
-
-<fieldset>
+<!-- STEP 3: Required Attachments -->
+<div class="form-step" id="step-2" style="display:none;">
+    <fieldset>
     <legend>Required Attachments</legend>
     <div class="form-group" style="margin-bottom: 0;">
         <label>Required Attachments</label>
+         <hr class="section-separator full-bleed">
         <div class="tab-container">
             <button type="button" class="tab-btn" onclick="showTab('application_form')">Application Form (BFP)</button>
             <button type="button" class="tab-btn" onclick="showTab('proof_of_ownership')">Proof of Ownership</button>
@@ -761,9 +808,23 @@ input[type="file"] {
     </div>
 </fieldset>
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <a href="fire_safety_inspection_certificate.php" class="btn btn-cancel">Cancel</a>
+        <button type="button" class="btn btn-cancel" onclick="prevStep(1)">Previous</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next</button>
     </div>
+</div>
+
+<!-- STEP 4: Confirm and Submit -->
+<div class="form-step" id="step-3" style="display:none;">
+    <fieldset>
+        <legend>Confirm and Submit</legend>
+        <p style="text-align:center;">Please review all information before submitting your application.</p>
+        <!-- Optionally, show a summary of entered data here -->
+    </fieldset>
+    <div class="form-actions">
+        <button type="button" class="btn btn-cancel" onclick="prevStep(2)">Previous</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</div>
 </form>
 
 
@@ -779,6 +840,32 @@ input[type="file"] {
 
 <!-- Add this JS before </body> -->
 <script>
+    function updateStepper(step) {
+    for (let i = 1; i <= 3; i++) {
+        const stepElem = document.getElementById('stepper-' + i);
+        stepElem.classList.remove('active', 'completed');
+        if (i < step) stepElem.classList.add('completed');
+        else if (i === step) stepElem.classList.add('active');
+    }
+    // Update lines
+    document.querySelectorAll('.stepper .line').forEach((line, idx) => {
+        if (idx < step - 1) line.classList.add('active');
+        else line.classList.remove('active');
+    });
+}
+function nextStep(step) {
+    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+    updateStepper(step);
+}
+function prevStep(step) {
+    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
+    document.getElementById('step-' + step).style.display = 'block';
+    updateStepper(step);
+}
+document.addEventListener('DOMContentLoaded', function() {
+    updateStepper(1);
+});
 function showTab(type) {
     // Hide all tab contents
     document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
@@ -849,6 +936,7 @@ function previewReport(event, previewContainerId) {
 </html>
 <script src = "../js/archivescript.js"></script>
 <script>
+    
         let lineCount = 1;  // Keeps track of the current line number
 
         function addFirstNumber() {

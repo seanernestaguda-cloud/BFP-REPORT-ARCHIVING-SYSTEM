@@ -150,7 +150,15 @@ $conn->close();
         cursor: pointer;          /* Pointer cursor on hover */
         font-size: 14px;          /* Font size */
     }
-
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
@@ -209,7 +217,7 @@ $conn->close();
 
         <div class="card">
             <h3>Reports Per Barangay</h3>
-            <hr>
+            <hr class="section-separator full-bleed">
             <div class="charts-container">
                 <!-- Monthly Reports per Barangay -->
                 <canvas id="monthlyChart"></canvas>
@@ -218,10 +226,13 @@ $conn->close();
         </div>
 
         <div class="card">
+        <h3>Barangays</h3>
+            <hr class="section-separator full-bleed">
         <div class = "top-controls">
-        <button onclick="printTable()" class="create-new-button">Print Report</button>
+        <button onclick="printTable()" class="create-new-button"><i class="fa-solid fa-print"></i>Print Report</button>
         </div>
-            <h3>List of Barangays</h3>
+        <hr class="section-separator full-bleed">
+
             <div class="filter">
                 <label for="barangayFilter">Filter by Barangay:</label>
                 <select id="barangayFilter">

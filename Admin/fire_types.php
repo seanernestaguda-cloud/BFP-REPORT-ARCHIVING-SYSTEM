@@ -164,6 +164,16 @@ mysqli_close($conn);
             color: #888;
             pointer-events: none;
             }
+
+            .section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
         </style>
     </head>
     <body>
@@ -223,12 +233,15 @@ mysqli_close($conn);
     <div class="card">
 
             <section class="archive-section">
+        <h3>Causes of Fire Classifications</h3>
+        <p> List of Fire Causes </p>
+         <hr class="section-separator full-bleed">
             <div class="top-controls">
             <button onclick="openModal('addFireTypesModal')" class="create-new-button">
                 <i class="fa-solid fa-circle-plus"></i>Add New Fire Cause</button>
             </div>
-                <h3>Causes of Fire Classifications</h3>
-                <hr><br>
+             <hr class="section-separator full-bleed">
+
                 
 <div class="entries-right">
     <div class="search-input-container">

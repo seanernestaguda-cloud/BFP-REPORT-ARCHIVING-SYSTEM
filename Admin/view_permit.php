@@ -413,8 +413,7 @@ iframe{
     <div class = "title-part">
     <h2> Fire Safety Inspection <?php echo htmlspecialchars($row['id']); ?> </h2>
     </div>
-    <hr>
-<form method="POST" action="view_permit.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
+    <form method="POST" action="view_permit.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
     <h2><?php echo htmlspecialchars($row['permit_name']); ?></h2>
 <fieldset>
     <legend> Inspection Details </legend>
@@ -434,9 +433,10 @@ iframe{
           <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="contact_number">Contact Number:</label>
             <input type="text" id="contact_number" name="contact_number" class="form-control" value="<?php echo htmlspecialchars($row['contact_number']); ?>" required>
-        </div><br>
-        <h4> Establishment Details </h4>
-        <br>
+        </div>
+        <hr class="section-separator full-bleed">
+        <h4 style="text-align:center;"> Establishment Details </h4>
+        <hr class="section-separator full-bleed">
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="inspection_establishment">Establishment Name:</label>
             <input type="text" id="inspection_establishment" name="inspection_establishment" class="form-control" value="<?php echo htmlspecialchars($row['inspection_establishment']); ?>" required>
@@ -497,9 +497,9 @@ iframe{
             <label for="building_construction">Building Construction:</label>
             <input type="text" id="building_construction" name="building_construction" class="form-control" value="<?php echo htmlspecialchars($row['building_construction']); ?>" required>
         </div>
-
-        <h4> Inspection Details </h4>
-
+<hr class="section-separator full-bleed">
+        <h4 style = "text-align: center;"> Inspection Details </h4>
+<hr class="section-separator full-bleed">
              <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="inspection_date">Date of Inspection:</label>
             <input type="date" id="inspection_date" name="inspection_date" class="form-control" value="<?php echo htmlspecialchars($row['inspection_date']); ?>" required>
@@ -522,7 +522,7 @@ iframe{
     </div>
 </fieldset>
 <br>
-    <fieldset>
+    <!-- <fieldset>
         <legend> Fire Safety Measures </legend>
         <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
             <thead>
@@ -556,7 +556,7 @@ iframe{
                 <?php } ?>
             </tbody>
         </table>
-    </fieldset>
+    </fieldset> -->
 
   
 <br>

@@ -116,7 +116,7 @@ $conn->close();
         }
         .top-controls {
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-start;
             margin-bottom: 10px;
         }
         .create-new-button {
@@ -148,6 +148,16 @@ $conn->close();
                 font-size: 12pt;
             }
         }
+
+        .section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
@@ -197,17 +207,19 @@ $conn->close();
             </header>
             <div class="card">
                 <h3>Monthly Fire Incident Report</h3>
-                <hr>
-                <br>
+<hr class="section-separator full-bleed">
                 <div class="charts-container">
                     <canvas id="monthlyChart"></canvas>
                 </div>
             </div>
             <div class="card">
-                   <div class="top-controls">
-                    <button onclick="printTable()" class="create-new-button">Print Report</button>
+                <h3>Monthly Incident Reports</h3>
+                <p> List of Incidents per Month </p>
+                <hr class="section-separator full-bleed">
+                <div class="top-controls">
+                    <button onclick="printTable()" class="create-new-button"><i class="fa-solid fa-print"></i>Print Report</button>
                 </div>
-                <h3>Incidents per Month</h3>
+                <hr class="section-separator full-bleed">
                 <table class="archive-table">
                     <thead>
                         <tr>

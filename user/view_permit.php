@@ -522,7 +522,7 @@ iframe{
     </div>
 </fieldset>
 <br>
-    <fieldset>
+    <!-- <fieldset>
         <legend> Fire Safety Measures </legend>
         <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
             <thead>
@@ -556,7 +556,7 @@ iframe{
                 <?php } ?>
             </tbody>
         </table>
-    </fieldset>
+    </fieldset> -->
 
   
 <br>

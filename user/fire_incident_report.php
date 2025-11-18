@@ -449,6 +449,16 @@ mysqli_close($conn);
     color: #fff;
     border-color: #003D73;
 }
+
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
         </style>
     </head>
     <body>
@@ -503,12 +513,14 @@ mysqli_close($conn);
     <div class="card">
 
             <section class="archive-section">
+            <h3>Fire Incident Reports</h3>
+            <p> List of Fire Incident Reports</p>
+                 <hr class="section-separator full-bleed">
             <div class="top-controls">
             <button onclick="window.location.href='create_fire_incident_report.php'" class="create-new-button">
                 <i class="fa-solid fa-circle-plus"></i>Create New</button>
         </div>
-                <h3>List of Fire Incidents</h3>
-                <hr>
+     <hr class="section-separator full-bleed">
 
     <div class="entries-search">
     <div class="entries-left">

@@ -274,7 +274,7 @@ box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15); /* Subtle hover effect for depth *
 .top-controls {
 
 display: flex;
-justify-content: flex-end; /* Aligns items to the right */
+justify-content: flex-start; /* Aligns items to the right */
 align-items: center; /* Center vertically */
 margin-bottom: 10px; /* Space below */
 }
@@ -368,7 +368,15 @@ border-bottom:1px solid #444;
             color: #888;
             pointer-events: none;
             }
-
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
 </style>
     </head>
     <body>
@@ -428,12 +436,13 @@ border-bottom:1px solid #444;
     <div class="card">
 
             <section class="archive-section">
+            <h3>Departments</h3>
+            <p> List of Departments </p>
+            <hr class="section-separator full-bleed">
             <div class="top-controls">
             <button onclick="openModal('addDepartmentModal')" class="create-new-button"><i class="fa-solid fa-circle-plus"></i>Add New Department</button>
             </div>
-                <h3> Department Lists </h3>
-                <hr>
-                            <br>
+           <hr class="section-separator full-bleed">
         <table class = "archive-table">
       <div class="entries-right">
   <div class="search-input-container">

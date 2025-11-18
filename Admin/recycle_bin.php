@@ -328,7 +328,8 @@ $stmt_fetch->close();
 </header>
 
  <div class="card">
-    <h2>Recycle Bin</h2>
+    <h3>Recycle Bin</h3>
+    <hr>
     <div class="entries-search">
     <div class="entries-left">
         <button type="button" id="toggleSelectBtn" class="select-multi-btn" style="margin-right:10px;">

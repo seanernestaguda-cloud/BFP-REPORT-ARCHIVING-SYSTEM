@@ -188,6 +188,16 @@ mysqli_close($conn);
             color: #888;
             pointer-events: none;
             }
+
+    .section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
         </style>
     </head>
     <body>
@@ -246,12 +256,15 @@ mysqli_close($conn);
     <!-- Card for the Archive Section -->
     <div class="card">
             <section class="archive-section">
+            <h3>Barangays</h3>
+            <p> List of Barangays </p>
+            <hr class="section-separator full-bleed">
             <div class="top-controls">
             <button onclick="openModal('addBarangayModal')" class="create-new-button">
                 <i class="fa-solid fa-circle-plus"></i>Add New Barangay</button>
             </div>
-                <h3>List of Barangays</h3>
-                <hr><br>
+            <hr class="section-separator full-bleed">
+ 
 
                            
     <div class="entries-right">

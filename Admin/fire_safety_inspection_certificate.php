@@ -230,6 +230,17 @@ if ($where_clauses) {
     color: #fff;
     border-color: #003D73;
 }
+
+.section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
+     
         </style>
     </head>
     <body>
@@ -290,11 +301,15 @@ if ($where_clauses) {
     <div class="card">
 
             <section class="archive-section">
-            <div class="top-controls">
+          
+                <h3>Fire Safety Inspection</h3>
+                <p> List of Fire Safety Inspection Reports </p>
+                <hr class="section-separator full-bleed">
+                  <div class="top-controls">
             <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i> Create New</button>
             </div>
-                <h3>Fire Safety Inspection</h3>
-                <hr>
+                <hr class="section-separator full-bleed">
+                
 <div class="entries-search">
     <!-- entries-left controls -->
     <div class="entries-left">

@@ -119,6 +119,15 @@ $conn->close();
     border: 1px hidden;
     color: white;
 }
+   .section-separator.full-bleed {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
+    border: none;
+    margin: 12px 0 20px;
+    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
+    margin-left: -20px;        /* shift left by container padding */
+    box-sizing: border-box;
+}
     </style>
 </head>
 <body>
@@ -176,11 +185,12 @@ $conn->close();
 </header>
 
     <div class="card">
-    <div class = "top-controls">
-        <button onclick="printTable()" class="create-new-button">Print Reports</button>
-    </div>
     <h3>Year-to-Year Comparison Table</h3>
-    <hr>
+     <hr class="section-separator full-bleed">
+     <div class = "top-controls">
+        <button onclick="printTable()" class="create-new-button"><i class="fa-solid fa-print"></i>Print Reports</button>
+    </div>
+     <hr class="section-separator full-bleed">
     <form method="GET" id="yearFilterForm">
 
     <div class = "date">

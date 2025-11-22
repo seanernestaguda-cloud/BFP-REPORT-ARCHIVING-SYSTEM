@@ -90,18 +90,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     (permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
     fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
     contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
-    application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 36 placeholders
+    application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 36 placeholders
 
     $stmt->bind_param(
-        "sssssssssssssssssssssssssssssssssss", // 36 "s"
+        "sssssssssssssssssssssssssssssssssssss", // 36 "s"
         $permit_name, $inspection_establishment, $owner, $inspection_address, $inspection_date,
         $establishment_type, $inspection_purpose, $fire_alarms, $fire_extinguishers, $emergency_exits,
         $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
         $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
         $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['building_plans'], $file_paths['fire_safety_equipment'],
         $file_paths['evacuation_plan'], $file_paths['fire_safety_personnel'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
-        $file_paths['business_permit']
+        $file_paths['business_permit'], $username, $_SESSION['department']
     );
 
     // Execute the statement

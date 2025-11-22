@@ -54,6 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $property_damage = $_POST['property_damage'];
     $fire_types = $_POST['fire_types'];
     $uploader = $_SESSION['username'];  // Assuming the uploader is the logged-in user
+    $department = null;
+    $dept_stmt = $conn->prepare("SELECT department FROM users WHERE username = ? LIMIT 1");
+    $dept_stmt->bind_param('s', $uploader);
+    $dept_stmt->execute();
+    $dept_result = $dept_stmt->get_result();
+    if ($dept_result && $dept_row = $dept_result->fetch_assoc()) {
+        $department = $dept_row['department'];
+    }
+    $dept_stmt->close();
 
     // Handling file uploads
     $documentation_photos = [];
@@ -120,13 +129,13 @@ if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation
 }
 
 
-    // Save report and uploaded files to the database
-    $query = "INSERT INTO fire_incident_reports (report_title, caller_name, responding_team, fire_location, street, purok, municipality, incident_date, arrival_time, fireout_time, establishment, victims, firefighters, property_damage, fire_types, alarm_status, occupancy_type, uploader, documentation_photos, narrative_report, progress_report, final_investigation_report)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-$stmt = mysqli_prepare($conn, $query);
+    // Save report and uploaded files to the database, now including department
+    $query = "INSERT INTO fire_incident_reports (report_title, caller_name, responding_team, fire_location, street, purok, municipality, incident_date, arrival_time, fireout_time, establishment, victims, firefighters, property_damage, fire_types, alarm_status, occupancy_type, uploader, department, documentation_photos, narrative_report, progress_report, final_investigation_report)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
     $documentation_photos = implode(',', $documentation_photos);  // Store multiple photo paths as a comma-separated string
-mysqli_stmt_bind_param($stmt, "ssssssssssssssssssssss", $report_title, $caller_name, $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $victims, $firefighters, $property_damage, $fire_types, $alarm_status, $occupancy_type, $uploader, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report);    
-if (mysqli_stmt_execute($stmt)) {
+    mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssss", $report_title, $caller_name, $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $victims, $firefighters, $property_damage, $fire_types, $alarm_status, $occupancy_type, $uploader, $department, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report);
+    if (mysqli_stmt_execute($stmt)) {
     $_SESSION['success_message'] = "Report created successfully!";
     // Log activity
     $new_report_id = mysqli_insert_id($conn);

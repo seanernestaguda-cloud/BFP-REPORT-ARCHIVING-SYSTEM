@@ -18,24 +18,28 @@ $allowed_sort = [
 ];
 $sort_by = isset($_GET['sort_by']) && isset($allowed_sort[$_GET['sort_by']]) ? $allowed_sort[$_GET['sort_by']] : 'id';
 
-$where = [];
+$where_clauses[] = "deleted_at IS NULL";
 $params = [];
 $param_types = '';
 
+$where_clauses[] = "uploader = ?";
+$params[] = $_SESSION['username'];
+$param_types .= 's';
+
 if (!empty($_GET['start_month'])) {
     $start = $_GET['start_month'] . '-01';
-    $where[] = "inspection_date >= ?";
+    $where_clauses[] = "inspection_date >= ?";
     $params[] = $start;
     $param_types .= 's';
 }
 if (!empty($_GET['end_month'])) {
     $end = date('Y-m-t', strtotime($_GET['end_month'] . '-01'));
-    $where[] = "inspection_date <= ?";
+    $where_clauses[] = "inspection_date <= ?";
     $params[] = $end;
     $param_types .= 's';
 }
 
-$where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+$where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
 
 // --- Avatar query (safe) ---
 $username = $_SESSION['username'];
@@ -60,7 +64,7 @@ $offset = ($page - 1) * $per_page;
 
 // --- Count total records (safe) ---
 $count_query = "SELECT COUNT(*) FROM fire_safety_inspection_certificate $where_sql";
-if ($where) {
+if ($where_clauses) {
     $stmt_count = $conn->prepare($count_query);
     if ($param_types) {
         $stmt_count->bind_param($param_types, ...$params);
@@ -76,7 +80,7 @@ if ($where) {
 
 // --- Main query (safe) ---
 $query = "SELECT * FROM fire_safety_inspection_certificate $where_sql ORDER BY $sort_by ASC LIMIT ? OFFSET ?";
-if ($where) {
+if ($where_clauses) {
     $stmt = $conn->prepare($query);
     $full_param_types = $param_types . 'ii';
     $params_with_limit = array_merge($params, [$per_page, $offset]);
@@ -94,7 +98,6 @@ if ($where) {
     $stmt->close();
 }
 ?>
-
 
     <!DOCTYPE html>
     <html lang="en">
@@ -241,6 +244,7 @@ if ($where) {
     margin-left: -20px;        /* shift left by container padding */
     box-sizing: border-box;
 }
+     
         </style>
     </head>
     <body>
@@ -268,6 +272,12 @@ if ($where) {
                         <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                     </ul>
                 </li>
+<!--                 
+                <li class="archive-text"><span>Maintenance</span></li>
+                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
+                <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
+                <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li> -->
             </ul>
         </nav>
     </aside>
@@ -295,14 +305,15 @@ if ($where) {
     <div class="card">
 
             <section class="archive-section">
-            <h3>Fire Safety Inspection</h3>
-            <p> List of Fire Safety Inspection Reports </p>
-            <hr class="section-separator full-bleed">
-            <div class="top-controls">
-            <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'" class="create-new-button"> 
-                <i class="fa-solid fa-circle-plus"></i>Create New</button>
+          
+                <h3>Fire Safety Inspection</h3>
+                <p> List of Fire Safety Inspection Reports </p>
+                <hr class="section-separator full-bleed">
+                  <div class="top-controls">
+            <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i> Create New</button>
             </div>
-            <hr class="section-separator full-bleed">
+                <hr class="section-separator full-bleed">
+                
 <div class="entries-search">
     <!-- entries-left controls -->
     <div class="entries-left">
@@ -311,7 +322,7 @@ if ($where) {
         </button>
         <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedPermits()">
             <i class="fa-solid fa-trash"></i>
-            <label for=""> Delete Selected </label>
+            <label for="">Delete Selected</label>
         </button>
         <button id="downloadSelectedBtn" class="select-multi-btn" style="display:none;" onclick="downloadSelectedPermits()">
             <i class="fa-solid fa-download"></i>
@@ -364,7 +375,7 @@ if ($where) {
   </div>
 </div>
                 <table class="archive-table">
-       <tr>
+            <tr>
                 <th class="select-checkbox-header" style="display:none;">
                     <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
                 </th>
@@ -380,7 +391,7 @@ if ($where) {
                 <th> Action </th>
             </tr>
         </thead>
-       <tbody id="permitsTableBody">
+  <tbody id="permitsTableBody">
     <?php if (count($permits) === 0): ?>
         <tr>
             <td colspan="12" style="text-align:center;">No reports found.</td>
@@ -469,8 +480,8 @@ echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style=
 </tbody>
 
 
-
     </table>
+
 <?php
 $total_pages = ceil($total_permits / $per_page);
 if ($total_pages > 1): ?>
@@ -515,7 +526,7 @@ if ($total_pages > 1): ?>
 <div id="successModal" class="success-modal">
     <div class="success-modal-content">
         <i class="fa-regular fa-circle-check"></i> <h2>Success!</h2>
-        <p id="successMessage"></p>
+        <p id="successMessage"> Report deleted successfully!</p>
     </div>
 </div>
 

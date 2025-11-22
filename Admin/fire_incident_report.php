@@ -610,6 +610,8 @@ mysqli_close($conn);
                 <th>Damage to Property</th>
                 <th>Cause of Fire</th>
                 <th>Status</th>
+                <th>Uploader</th>
+                <th>Department</th>
                 <th>Action</th>
      
             </tr>
@@ -671,6 +673,8 @@ foreach ($required_fields as $field) {
 }
 echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>';
 ?>
+<td><?php echo htmlspecialchars($row['uploader']); ?></td>
+<td><?php echo htmlspecialchars($row['department']); ?></td>
     </td>
             <td class="action-button-container">
             <button class="view-btn" onclick="window.location.href='view_report.php?report_id=<?php echo $row['report_id']; ?>'">

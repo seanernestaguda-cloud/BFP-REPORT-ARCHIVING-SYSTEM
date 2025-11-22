@@ -85,25 +85,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Prepare an SQL statement to insert the data
-    $stmt = $conn->prepare("INSERT INTO fire_safety_inspection_certificate 
-    (permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
-    fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
-    contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
-    application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 36 placeholders
+$uploader = $_SESSION['username'];
+  // Fetch department for the uploader
+    $department = null;
+    $dept_stmt = $conn->prepare("SELECT department FROM users WHERE username = ? LIMIT 1");
+    $dept_stmt->bind_param('s', $uploader);
+    $dept_stmt->execute();
+    $dept_result = $dept_stmt->get_result();
+    if ($dept_result && $dept_row = $dept_result->fetch_assoc()) {
+        $department = $dept_row['department'];
+    }
+    $dept_stmt->close();
 
-    $stmt->bind_param(
-        "sssssssssssssssssssssssssssssssssss", // 36 "s"
-        $permit_name, $inspection_establishment, $owner, $inspection_address, $inspection_date,
-        $establishment_type, $inspection_purpose, $fire_alarms, $fire_extinguishers, $emergency_exits,
-        $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
-        $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
-        $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['building_plans'], $file_paths['fire_safety_equipment'],
-        $file_paths['evacuation_plan'], $file_paths['fire_safety_personnel'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
-        $file_paths['business_permit']
-    );
+        // Prevent null department (set to empty string if not found)
+        if ($department === null) {
+            $department = '';
+        }
 
+// Add uploader to the columns and values
+$stmt = $conn->prepare("INSERT INTO fire_safety_inspection_certificate 
+(permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
+fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
+contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
+application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 37 placeholders
+
+$stmt->bind_param(
+    "sssssssssssssssssssssssssssssssssssss", // 37 "s"
+    $permit_name, $inspection_establishment, $owner, $inspection_address, $inspection_date,
+    $establishment_type, $inspection_purpose, $fire_alarms, $fire_extinguishers, $emergency_exits,
+    $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
+    $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
+    $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['building_plans'], $file_paths['fire_safety_equipment'],
+    $file_paths['evacuation_plan'], $file_paths['fire_safety_personnel'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
+    $file_paths['business_permit'], $uploader, $department // Add this at the end
+);
     // Execute the statement
     if (mysqli_stmt_execute($stmt)) {
         // Log activity
@@ -446,7 +462,7 @@ input[type="file"] {
         <nav>
             <ul>
                 <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
-                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li><a href="adminlogin.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>

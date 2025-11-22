@@ -24,6 +24,7 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
 $stmt_user->close();
 
 
+
 $report_id = isset($_GET['report_id']) ? intval($_GET['report_id']) : 0;
 if ($report_id <= 0) {
     die("Invalid report ID.");
@@ -39,6 +40,11 @@ $report = mysqli_fetch_assoc($result);
 
 if (!$report) {
     die("Report not found.");
+}
+
+// Restrict access: only uploader can view
+if (!isset($report['uploader']) || $report['uploader'] !== $_SESSION['username']) {
+    die("Access denied. You are not allowed to view this report.");
 }
 
 

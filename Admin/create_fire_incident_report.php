@@ -55,6 +55,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $fire_types = $_POST['fire_types'];
     $uploader = $_SESSION['username'];  // Assuming the uploader is the logged-in user
 
+    // Fetch department for the uploader
+    $department = null;
+    $dept_stmt = $conn->prepare("SELECT department FROM users WHERE username = ? LIMIT 1");
+    $dept_stmt->bind_param('s', $uploader);
+    $dept_stmt->execute();
+    $dept_result = $dept_stmt->get_result();
+    if ($dept_result && $dept_row = $dept_result->fetch_assoc()) {
+        $department = $dept_row['department'];
+    }
+    $dept_stmt->close();
+
     // Handling file uploads
     $documentation_photos = [];
     if (isset($_FILES['documentation_photos']) && !empty($_FILES['documentation_photos']['name'][0])) {
@@ -64,7 +75,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $file_tmp = $_FILES['documentation_photos']['tmp_name'][$index];
             $file_error = $_FILES['documentation_photos']['error'][$index];
             $file_size = $_FILES['documentation_photos']['size'][$index];
-            
             // Check for file errors
             if ($file_error === 0) {
                 // Define the upload directory
@@ -72,11 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0777, true);  // Create the directory if it doesn't exist
                 }
-                
                 // Generate a unique file name to prevent overwriting
                 $unique_file_name = time() . "_" . basename($file_name);
                 $upload_path = $upload_dir . $unique_file_name;
-
                 if (move_uploaded_file($file_tmp, $upload_path)) {
                     $documentation_photos[] = $upload_path;  // Store the file path
                 }
@@ -90,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $narrative_report_name = $_FILES['narrative_report']['name'];
         $narrative_report_tmp = $_FILES['narrative_report']['tmp_name'];
         $narrative_report_error = $_FILES['narrative_report']['error'];
-
         if ($narrative_report_error === 0) {
             $narrative_report_path = '../uploads/' . time() . "_" . basename($narrative_report_name);
             if (move_uploaded_file($narrative_report_tmp, $narrative_report_path)) {
@@ -100,47 +107,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     $progress_report = '';
-if (isset($_FILES['progress_report']) && $_FILES['progress_report']['error'] === 0) {
-    $progress_report_name = $_FILES['progress_report']['name'];
-    $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
-    $progress_report_path = '../uploads/' . time() . "_progress_" . basename($progress_report_name);
-    if (move_uploaded_file($progress_report_tmp, $progress_report_path)) {
-        $progress_report = $progress_report_path;
+    if (isset($_FILES['progress_report']) && $_FILES['progress_report']['error'] === 0) {
+        $progress_report_name = $_FILES['progress_report']['name'];
+        $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
+        $progress_report_path = '../uploads/' . time() . "_progress_" . basename($progress_report_name);
+        if (move_uploaded_file($progress_report_tmp, $progress_report_path)) {
+            $progress_report = $progress_report_path;
+        }
     }
-}
 
-$final_investigation_report = '';
-if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation_report']['error'] === 0) {
-    $final_investigation_report_name = $_FILES['final_investigation_report']['name'];
-    $final_investigation_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
-    $final_investigation_report_path = '../uploads/' . time() . "_final_" . basename($final_investigation_report_name);
-    if (move_uploaded_file($final_investigation_report_tmp, $final_investigation_report_path)) {
-        $final_investigation_report = $final_investigation_report_path;
+    $final_investigation_report = '';
+    if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation_report']['error'] === 0) {
+        $final_investigation_report_name = $_FILES['final_investigation_report']['name'];
+        $final_investigation_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
+        $final_investigation_report_path = '../uploads/' . time() . "_final_" . basename($final_investigation_report_name);
+        if (move_uploaded_file($final_investigation_report_tmp, $final_investigation_report_path)) {
+            $final_investigation_report = $final_investigation_report_path;
+        }
     }
-}
 
-
-    // Save report and uploaded files to the database
-    $query = "INSERT INTO fire_incident_reports (report_title, caller_name, responding_team, fire_location, street, purok, municipality, incident_date, arrival_time, fireout_time, establishment, victims, firefighters, property_damage, fire_types, alarm_status, occupancy_type, uploader, documentation_photos, narrative_report, progress_report, final_investigation_report)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-$stmt = mysqli_prepare($conn, $query);
+    // Save report and uploaded files to the database (now including department)
+    $query = "INSERT INTO fire_incident_reports (report_title, caller_name, responding_team, fire_location, street, purok, municipality, incident_date, arrival_time, fireout_time, establishment, victims, firefighters, property_damage, fire_types, alarm_status, occupancy_type, uploader, department, documentation_photos, narrative_report, progress_report, final_investigation_report)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $query);
     $documentation_photos = implode(',', $documentation_photos);  // Store multiple photo paths as a comma-separated string
-mysqli_stmt_bind_param($stmt, "ssssssssssssssssssssss", $report_title, $caller_name, $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $victims, $firefighters, $property_damage, $fire_types, $alarm_status, $occupancy_type, $uploader, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report);    
-if (mysqli_stmt_execute($stmt)) {
-    $_SESSION['success_message'] = "Report created successfully!";
-    // Log activity
-    $new_report_id = mysqli_insert_id($conn);
-    $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'create', ?, ?)";
-    $log_stmt = $conn->prepare($log_query);
-    $log_details = "Created report: " . $report_title;
-    $log_stmt->bind_param('sis', $uploader, $new_report_id, $log_details);
-    $log_stmt->execute();
-    $log_stmt->close();
-    // No immediate redirection
-} else {
-    $_SESSION['error_message'] = "There was an error creating the report. Please try again.";
-}
-    
+    mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssss", $report_title, $caller_name, $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $victims, $firefighters, $property_damage, $fire_types, $alarm_status, $occupancy_type, $uploader, $department, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report);
+    if (mysqli_stmt_execute($stmt)) {
+        $_SESSION['success_message'] = "Report created successfully!";
+        // Log activity
+        $new_report_id = mysqli_insert_id($conn);
+        $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'create', ?, ?)";
+        $log_stmt = $conn->prepare($log_query);
+        $log_details = "Created report: " . $report_title;
+        $log_stmt->bind_param('sis', $uploader, $new_report_id, $log_details);
+        $log_stmt->execute();
+        $log_stmt->close();
+        // No immediate redirection
+    } else {
+        $_SESSION['error_message'] = "There was an error creating the report. Please try again.";
+    }
 }
 
 

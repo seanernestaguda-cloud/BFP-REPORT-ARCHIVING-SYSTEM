@@ -383,6 +383,8 @@ if ($where_clauses) {
                 <th>Purpose</th>
                 <th>Address</th>
                 <th>Date of Inspection</th>
+                <th>Uploader</th>
+                <th>Department</th>
                 <th>Status</th>
                 <th> Action </th>
             </tr>
@@ -406,6 +408,8 @@ if ($where_clauses) {
             <td><?php echo htmlspecialchars($row['inspection_purpose']); ?></td>
             <td><?php echo htmlspecialchars($row['inspection_address']); ?></td>
             <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($row['inspection_date']))) ?></td>
+            <td><?php echo htmlspecialchars($row['uploader']); ?></td>
+            <td><?php echo htmlspecialchars($row['department']); ?></td>
             <td>
             <?php
      // List all required fields from your create form

@@ -136,14 +136,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['
     exit;
 }
 
+
 $allowed_sort_columns = ['report_id', 'report_title', 'incident_date', 'fire_location'];
 $sort_by = isset($_GET['sort_by']) && in_array($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'report_id';
 $order_by = 'ASC';
 
 // --- Add filtering by month ---
-$where_clauses[] = "deleted_at IS NULL";
+$where_clauses = [];
 $params = [];
 $param_types = '';
+
+$where_clauses[] = "deleted_at IS NULL";
+$where_clauses[] = "uploader = ?";
+$params[] = $_SESSION['username'];
+$param_types .= 's';
 
 if (!empty($_GET['start_month'])) {
     $start = $_GET['start_month'] . '-01 00:00:00';
@@ -201,19 +207,14 @@ $offset = ($page - 1) * $per_page;
 
 // Count total records for pagination
 $count_query = "SELECT COUNT(*) FROM fire_incident_reports $where_sql";
-if ($where_clauses) {
-    $stmt_count = $conn->prepare($count_query);
-    if ($param_types) {
-        $stmt_count->bind_param($param_types, ...$params);
-    }
-    $stmt_count->execute();
-    $stmt_count->bind_result($total_reports);
-    $stmt_count->fetch();
-    $stmt_count->close();
-} else {
-    $result_count = mysqli_query($conn, $count_query);
-    $total_reports = mysqli_fetch_row($result_count)[0];
+$stmt_count = $conn->prepare($count_query);
+if ($param_types) {
+    $stmt_count->bind_param($param_types, ...$params);
 }
+$stmt_count->execute();
+$stmt_count->bind_result($total_reports);
+$stmt_count->fetch();
+$stmt_count->close();
 
 // --- Modify main query to add LIMIT and OFFSET ---
 $query = "SELECT 
@@ -239,24 +240,15 @@ $where_sql
 ORDER BY $sort_by $order_by
 LIMIT ? OFFSET ?";
 
-// Use prepared statement if filtering
-if ($where_clauses) {
-    $stmt = $conn->prepare($query);
-    $full_param_types = $param_types . 'ii';
-    $params_with_limit = array_merge($params, [$per_page, $offset]);
-    $stmt->bind_param($full_param_types, ...$params_with_limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $reports = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-} else {
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('ii', $per_page, $offset);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $reports = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-}
+// Always use prepared statement (uploader restriction always applies)
+$stmt = $conn->prepare($query);
+$full_param_types = $param_types . 'ii';
+$params_with_limit = array_merge($params, [$per_page, $offset]);
+$stmt->bind_param($full_param_types, ...$params_with_limit);
+$stmt->execute();
+$result = $stmt->get_result();
+$reports = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 mysqli_close($conn);
 ?>
 <!DOCTYPE html>

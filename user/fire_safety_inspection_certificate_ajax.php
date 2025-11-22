@@ -1,10 +1,13 @@
 <?php
-session_start();
+// session_start();
 include('connection.php');
 include('auth_check.php');
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
 $where = [];
+$where[] = "deleted_at IS NULL";
+// Only show reports uploaded by the current user
+$where[] = "uploader = '" . mysqli_real_escape_string($conn, $_SESSION['username']) . "'";
 if ($search !== '') {
     $like = "'%$search%'";
     $where[] = "(permit_name LIKE $like OR inspection_establishment LIKE $like OR owner LIKE $like OR inspection_address LIKE $like)";

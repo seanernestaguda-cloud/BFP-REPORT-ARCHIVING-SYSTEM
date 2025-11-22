@@ -34,6 +34,11 @@ if (isset($_GET['id'])) {
     // If the record exists, fetch the data
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        // Restrict access: only uploader can view
+        if (!isset($row['uploader']) || $row['uploader'] !== $_SESSION['username']) {
+            echo "Access denied. You are not allowed to view this permit.";
+            exit();
+        }
     } else {
         echo "Record not found!";
         exit();

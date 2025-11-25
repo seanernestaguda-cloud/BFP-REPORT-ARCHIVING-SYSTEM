@@ -3,23 +3,26 @@
 
 // // Check if the user is logged in
 // if (!isset($_SESSION['username'])) {
-//     header("Location: userlogin.php");
+//     header("Location: adminlogin.php");
 // }
 
 include('connection.php');
 include('auth_check.php');
 
+// Get user info and role
 $username = $_SESSION['username'];
-$sql_user = "SELECT avatar FROM users WHERE username = ? LIMIT 1";
+$sql_user = "SELECT avatar, user_type FROM users WHERE username = ? LIMIT 1";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("s", $username);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $avatar = '../avatars/default_avatar.png';
+$user_type = '';
 if ($result_user && $row_user = $result_user->fetch_assoc()) {
     if (!empty($row_user['avatar']) && file_exists('../avatars/' . $row_user['avatar'])) {
         $avatar = '../avatars/' . $row_user['avatar'];
     }
+    $user_type = isset($row_user['user_type']) ? $row_user['user_type'] : '';
 }
 // Fetch the record to be edited based on ID from URL
 if (isset($_GET['id'])) {
@@ -34,11 +37,6 @@ if (isset($_GET['id'])) {
     // If the record exists, fetch the data
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        // Restrict access: only uploader can view
-        if (!isset($row['uploader']) || $row['uploader'] !== $_SESSION['username']) {
-            echo "Access denied. You are not allowed to view this permit.";
-            exit();
-        }
     } else {
         echo "Record not found!";
         exit();
@@ -359,19 +357,20 @@ iframe{
 <body>
 
 <div class="dashboard">
-<aside class="sidebar">
+    <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
-                <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li> -->
-                <!-- <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
+                <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                        <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -418,43 +417,46 @@ iframe{
     <div class = "title-part">
     <h2> Fire Safety Inspection <?php echo htmlspecialchars($row['id']); ?> </h2>
     </div>
-    <hr>
-<form method="POST" action="view_permit.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
+    <?php
+    $can_edit = ($row['uploader'] === $username) || ($user_type === 'admin');
+    ?>
+    <form method="POST" action="view_permit.php?id=<?php echo $id; ?>" enctype="multipart/form-data">
     <h2><?php echo htmlspecialchars($row['permit_name']); ?></h2>
 <fieldset>
     <legend> Inspection Details </legend>
     <div class="form-group-container">
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="permit_name">Title:</label>
-            <input type="text" id="permit_name" name="permit_name" class="form-control" value="<?php echo htmlspecialchars($row['permit_name']); ?>" required>
+            <input type="text" id="permit_name" name="permit_name" class="form-control" value="<?php echo htmlspecialchars($row['permit_name']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
           <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="owner">Owner:</label>
-            <input type="text" id="owner" name="owner" class="form-control" value="<?php echo htmlspecialchars($row['owner']); ?>" required>
+            <input type="text" id="owner" name="owner" class="form-control" value="<?php echo htmlspecialchars($row['owner']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
           <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="contact_person">Contact Person:</label>
-            <input type="text" id="contact_person" name="contact_person" class="form-control" value="<?php echo htmlspecialchars($row['contact_person']); ?>" required>
+            <input type="text" id="contact_person" name="contact_person" class="form-control" value="<?php echo htmlspecialchars($row['contact_person']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
           <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="contact_number">Contact Number:</label>
-            <input type="text" id="contact_number" name="contact_number" class="form-control" value="<?php echo htmlspecialchars($row['contact_number']); ?>" required>
-        </div><br>
-        <h4> Establishment Details </h4>
-        <br>
+            <input type="text" id="contact_number" name="contact_number" class="form-control" value="<?php echo htmlspecialchars($row['contact_number']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
+        </div>
+        <hr class="section-separator full-bleed">
+        <h4 style="text-align:center;"> Establishment Details </h4>
+        <hr class="section-separator full-bleed">
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="inspection_establishment">Establishment Name:</label>
-            <input type="text" id="inspection_establishment" name="inspection_establishment" class="form-control" value="<?php echo htmlspecialchars($row['inspection_establishment']); ?>" required>
+            <input type="text" id="inspection_establishment" name="inspection_establishment" class="form-control" value="<?php echo htmlspecialchars($row['inspection_establishment']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
       
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="inspection_address">Address:</label>
-            <input type="text" id="inspection_address" name="inspection_address" class="form-control" value="<?php echo htmlspecialchars($row['inspection_address']); ?>" required>
+            <input type="text" id="inspection_address" name="inspection_address" class="form-control" value="<?php echo htmlspecialchars($row['inspection_address']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
    
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="establishment_type">Establishment Type:</label>
-            <select id="establishment_type" name="establishment_type" class="form-control" required>
+            <select id="establishment_type" name="establishment_type" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
                 <option value="" disabled>Select Establishment Type</option>
                 <option value="residential" <?php echo $row['establishment_type'] == 'residential' ? 'selected' : ''; ?>>Residential</option>
                 <option value="commercial" <?php echo $row['establishment_type'] == 'commercial' ? 'selected' : ''; ?>>Commercial</option>
@@ -463,7 +465,7 @@ iframe{
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="inspection_purpose">Purpose of Inspection:</label>
-            <select id="inspection_purpose" name="inspection_purpose" class="form-control" required>
+            <select id="inspection_purpose" name="inspection_purpose" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
                 <option value="" disabled>Select Purpose</option>
                 <option value="routine" <?php echo $row['inspection_purpose'] == 'routine' ? 'selected' : ''; ?>>Routine</option>
                 <option value="compliance" <?php echo $row['inspection_purpose'] == 'compliance' ? 'selected' : ''; ?>>Compliance</option>
@@ -472,23 +474,23 @@ iframe{
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="number_of_occupants">Number of Occupants:</label>
-            <input type="number" id="number_of_occupants" name="number_of_occupants" class="form-control" value="<?php echo htmlspecialchars($row['number_of_occupants']); ?>" required>
+            <input type="number" id="number_of_occupants" name="number_of_occupants" class="form-control" value="<?php echo htmlspecialchars($row['number_of_occupants']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="nature_of_business">Nature of Business:</label>
-            <input type="text" id="nature_of_business" name="nature_of_business" class="form-control" value="<?php echo htmlspecialchars($row['nature_of_business']); ?>" required>
+            <input type="text" id="nature_of_business" name="nature_of_business" class="form-control" value="<?php echo htmlspecialchars($row['nature_of_business']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="number_of_floors">Number of Floors:</label>
-            <input type="number" id="number_of_floors" name="number_of_floors" class="form-control" value="<?php echo htmlspecialchars($row['number_of_floors']); ?>" required>
+            <input type="number" id="number_of_floors" name="number_of_floors" class="form-control" value="<?php echo htmlspecialchars($row['number_of_floors']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="floor_area">Floor Area:</label>
-            <input type="text" id="floor_area" name="floor_area" class="form-control" value="<?php echo htmlspecialchars($row['floor_area']); ?>" required>
+            <input type="text" id="floor_area" name="floor_area" class="form-control" value="<?php echo htmlspecialchars($row['floor_area']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="classification_of_hazards">Classification of Hazards:</label>
-            <select id="classification_of_hazards" name="classification_of_hazards" class="form-control" required>
+            <select id="classification_of_hazards" name="classification_of_hazards" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
                 <option value="" disabled>Select Classification</option>
                 <option value="Class_A" <?php echo $row['classification_of_hazards'] == 'Class_A' ? 'selected' : ''; ?>>Class A</option>
                 <option value="Class_B" <?php echo $row['classification_of_hazards'] == 'Class_B' ? 'selected' : ''; ?>>Class B</option>
@@ -500,28 +502,28 @@ iframe{
 
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="building_construction">Building Construction:</label>
-            <input type="text" id="building_construction" name="building_construction" class="form-control" value="<?php echo htmlspecialchars($row['building_construction']); ?>" required>
+            <input type="text" id="building_construction" name="building_construction" class="form-control" value="<?php echo htmlspecialchars($row['building_construction']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
-
-        <h4> Inspection Details </h4>
-
+<hr class="section-separator full-bleed">
+        <h4 style = "text-align: center;"> Inspection Details </h4>
+<hr class="section-separator full-bleed">
              <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="inspection_date">Date of Inspection:</label>
-            <input type="date" id="inspection_date" name="inspection_date" class="form-control" value="<?php echo htmlspecialchars($row['inspection_date']); ?>" required>
+            <input type="date" id="inspection_date" name="inspection_date" class="form-control" value="<?php echo htmlspecialchars($row['inspection_date']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
 
         <div class="form-group" style="width: 48%; display: inline-block;">
         <label for="inspected_by">Inspected By:</label>
-        <input type="text" id="inspected_by" name="inspected_by" class="form-control" value="<?php echo htmlspecialchars($row['inspected_by']); ?>" required>
+        <input type="text" id="inspected_by" name="inspected_by" class="form-control" value="<?php echo htmlspecialchars($row['inspected_by']); ?>" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
     <div class="form-group-container">
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="possible_problems">Possible Problems during Fire:</label>
-    <textarea id="possible_problems" name="possible_problems" rows="10" cols="30" placeholder="Possible Problems During Fire" onfocus="addFirstNumber()" oninput="autoNumber()"></textarea><br><br>
+    <textarea id="possible_problems" name="possible_problems" rows="10" cols="30" placeholder="Possible Problems During Fire" onfocus="addFirstNumber()" oninput="autoNumber()" <?php echo !$can_edit ? 'disabled' : ''; ?>></textarea><br><br>
         </div>
         <div class="form-group" style="width: 48%; display: inline-block;">
             <label for="hazardous_materials">Hazardous/Flammable Materials:</label>
-        <textarea id="hazardous_materials" name="hazardous_materials" rows="10" cols="30" placeholder="Hazardous Materials" onfocus="addFirstNumber()" oninput="autoNumber()"></textarea><br><br>
+        <textarea id="hazardous_materials" name="hazardous_materials" rows="10" cols="30" placeholder="Hazardous Materials" onfocus="addFirstNumber()" oninput="autoNumber()" <?php echo !$can_edit ? 'disabled' : ''; ?>></textarea><br><br>
         </div>
         </div>
     </div>
@@ -608,7 +610,7 @@ iframe{
         <label for="application_form">Change Application Form (BFP):</label>
         <label for="application_form_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="application_form_file" name="application_form_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'application-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'application-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -638,7 +640,7 @@ iframe{
         <label for="proof_of_ownership">Change Proof of Ownership:</label>
         <label for="proof_of_ownership_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="proof_of_ownership_file" name="proof_of_ownership_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'ownership-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'ownership-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -668,7 +670,7 @@ iframe{
         <label for="building_plans">Change Building Plans:</label>
         <label for="building_plans_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="building_plans_file" name="building_plans_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'plans-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'plans-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -697,7 +699,7 @@ iframe{
         <label for="fire_safety_equipment">Change Fire Safety Equipment:</label>
         <label for="fire_safety_equipment_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="fire_safety_equipment_file" name="fire_safety_equipment_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'equipment-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'equipment-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -727,7 +729,7 @@ iframe{
         <label for="evacuation_plan">Change Evacuation Plan:</label>
         <label for="evacuation_plan_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="evacuation_plan_file" name="evacuation_plan_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'evacuation-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'evacuation-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -757,7 +759,7 @@ iframe{
         <label for="fire_safety_personnel_file">Change Fire Safety Personnel:</label>
         <label for="fire_safety_personnel_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="fire_safety_personnel_file" name="fire_safety_personnel_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'personnel-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'personnel-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -787,7 +789,7 @@ iframe{
         <label for="fire_insurance_policy">Change Fire Insurance Policy:</label>
         <label for="fire_insurance_policy_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="fire_insurance_policy_file" name="fire_insurance_policy_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'insurance-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'insurance-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -816,7 +818,7 @@ iframe{
         <label for="occupancy_permit">Change Occupancy Permit:</label>
         <label for="occupancy_permit_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="occupancy_permit_file" name="occupancy_permit_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'occupancy-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'occupancy-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -846,7 +848,7 @@ iframe{
         <label for="business_permit">Change Business Permit:</label>
         <label for="business_permit_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
         <input type="file" id="business_permit_file" name="business_permit_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'business-preview')">
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'business-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 </fieldset>
@@ -854,8 +856,8 @@ iframe{
 </tr>
     </table>
         <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a href="fire_safety_inspection_certificate.php" class="btn btn-cancel">Cancel</a>
+        <button type="submit" class="btn btn-primary" <?php echo !$can_edit ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>Save</button>
+        <a href="my_fire_safety_reports.php" class="btn btn-cancel">Cancel</a>
     </div>
 
 </form>

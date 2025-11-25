@@ -3,7 +3,7 @@
 
 // // Check if the user is logged in
 // if (!isset($_SESSION['username'])) {
-//     header("Location: adminlogin.php");
+//     header("Location: userlogin.php");
 // }
 
 include('connection.php');
@@ -22,6 +22,19 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
     }
 }
 $stmt_user->close();
+
+// Ensure department is set in session
+if (!isset($_SESSION['department']) || empty($_SESSION['department'])) {
+    $sql_dept = "SELECT department FROM users WHERE username = ? LIMIT 1";
+    $stmt_dept = $conn->prepare($sql_dept);
+    $stmt_dept->bind_param("s", $username);
+    $stmt_dept->execute();
+    $result_dept = $stmt_dept->get_result();
+    if ($result_dept && $row_dept = $result_dept->fetch_assoc()) {
+        $_SESSION['department'] = $row_dept['department'];
+    }
+    $stmt_dept->close();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get form data
@@ -85,41 +98,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-$uploader = $_SESSION['username'];
-  // Fetch department for the uploader
-    $department = null;
-    $dept_stmt = $conn->prepare("SELECT department FROM users WHERE username = ? LIMIT 1");
-    $dept_stmt->bind_param('s', $uploader);
-    $dept_stmt->execute();
-    $dept_result = $dept_stmt->get_result();
-    if ($dept_result && $dept_row = $dept_result->fetch_assoc()) {
-        $department = $dept_row['department'];
-    }
-    $dept_stmt->close();
+    // Prepare an SQL statement to insert the data
+    $stmt = $conn->prepare("INSERT INTO fire_safety_inspection_certificate 
+    (permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
+    fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
+    contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
+    application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 36 placeholders
 
-        // Prevent null department (set to empty string if not found)
-        if ($department === null) {
-            $department = '';
-        }
+    // Insert default value for department if missing
+    $department = isset($_SESSION['department']) && !empty($_SESSION['department']) ? $_SESSION['department'] : 'N/A';
+    $stmt->bind_param(
+        "sssssssssssssssssssssssssssssssssssss", // 36 "s"
+        $permit_name, $inspection_establishment, $owner, $inspection_address, $inspection_date,
+        $establishment_type, $inspection_purpose, $fire_alarms, $fire_extinguishers, $emergency_exits,
+        $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
+        $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
+        $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['building_plans'], $file_paths['fire_safety_equipment'],
+        $file_paths['evacuation_plan'], $file_paths['fire_safety_personnel'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
+        $file_paths['business_permit'], $username, $department
+    );
 
-// Add uploader to the columns and values
-$stmt = $conn->prepare("INSERT INTO fire_safety_inspection_certificate 
-(permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
-fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
-contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
-application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 37 placeholders
-
-$stmt->bind_param(
-    "sssssssssssssssssssssssssssssssssssss", // 37 "s"
-    $permit_name, $inspection_establishment, $owner, $inspection_address, $inspection_date,
-    $establishment_type, $inspection_purpose, $fire_alarms, $fire_extinguishers, $emergency_exits,
-    $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
-    $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
-    $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['building_plans'], $file_paths['fire_safety_equipment'],
-    $file_paths['evacuation_plan'], $file_paths['fire_safety_personnel'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
-    $file_paths['business_permit'], $uploader, $department // Add this at the end
-);
     // Execute the statement
     if (mysqli_stmt_execute($stmt)) {
         // Log activity
@@ -135,15 +134,11 @@ $stmt->bind_param(
     } else {
         $_SESSION['error_message'] = "There was an error creating the report. Please try again.";
     }
-
-    // Close the prepared statement
+    // Close the prepared statement and connection
     $stmt->close();
+    mysqli_close($conn);
 }
-
-mysqli_close($conn);
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -458,19 +453,20 @@ input[type="file"] {
 
 <body>
 
-<aside class="sidebar">
+    <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
-                <li><a href="adminlogin.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                        <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -512,12 +508,17 @@ input[type="file"] {
 <br>
 <div class="card">
     <div class = "form-header"> <h2>Fire Safety Inspection Report<h2></div>
-            <?php if (isset($success_message)) { ?>
-            <div class="alert alert-success"><?php echo $success_message; ?></div>
-        <?php } ?>
-        <?php if (isset($error_message)) { ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php } ?>
+            <!-- <?php
+            // Use session variable for success and error messages
+            if (isset($_SESSION['success_message'])) {
+                $success_message = $_SESSION['success_message'];
+                echo '<div class="alert alert-success">' . htmlspecialchars($success_message) . '</div>';
+            }
+            if (isset($_SESSION['error_message'])) {
+                $error_message = $_SESSION['error_message'];
+                echo '<div class="alert alert-danger">' . htmlspecialchars($error_message) . '</div>';
+            }
+            ?> -->
 
 <div class="stepper-container">
     <div class="stepper">
@@ -663,7 +664,7 @@ input[type="file"] {
     </div>
 </fieldset>
     <div class="form-actions">
-        <a href="fire_safety_inspection_certificate.php" class="btn btn-cancel">Cancel</a>
+        <a href="my_fire_safety_reports.php" class="btn btn-cancel">Cancel</a>
         <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
     </div>
 </div>
@@ -1016,7 +1017,7 @@ function showSuccessModal(message) {
 
     // Redirect after 2 seconds
     setTimeout(() => {
-        window.location.href = "fire_safety_inspection_certificate.php"; // Change URL as needed
+        window.location.href = "my_fire_safety_reports.php"; // Change URL as needed
     }, 2000);
 }
 
@@ -1025,15 +1026,16 @@ function closeModal() {
     document.getElementById('successModal').style.display = "none";
 }
 
+
 // Trigger the modal if a success message is set
 <?php if (isset($_SESSION['success_message'])): ?>
-    showSuccessModal("<?php echo $_SESSION['success_message']; ?>");
+    showSuccessModal("<?php echo addslashes($_SESSION['success_message']); ?>");
     <?php unset($_SESSION['success_message']); // Clear the session message ?>
 <?php endif; ?>
 
 // Check for error message
 <?php if (isset($_SESSION['error_message'])): ?>
-    alert("<?php echo $_SESSION['error_message']; ?>");
+    alert("<?php echo addslashes($_SESSION['error_message']); ?>");
     <?php unset($_SESSION['error_message']); ?>
 <?php endif; ?>
 

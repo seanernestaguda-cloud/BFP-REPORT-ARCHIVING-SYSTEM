@@ -463,7 +463,7 @@ mysqli_close($conn);
     <body>
     
     <div class="dashboard">
-    <aside class="sidebar">
+     <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
@@ -471,6 +471,7 @@ mysqli_close($conn);
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-fire"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
@@ -487,7 +488,6 @@ mysqli_close($conn);
                 </li>
                 
                 <li class="archive-text"><span>Maintenance</span></li>
-
                 <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
@@ -674,7 +674,7 @@ foreach ($required_fields as $field) {
 echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>';
 ?>
 <td><?php echo htmlspecialchars($row['uploader']); ?></td>
-<td><?php echo htmlspecialchars($row['department']); ?></td>
+<td><?php echo !empty($row['department']) ? htmlspecialchars($row['department']) : 'N/A'; ?></td>
     </td>
             <td class="action-button-container">
             <button class="view-btn" onclick="window.location.href='view_report.php?report_id=<?php echo $row['report_id']; ?>'">

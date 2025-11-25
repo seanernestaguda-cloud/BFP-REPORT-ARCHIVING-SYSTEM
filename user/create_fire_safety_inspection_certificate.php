@@ -442,7 +442,7 @@ input[type="file"] {
 
 <body>
 
-<aside class="sidebar">
+    <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
@@ -450,11 +450,12 @@ input[type="file"] {
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                        <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -647,7 +648,7 @@ input[type="file"] {
     </div>
 </fieldset>
     <div class="form-actions">
-        <a href="fire_safety_inspection_certificate.php" class="btn btn-cancel">Cancel</a>
+        <a href="my_fire_safety_reports.php" class="btn btn-cancel">Cancel</a>
         <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
     </div>
 </div>
@@ -1000,7 +1001,7 @@ function showSuccessModal(message) {
 
     // Redirect after 2 seconds
     setTimeout(() => {
-        window.location.href = "fire_safety_inspection_certificate.php"; // Change URL as needed
+        window.location.href = "my_fire_safety_reports.php"; // Change URL as needed
     }, 2000);
 }
 

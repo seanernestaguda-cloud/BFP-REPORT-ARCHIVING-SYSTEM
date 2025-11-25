@@ -9,19 +9,23 @@
 include('connection.php');
 include('auth_check.php');
 
+
 $username = $_SESSION['username'];
-$sql_user = "SELECT avatar FROM users WHERE username = ? LIMIT 1";
+$sql_user = "SELECT avatar, user_type FROM users WHERE username = ? LIMIT 1";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param('s', $username);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $avatar = '../avatars/default_avatar.png';
+$user_type = '';
 if ($result_user && $row_user = $result_user->fetch_assoc()) {
     if (!empty($row_user['avatar']) && file_exists('../avatars/' . $row_user['avatar'])) {
         $avatar = '../avatars/' . $row_user['avatar'];
     }
+    $user_type = isset($row_user['user_type']) ? $row_user['user_type'] : '';
 }
 $stmt_user->close();
+
 
 
 $report_id = isset($_GET['report_id']) ? intval($_GET['report_id']) : 0;
@@ -42,6 +46,13 @@ if (!$report) {
 }
 
 
+// Restrict editing: only uploader or admin can edit, others can view
+if (!isset($report['uploader'])) {
+    die("Access denied. You are not allowed to view this report.");
+}
+$can_edit = (strtolower($user_type) === 'admin');
+
+
 $query_barangays = "SELECT barangay_id, barangay_name FROM barangays ORDER BY barangay_name";
 $result_barangays = mysqli_query($conn, $query_barangays);
 
@@ -57,7 +68,7 @@ if (!$result_fire_types) {
 
 
 // Handle update if the form is submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     // Get updated form data
     $report_title = $_POST['report_title'];
     $caller_name = $_POST['caller_name'];
@@ -155,6 +166,12 @@ if (mysqli_stmt_execute($stmt)) {
     $log_stmt->bind_param('sis', $username, $report_id, $log_details);
     $log_stmt->execute();
     $log_stmt->close();
+    // Set redirect target for JS
+    if (strtolower($user_type) === 'admin' && $report['uploader'] === $_SESSION['username']) {
+        $redirect_target = 'my_fire_incident_reports.php';
+    } else {
+        $redirect_target = 'fire_incident_report.php';
+    }
 } else {
     $error_message = "There was an error updating the report.";
 }
@@ -313,6 +330,7 @@ mysqli_close($conn);
 .btn-delete:hover {
     background: #c0392b;
 }
+
 .card{
     max-width: 900px;     /* change to desired max width (e.g. 700px for smaller) */
     width: 90%;           /* responsive width */
@@ -388,7 +406,7 @@ mysqli_close($conn);
 </form>
     </div>
     <div class = "title-part">
-            <h2> Fire Incident Report <?php echo htmlspecialchars($report['report_id']); ?> </h2>
+            <h2> Fire Incident Report # <?php echo htmlspecialchars($report['report_id']); ?> </h2>
             <form method="POST" action="generate_pdf.php?report_id=<?php echo $report_id; ?>">
 </form>
         </div>
@@ -400,45 +418,43 @@ mysqli_close($conn);
             <div class="form-group-container">
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="report_title">Report Title:</label>
-                <input type="text" id="report_title" name="report_title" value="<?php echo htmlspecialchars($report['report_title']); ?>" class="form-control" required>
+                <input type="text" id="report_title" name="report_title" value="<?php echo htmlspecialchars($report['report_title']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
 
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="caller_name">Name of Caller</label>
-                <input type="text" id="caller_name" name="caller_name" value="<?php echo htmlspecialchars($report['caller_name']); ?>" class="form-control" required>
+                <input type="text" id="caller_name" name="caller_name" value="<?php echo htmlspecialchars($report['caller_name']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
-      <div class="form-group-container">
+
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="responding_team">Responding Team</label>
-                <input type="text" id="responding_team" name="responding_team" value="<?php echo htmlspecialchars($report['responding_team']); ?>" class="form-control" required>
+                <input type="text" id="responding_team" name="responding_team" value="<?php echo htmlspecialchars($report['responding_team']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="establishment">Establishment Name:</label>
-                <input type="text" id="establishment" name="establishment" value="<?php echo htmlspecialchars($report['establishment']); ?>" class="form-control" required>
+                <input type="text" id="establishment" name="establishment" value="<?php echo htmlspecialchars($report['establishment']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
-            </div>
-            <hr class="section-separator full-bleed">
-<h4 style = "text-align:center ;"> Fire Location </h4>
-<hr class="section-separator full-bleed">
+<h4> Fire Location </h4>
+
 <div class = "form-group-container">
             <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="street">Street:</label>
-    <input type="text" id="street" name="street" value="<?php echo htmlspecialchars($report['street'] ?? ''); ?>" class="form-control" required>
+    <input type="text" id="street" name="street" value="<?php echo htmlspecialchars($report['street'] ?? ''); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
 </div>
 
 
 <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="purok">Purok:</label>
-    <input type="text" id="purok" name="purok" value="<?php echo htmlspecialchars($report['purok'] ?? ''); ?>" class="form-control" required>
+    <input type="text" id="purok" name="purok" value="<?php echo htmlspecialchars($report['purok'] ?? ''); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
 </div>
 <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="municipality">Municipality:</label>
-    <input type="text" id="municipality" name="municipality" value="<?php echo htmlspecialchars($report['municipality'] ?? ''); ?>" class="form-control" required>
+    <input type="text" id="municipality" name="municipality" value="<?php echo htmlspecialchars($report['municipality'] ?? ''); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
 </div>
 
 <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="fire_location">Barangay:</label>
-                <select id="fire_location" name="fire_location" class="form-control" required>
+                <select id="fire_location" name="fire_location" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
                     <option value="" disabled selected>Select Barangay</option>
                     <?php while ($row = mysqli_fetch_assoc($result_barangays)) { ?>
                         <option value="<?php echo htmlspecialchars($row['barangay_name']); ?>" 
@@ -449,34 +465,47 @@ mysqli_close($conn);
                 </select>
             </div>
             </div>
-<hr class="section-separator full-bleed">
-<h4 style = "text-align: center;"> Date and Time </h4>
-<hr class="section-separator full-bleed">
+
+<h4> Date and Time </h4>
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
                 <label for="incident_date">Time and Date Reported:</label>
-                <input type="datetime-local" id="incident_date" name="incident_date" value="<?php echo htmlspecialchars($report['incident_date']); ?>" class="form-control" required>
+                <input type="datetime-local" id="incident_date" name="incident_date" value="<?php echo htmlspecialchars($report['incident_date']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
 <div class="form-group" style="width: 30%; display: inline-block;">
                 <label for="arrival_time">Arrival Time:</label>
-                <input type="time" id="arrival_time" name="arrival_time" value="<?php echo htmlspecialchars($report['arrival_time']); ?>" class="form-control" required>
+                <input type="time" id="arrival_time" name="arrival_time" value="<?php echo htmlspecialchars($report['arrival_time']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
             <div class="form-group" style="width: 30%; display: inline-block;">
                 <label for="fireout_time">Fireout Time:</label>
-                <input type="time" id="fireout_time" name="fireout_time" value="<?php echo htmlspecialchars($report['fireout_time']); ?>" class="form-control" required>
+                <input type="time" id="fireout_time" name="fireout_time" value="<?php echo htmlspecialchars($report['fireout_time']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
             </div>
 
-<hr class="section-separator full-bleed">
+<h4> Injured/Casualties </h4>
+<br>
+<div class="form-group-container">
+<div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="victims">Civilians:</label>
+                <textarea id="victims" name="victims" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['victims']); ?></textarea>
+            </div>
+
+            <div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="firefighters">Firefighters:</label>
+                <textarea id="victims" name="firefighters" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
+            </div>
+            </div>
+
+<h4></h4>
 <div class = "form-group-container"></div>
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="property_damage">Damage to Property (₱):</label>
-                <input type="text" id="property_damage" name="property_damage" value="<?php echo htmlspecialchars($report['property_damage']); ?>" class="form-control" required>
+                <input type="text" id="property_damage" name="property_damage" value="<?php echo htmlspecialchars($report['property_damage']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
 
 <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="alarm_status">Alarm Status:</label>
-    <select id="alarm_status" name="alarm_status" class="form-control" required>
+    <select id="alarm_status" name="alarm_status" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         <option value="" disabled>Select Alarm Status</option>
         <option value="1st Alarm" <?php echo ($report['alarm_status'] === '1st Alarm') ? 'selected' : ''; ?>>1st Alarm</option>
         <option value="2nd Alarm" <?php echo ($report['alarm_status'] === '2nd Alarm') ? 'selected' : ''; ?>>2nd Alarm</option>
@@ -489,7 +518,7 @@ mysqli_close($conn);
 <div class = "form-group-container">
 <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="occupancy_type">Type of Occupancy:</label>
-    <select id="occupancy_type" name="occupancy_type" class="form-control" required>
+    <select id="occupancy_type" name="occupancy_type" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
         <option value="" disabled>Select Type of Occupancy</option>
         <option value="Residential" <?php echo ($report['occupancy_type'] === 'Residential') ? 'selected' : ''; ?>>Residential</option>
         <option value="Commercial" <?php echo ($report['occupancy_type'] === 'Commercial') ? 'selected' : ''; ?>>Commercial</option>
@@ -502,7 +531,7 @@ mysqli_close($conn);
  
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="fire_types">Cause of Fire:</label>
-                <select id="fire_types" name="fire_types" class="form-control" >
+                <select id="fire_types" name="fire_types" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>>
                     <option value="" disabled selected>Select Fire Cause</option>
                     <?php while ($row = mysqli_fetch_assoc($result_fire_types)) { ?>
                         <option value="<?php echo htmlspecialchars($row['fire_types']); ?>" 
@@ -511,20 +540,6 @@ mysqli_close($conn);
                         </option>
                     <?php } ?>
                 </select>
-            </div>
-            <hr class="section-separator full-bleed">
-<h4 style = "text-align: center;"> Injured/Casualties </h4>
-<hr class="section-separator full-bleed">
-<div class="form-group-container">
-<div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="victims">Civilians:</label>
-                <textarea id="victims" name="victims" rows="10" class="form-control"><?php echo htmlspecialchars($report['victims']); ?></textarea>
-            </div>
-
-            <div class="form-group" style="width: 45%; display: inline-block; margin-bottom: 20px;">
-                <label for="firefighters">Firefighters:</label>
-                <textarea id="victims" name="firefighters" rows="10" class="form-control"><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
-            </div>
             </div>
 </fieldset>
 <br>
@@ -558,7 +573,7 @@ mysqli_close($conn);
                 <i class="fa-solid fa-plus"></i>
             </label>
                 <label for="documentation_photos" style = "font-weight: lighter;">Add New</label>
-            <input type="file" id="documentation_photos" name="documentation_photos[]" class="form-control" multiple accept="image/*" onchange="previewImages(event)" style="display:none;">
+            <input type="file" id="documentation_photos" name="documentation_photos[]" class="form-control" multiple accept="image/*" onchange="previewImages(event)" style="display:none;" <?php echo !$can_edit ? 'disabled' : ''; ?>>
         </div>
         <div id="image-previews" class="image-previews"></div>
         </fieldset>
@@ -600,7 +615,7 @@ mysqli_close($conn);
     <label for="narrative_report">Change Spot Investigation Report:</label>
     <label for="narrative_report" class="file-icon-label"><i class="fa-solid fa-pen-to-square"><span id="labelChange"></i></label>
     <input type="file" id="narrative_report" name="narrative_report" class="form-control"
-    accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewReport(event, 'narrative-preview')">
+    accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewReport(event, 'narrative-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
    
 </div>
@@ -628,8 +643,8 @@ mysqli_close($conn);
     <div id="progress-preview"></div>
     <label for="progress_report">Change Progress Report:</label>
     <label for="progress_report" class="file-icon-label"><i class="fa-solid fa-pen-to-square"></i></label>
-    <input type="file" id="progress_report" name="progress_report" class="form-control"
-       accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewReport(event, 'progress-preview')">
+     <input type="file" id="progress_report" name="progress_report" class="form-control"
+         accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewReport(event, 'progress-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
     
 </div>
@@ -658,14 +673,14 @@ mysqli_close($conn);
     <div id="final-preview"></div>
      <label for="final_investigation_report">Change Final Investigation Report:</label>
     <label for="final_investigation_report" class="file-icon-label"><i class="fa-solid fa-pen-to-square"></i></label>
-    <input type="file" id="final_investigation_report" name="final_investigation_report" class="form-control"
-       accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewReport(event, 'final-preview')">
+     <input type="file" id="final_investigation_report" name="final_investigation_report" class="form-control"
+         accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewReport(event, 'final-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
        </div>
         </div>
  </fieldset>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary" id="saveBtn" disabled>Save</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn" disabled <?php echo !$can_edit ? 'style="display:none;"' : ''; ?>>Save</button>
                 <a href="fire_incident_report.php" class="btn btn-cancel">Cancel</a>
             </div>
         </form>
@@ -741,15 +756,15 @@ function showTab(tab) {
 }
 
 // --- Show Modal on Success ---
-function showModal() {
+function showModal(redirectUrl) {
     const modal = document.getElementById('successModal');
     modal.style.display = 'block';
     setTimeout(() => {
-        window.location.href = 'fire_incident_report.php';
+        window.location.href = redirectUrl;
     }, 2000);
 }
 <?php if (isset($success_message)) { ?>
-    showModal();
+    showModal('<?php echo isset($redirect_target) ? $redirect_target : "fire_incident_report.php"; ?>');
 <?php } ?>
 
 // --- Enable Save Button on Any Change ---

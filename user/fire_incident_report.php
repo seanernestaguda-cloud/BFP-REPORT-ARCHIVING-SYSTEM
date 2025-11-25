@@ -136,20 +136,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['
     exit;
 }
 
-
 $allowed_sort_columns = ['report_id', 'report_title', 'incident_date', 'fire_location'];
 $sort_by = isset($_GET['sort_by']) && in_array($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'report_id';
 $order_by = 'ASC';
 
 // --- Add filtering by month ---
-$where_clauses = [];
+$where_clauses[] = "deleted_at IS NULL";
 $params = [];
 $param_types = '';
-
-$where_clauses[] = "deleted_at IS NULL";
-$where_clauses[] = "uploader = ?";
-$params[] = $_SESSION['username'];
-$param_types .= 's';
 
 if (!empty($_GET['start_month'])) {
     $start = $_GET['start_month'] . '-01 00:00:00';
@@ -207,14 +201,19 @@ $offset = ($page - 1) * $per_page;
 
 // Count total records for pagination
 $count_query = "SELECT COUNT(*) FROM fire_incident_reports $where_sql";
-$stmt_count = $conn->prepare($count_query);
-if ($param_types) {
-    $stmt_count->bind_param($param_types, ...$params);
+if ($where_clauses) {
+    $stmt_count = $conn->prepare($count_query);
+    if ($param_types) {
+        $stmt_count->bind_param($param_types, ...$params);
+    }
+    $stmt_count->execute();
+    $stmt_count->bind_result($total_reports);
+    $stmt_count->fetch();
+    $stmt_count->close();
+} else {
+    $result_count = mysqli_query($conn, $count_query);
+    $total_reports = mysqli_fetch_row($result_count)[0];
 }
-$stmt_count->execute();
-$stmt_count->bind_result($total_reports);
-$stmt_count->fetch();
-$stmt_count->close();
 
 // --- Modify main query to add LIMIT and OFFSET ---
 $query = "SELECT 
@@ -240,15 +239,24 @@ $where_sql
 ORDER BY $sort_by $order_by
 LIMIT ? OFFSET ?";
 
-// Always use prepared statement (uploader restriction always applies)
-$stmt = $conn->prepare($query);
-$full_param_types = $param_types . 'ii';
-$params_with_limit = array_merge($params, [$per_page, $offset]);
-$stmt->bind_param($full_param_types, ...$params_with_limit);
-$stmt->execute();
-$result = $stmt->get_result();
-$reports = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+// Use prepared statement if filtering
+if ($where_clauses) {
+    $stmt = $conn->prepare($query);
+    $full_param_types = $param_types . 'ii';
+    $params_with_limit = array_merge($params, [$per_page, $offset]);
+    $stmt->bind_param($full_param_types, ...$params_with_limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $reports = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+} else {
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('ii', $per_page, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $reports = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+}
 mysqli_close($conn);
 ?>
 <!DOCTYPE html>
@@ -456,7 +464,7 @@ mysqli_close($conn);
     <body>
     
     <div class="dashboard">
-    <aside class="sidebar">
+       <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
@@ -464,11 +472,12 @@ mysqli_close($conn);
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                        <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -478,6 +487,12 @@ mysqli_close($conn);
                         <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                     </ul>
                 </li>
+                
+                <!-- <li class="archive-text"><span>Maintenance</span></li>
+                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
+                <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
+                <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li> -->
             </ul>
         </nav>
     </aside>
@@ -507,11 +522,11 @@ mysqli_close($conn);
             <section class="archive-section">
             <h3>Fire Incident Reports</h3>
             <p> List of Fire Incident Reports</p>
-                 <hr class="section-separator full-bleed">
+                 <!-- <hr class="section-separator full-bleed">
             <div class="top-controls">
             <button onclick="window.location.href='create_fire_incident_report.php'" class="create-new-button">
                 <i class="fa-solid fa-circle-plus"></i>Create New</button>
-        </div>
+        </div> -->
      <hr class="section-separator full-bleed">
 
     <div class="entries-search">
@@ -520,10 +535,7 @@ mysqli_close($conn);
             <i class="fa-solid fa-check-square"></i>
             <label for=""> Select </label>
 </button>
-        <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedReports()">
-            <i class="fa-solid fa-trash"></i>
-            <label for=""> Delete Selected </label>
-        </button>
+
         <button id="downloadSelectedBtn" class="select-multi-btn" style="display:none;" onclick="downloadSelectedReports()">
             <i class="fa-solid fa-download"></i> 
             <label for="">Download Selected</label>
@@ -662,9 +674,9 @@ echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style=
             <button class="view-btn" onclick="window.location.href='view_report.php?report_id=<?php echo $row['report_id']; ?>'">
                 <i class="fa-solid fa-eye"></i>
             </button>
-                <button class="delete-btn" onclick="deleteReport(<?php echo $row['report_id']; ?>)">
+                <!-- <button class="delete-btn" onclick="deleteReport(<?php echo $row['report_id']; ?>)">
                     <i class="fa-solid fa-trash"></i>
-                </button>
+                </button> -->
                 <button class="download-btn" onclick="window.location.href='generate_pdf.php?report_id=<?php echo $row['report_id']; ?>'">
                     <i class="fa-solid fa-download"></i>
                 </button>
@@ -707,7 +719,7 @@ if ($total_pages > 1): ?>
         </div>
     </div>
 
-    <div id="uploadModal" class="report-details-modal">
+    <!-- <div id="uploadModal" class="report-details-modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeUploadModal()">&times;</span>
         <h3>Upload Fire Incident Report</h3>
@@ -719,7 +731,7 @@ if ($total_pages > 1): ?>
             </div>
         </form>
     </div>
-</div>
+</div> -->
 
 <div id="confirmDeleteModal" class="confirm-delete-modal">
     <div class="modal-content">
@@ -774,19 +786,16 @@ function closeSuccessModal() {
 function toggleSelectMode() {
     const header = document.querySelector('.select-checkbox-header');
     const cells = document.querySelectorAll('.select-checkbox-cell');
-    const deleteBtn = document.getElementById('deleteSelectedBtn');
     const downloadBtn = document.getElementById('downloadSelectedBtn');
-    const isVisible = header.style.display !== 'none';
+    const isVisible = header.style.display !== 'none' && header.style.display !== '';
 
     if (isVisible) {
         header.style.display = 'none';
         cells.forEach(cell => cell.style.display = 'none');
-        deleteBtn.style.display = 'none';
         downloadBtn.style.display = 'none';
     } else {
-        header.style.display = '';
-        cells.forEach(cell => cell.style.display = '');
-        deleteBtn.style.display = '';
+        header.style.display = 'table-cell';
+        cells.forEach(cell => cell.style.display = 'table-cell');
         downloadBtn.style.display = '';
     }
 }

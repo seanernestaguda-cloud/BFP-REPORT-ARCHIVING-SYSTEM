@@ -254,6 +254,7 @@ if ($where_clauses) {
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-fire"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
@@ -304,10 +305,10 @@ if ($where_clauses) {
           
                 <h3>Fire Safety Inspection</h3>
                 <p> List of Fire Safety Inspection Reports </p>
-                <hr class="section-separator full-bleed">
+                <!-- <hr class="section-separator full-bleed">
                   <div class="top-controls">
             <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i> Create New</button>
-            </div>
+            </div> -->
                 <hr class="section-separator full-bleed">
                 
 <div class="entries-search">
@@ -464,7 +465,7 @@ echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style=
 </td>
             
             <td class="action-button-container">
-            <button class="view-btn" onclick="window.location.href='view_permit.php?id=<?php echo $row['id']; ?>'">
+            <button class="view-btn" onclick="window.location.href='permit_details.php?id=<?php echo $row['id']; ?>'">
                 <i class="fa-solid fa-eye"></i>
             </button>
                 <button class="delete-btn" onclick="deletePermit(<?php echo $row['id']; ?>)">

@@ -22,10 +22,6 @@ $where_clauses[] = "deleted_at IS NULL";
 $params = [];
 $param_types = '';
 
-$where_clauses[] = "uploader = ?";
-$params[] = $_SESSION['username'];
-$param_types .= 's';
-
 if (!empty($_GET['start_month'])) {
     $start = $_GET['start_month'] . '-01';
     $where_clauses[] = "inspection_date >= ?";
@@ -258,11 +254,12 @@ if ($where_clauses) {
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                        <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -272,8 +269,8 @@ if ($where_clauses) {
                         <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                     </ul>
                 </li>
-<!--                 
-                <li class="archive-text"><span>Maintenance</span></li>
+                
+                <!-- <li class="archive-text"><span>Maintenance</span></li>
                 <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
@@ -308,10 +305,10 @@ if ($where_clauses) {
           
                 <h3>Fire Safety Inspection</h3>
                 <p> List of Fire Safety Inspection Reports </p>
-                <hr class="section-separator full-bleed">
+                <!-- <hr class="section-separator full-bleed">
                   <div class="top-controls">
             <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i> Create New</button>
-            </div>
+            </div> -->
                 <hr class="section-separator full-bleed">
                 
 <div class="entries-search">
@@ -320,9 +317,9 @@ if ($where_clauses) {
         <button id="toggleSelectBtn" class="select-multi-btn" onclick="toggleSelectMode()">
             <i class="fa-solid fa-check-square"></i> Select
         </button>
-        <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedPermits()">
+        <!-- <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedPermits()">
             <i class="fa-solid fa-trash"></i>
-            <label for="">Delete Selected</label>
+            <label for="">Delete Selected</label> -->
         </button>
         <button id="downloadSelectedBtn" class="select-multi-btn" style="display:none;" onclick="downloadSelectedPermits()">
             <i class="fa-solid fa-download"></i>
@@ -387,6 +384,8 @@ if ($where_clauses) {
                 <th>Purpose</th>
                 <th>Address</th>
                 <th>Date of Inspection</th>
+                <th>Uploader</th>
+                <th>Department</th>
                 <th>Status</th>
                 <th> Action </th>
             </tr>
@@ -410,6 +409,8 @@ if ($where_clauses) {
             <td><?php echo htmlspecialchars($row['inspection_purpose']); ?></td>
             <td><?php echo htmlspecialchars($row['inspection_address']); ?></td>
             <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($row['inspection_date']))) ?></td>
+            <td><?php echo htmlspecialchars($row['uploader']); ?></td>
+            <td><?php echo htmlspecialchars($row['department']); ?></td>
             <td>
             <?php
      // List all required fields from your create form
@@ -464,12 +465,12 @@ echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style=
 </td>
             
             <td class="action-button-container">
-            <button class="view-btn" onclick="window.location.href='view_permit.php?id=<?php echo $row['id']; ?>'">
+            <button class="view-btn" onclick="window.location.href='permit_details.php?id=<?php echo $row['id']; ?>'">
                 <i class="fa-solid fa-eye"></i>
             </button>
-                <button class="delete-btn" onclick="deletePermit(<?php echo $row['id']; ?>)">
+                <!-- <button class="delete-btn" onclick="deletePermit(<?php echo $row['id']; ?>)">
                     <i class="fa-solid fa-trash"></i>
-                </button>
+                </button> -->
                 <button class="download-btn" onclick="window.location.href='generate_permit.php?id=<?php echo $row['id']; ?>'">
                     <i class="fa-solid fa-download"></i>
                 </button>
@@ -567,7 +568,7 @@ function toggleSelectMode() {
     // Toggle visibility of checkbox columns
     const header = document.querySelector('.select-checkbox-header');
     const cells = document.querySelectorAll('.select-checkbox-cell');
-    const deleteBtn = document.getElementById('deleteSelectedBtn');
+    // const deleteBtn = document.getElementById('deleteSelectedBtn');
     const downloadBtn = document.getElementById('downloadSelectedBtn');
     const isVisible = header && header.style.display !== 'none';
 

@@ -3,7 +3,7 @@ session_start();
 
 // Ensure the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: adminlogin.php");
+    header("Location: userlogin.php");
     exit;
 }
 
@@ -80,7 +80,6 @@ $html = <<<EOD
 EOD;
 $pdf->writeHTML($html, true, false, true, false, '');
 
-// Add documentation photos
 if (!empty($report['documentation_photos'])) {
     $pdf->AddPage();
     $pdf->SetFont('helvetica', 'B', 14);
@@ -123,14 +122,17 @@ $reports = [
 foreach ($reports as $title => $filePath) {
     if (!empty($filePath) && file_exists($filePath)) {
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-       if ($ext === 'pdf') {
-            // For PDFs, import all pages (no need to add a page or title here)
-            importPdfPages($pdf, $filePath);
-        } else {
-            $pdf->AddPage();
-            $pdf->SetFont('helvetica', 'B', 14);
-            $pdf->Cell(0, 10, $title, 0, 1, 'L');
-            $pdf->SetFont('helvetica', '', 12);
+  if ($ext === 'pdf') {
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica', 'B', 14);
+    $pdf->Cell(0, 10, $title, 0, 1, 'L');
+    $pdf->SetFont('helvetica', '', 12);
+    importPdfPages($pdf, $filePath, true); // Use current page for first imported page
+} else {
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica', 'B', 14);
+    $pdf->Cell(0, 10, $title, 0, 1, 'L');
+    $pdf->SetFont('helvetica', '', 12);
 
             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
                 $pdf->Image($filePath, '', '', 120, 90, '', '', 'T', true);

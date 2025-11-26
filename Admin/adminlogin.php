@@ -139,7 +139,7 @@ if (mysqli_num_rows($result) > 0) {
                 <button type="submit">Login</button>
             </div>
             <div class="links-container">
-                <a href="/archiving system/index.html">Go to Home</a>
+                <a href="/archiving system/index.php">Go to Home</a>
             </div>
         </form>
     </div>

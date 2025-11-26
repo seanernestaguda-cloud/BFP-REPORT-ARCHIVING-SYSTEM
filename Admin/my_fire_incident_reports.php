@@ -7,6 +7,13 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
+
 $allowed_sort_columns = ['report_id', 'report_title', 'incident_date', 'fire_location'];
 $sort_by = isset($_GET['sort_by']) && in_array($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'report_id';
 $order_by = 'ASC';
@@ -315,15 +322,14 @@ mysqli_close($conn);
 </head>
 <body>
 <div class="dashboard">
-    <aside class="sidebar">
+   <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
-                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
-                <li><a href="myarchives.php"><i class="fa-solid fa-fire"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
@@ -348,16 +354,25 @@ mysqli_close($conn);
         </nav>
     </aside>
     <div class="main-content">
-        <header class="header">
-            <button id="toggleSidebar" class="toggle-sidebar-btn">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-            <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
-            <div class="header-right">
-                <div class="dropdown">
-                </div>
+      <header class="header">
+    <button id="toggleSidebar" class="toggle-sidebar-btn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <h2><?php echo htmlspecialchars($system_name); ?></h2>
+    <div class="header-right">
+        <div class="dropdown">
+            <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
+                <!-- Add avatar image here -->
+                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+            </a>
+            <div id="profileDropdown" class="dropdown-content">
+                <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
+                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
-        </header>
+        </div>
+    </div>
+</header>
         <div class="card">
         <section class="archive-section">
             <h3><?php echo htmlspecialchars($_SESSION['username']); ?>'s Fire Incident Reports</h3>

@@ -453,20 +453,25 @@ input[type="file"] {
 
 <body>
 
-    <aside class="sidebar">
+      <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
-                <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li class = "archive-text"><h4><?php 
+include('connection.php');
+$sql = "SELECT * FROM settings LIMIT 1";
+$result = $conn->query($sql);
+$settings = $result ? $result->fetch_assoc() : [];
+echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'); ?></h4></li>
+                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
                 <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-chart-column"></i>
+                        <i class="fa-solid fa-box-archive"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -490,7 +495,7 @@ input[type="file"] {
     <button id="toggleSidebar" class="toggle-sidebar-btn">
         <i class="fa-solid fa-bars"></i>
     </button>
-    <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+    <h2><?php echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'); ?></h2>
     <div class="header-right">
         <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">

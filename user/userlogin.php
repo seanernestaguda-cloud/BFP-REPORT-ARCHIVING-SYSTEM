@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit">Login</button>
             </div>
             <div class="links-container">
-                <a href="/archiving system/index.html">Go to Home</a>
+                <a href="/archiving system/index.php">Go to Home</a>
                 <div class="sign-up-container">
                     <p>Don't have an account? <a href="signup.php">Sign up</a></p>
                 </div>

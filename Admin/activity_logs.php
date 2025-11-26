@@ -75,6 +75,14 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
         $avatar = '../avatars/' . $row_user['avatar'];
     }
 }
+
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
+
 $stmt->close();
 ?>
 <!DOCTYPE html>
@@ -186,15 +194,20 @@ $stmt->close();
     <body>
     
     <div class="dashboard">
-     <aside class="sidebar">
+       <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
+                <li class = "archive-text"><h4><?php 
+include('connection.php');
+$sql = "SELECT * FROM settings LIMIT 1";
+$result = $conn->query($sql);
+$settings = $result ? $result->fetch_assoc() : [];
+echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'); ?></h4></li>
                 <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
-                <li><a href="myarchives.php"><i class="fa-solid fa-fire"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
@@ -223,7 +236,7 @@ $stmt->close();
     <button id="toggleSidebar" class="toggle-sidebar-btn">
         <i class="fa-solid fa-bars"></i>
     </button>
-    <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+<h2><?php echo htmlspecialchars($system_name); ?></h2>
     <div class="header-right">
         <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">

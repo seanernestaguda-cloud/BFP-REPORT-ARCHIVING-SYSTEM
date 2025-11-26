@@ -1,3 +1,13 @@
+<?php
+include 'connection.php';
+// Fetch settings from the database
+$sql = "SELECT * FROM settings LIMIT 1";
+$result = $conn->query($sql);
+$settings = $result ? $result->fetch_assoc() : [];
+$system_name = $settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+$logo = !empty($settings['logo']) ? 'webfonts/' . $settings['logo'] : 'REPORT.png';
+$contact_email = $settings['contact_email'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,14 +15,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Bureau of Fire Protection - Archiving System. Search, create and manage archive reports."
+      content="<?php echo htmlspecialchars($system_name); ?>. Search, create and manage archive reports."
     />
-    <link rel="icon" type="image/png" href="REPORT.png" />
+    <link rel="icon" type="image/png" href="<?php echo htmlspecialchars($logo); ?>" />
     <link rel="stylesheet" href="style.css" />
-    <!-- adjust these paths if your fontawesome files live elsewhere -->
     <link rel="stylesheet" href="css/all.min.css" />
     <link rel="stylesheet" href="css/fontawesome.min.css" />
-    <title>BFP Archiving System — Home</title>
+    <title><?php echo htmlspecialchars($system_name); ?> — Home</title>
     <style>
       /* Minimal hero styles here while you move the rest to style.css */
       .image-container {
@@ -109,7 +118,7 @@
     <header role="banner">
       <nav class="navbar" role="navigation" aria-label="Primary">
         <div class="logo">
-          <a href="index.html">BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</a>
+          <a href="index.php"><?php echo htmlspecialchars($system_name); ?></a>
         </div>
         <ul class="nav-links">
           <li><a href="user/signup.php">Register</a></li>
@@ -120,7 +129,7 @@
 
       <nav class="navbar2" role="navigation" aria-label="Secondary">
         <ul class="nav-links">
-          <li><a class="active" href="index.html">Home</a></li>
+          <li><a class="active" href="index.php">Home</a></li>
           <li><a href="About.html">About Us</a></li>
         </ul>
       </nav>
@@ -129,7 +138,7 @@
     <main id="main" role="main">
       <section class="image-container" aria-label="Hero">
         <div class="hero">
-          <h1>Welcome to the BFP Archiving System</h1>
+          <h1>Welcome to the <?php echo htmlspecialchars($system_name); ?></h1>
           <p>
             Search, create and manage official reports securely and efficiently.
           </p>
@@ -156,7 +165,7 @@
       </section>
 
       <section class="welcome-box" aria-label="Welcome">
-        <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+        <h2><?php echo htmlspecialchars($system_name); ?></h2>
         <hr />
         <p>
           We are glad to have you here! Explore our services and learn more
@@ -167,7 +176,7 @@
 
     <footer role="contentinfo">
       <div class="footer-content">
-        <p>&copy; Copyright 2025. All rights reserved.</p>
+        <p>&copy; Copyright 2025. All rights reserved. <?php if($contact_email) echo 'Contact: ' . htmlspecialchars($contact_email); ?></p>
       </div>
     </footer>
   </body>

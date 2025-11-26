@@ -120,6 +120,7 @@ if ($result_damage && $row_damage = $result_damage->fetch_assoc()) {
 $sql_occupancy = "SELECT occupancy_type, COUNT(*) AS occupancy_count FROM fire_incident_reports WHERE deleted_at IS NULL GROUP BY occupancy_type ORDER BY occupancy_count DESC";
 $result_occupancy = $conn->query($sql_occupancy);
 
+
 $sql_top_barangay = "SELECT fire_location, COUNT(*) AS cnt
     FROM fire_incident_reports
     WHERE deleted_at IS NULL
@@ -132,6 +133,14 @@ $top_barangay_count = 0;
 if ($result_top_barangay && $row_tb = $result_top_barangay->fetch_assoc()) {
     $top_barangay_name = $row_tb['fire_location'];
     $top_barangay_count = $row_tb['cnt'];
+}
+
+// Fetch system name from settings BEFORE closing connection
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
 }
 $conn->close();
 
@@ -371,17 +380,17 @@ h4{
 <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
-                <li><a href="myarchives.php"><i class="fa-solid fa-fire"></i><span> My Archives</span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -405,7 +414,7 @@ h4{
     <button id="toggleSidebar" class="toggle-sidebar-btn">
                     <i class="fa-solid fa-bars"></i> <!-- Sidebar toggle icon -->
                 </button>
-        <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+        <h2><?php echo htmlspecialchars($system_name); ?></h2>
         <div class="header-right">
        <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleDropdown(event)" style="display:flex;align-items:center;gap:0px;">
@@ -448,7 +457,7 @@ h4{
     <p class="card-number"><?php echo $total_fsic_reports; ?></p>
 </div>
     <div class="dashboard-card">
-        <i class="fas fa-building"></i>
+        <i class="fa-solid fa-map-location-dot"></i>
         <h2>Barangays</h2>
         <p class="card-number"><?php echo $total_barangays; ?></p>
     </div>

@@ -1,34 +1,12 @@
+
 <?php
-// session_start(); // Start the session
-
-// // Check if the user is logged in as an admin
-// if (!isset($_SESSION['username'])) {
-//     header("Location: adminlogin.php"); // Redirect to login if not logged in
-//     exit();
-// }
-
-// Include database connection
 include 'connection.php';
-include 'auth_check.php';
-
-$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'; // Default value
-$sql = "SELECT system_name, welcome_content, logo, cover FROM system_settings WHERE id=1 LIMIT 1";
-$result = $conn->query($sql);
-if ($result && $row = $result->fetch_assoc()) {
-    $system_name = $row['system_name'];
-    $welcome_content = $row['welcome_content'];
-    $logo_path = $row['logo'];
-    $cover_path = $row['cover'];
-} else {
-    $welcome_content = '';
-    $logo_path = '';
-    $cover_path = '';
-}
+include('auth_check.php');
 
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar FROM users WHERE username = ? LIMIT 1";
 $stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("s", $username);
+$stmt_user->bind_param('s', $username);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $avatar = '../avatars/default_avatar.png';
@@ -37,66 +15,146 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
         $avatar = '../avatars/' . $row_user['avatar'];
     }
 }
-$stmt_user->close();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' ){
+// Fetch current settings (assuming a 'settings' table with one row)
+$sql = "SELECT * FROM settings LIMIT 1";
+$result = $conn->query($sql);
+$settings = $result ? $result->fetch_assoc() : [];
 
-    $system_name = $_POST['system_name'] ?? '';
-    $welcome_content = $_POST['content']['welcome'] ?? '';
+// Fetch system name from settings BEFORE closing connection
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $system_name = $_POST['system_name'];
+    $contact_email = $_POST['contact_email'];
+    $logo = $settings['logo'] ?? '';
 
     // Handle logo upload
-    if (isset($_FILES['img']) && $_FILES['img']['error'] === UPLOAD_ERR_OK) {
-        $logo_tmp = $_FILES['img']['tmp_name'];
-        $logo_name = basename($_FILES['img']['name']);
-        $logo_path = '../uploads/' . $logo_name;
-        move_uploaded_file($logo_tmp, $logo_path);
+    if (isset($_FILES['logo']) && $_FILES['logo']['error'] == UPLOAD_ERR_OK) {
+        $logo_name = basename($_FILES['logo']['name']);
+        $target_path = "../webfonts/" . $logo_name;
+        if (move_uploaded_file($_FILES['logo']['tmp_name'], $target_path)) {
+            $logo = $logo_name;
+        }
     }
 
-    // Handle cover upload
-    if (isset($_FILES['cover']) && $_FILES['cover']['error'] === UPLOAD_ERR_OK) {
-        $cover_tmp = $_FILES['cover']['tmp_name'];
-        $cover_name = basename($_FILES['cover']['name']);
-        $cover_path = '../uploads/' . $cover_name;
-        move_uploaded_file($cover_tmp, $cover_path);
-    }
-
-    // Use previous logo/cover if not uploaded
-    $sql = "UPDATE system_settings SET system_name=?, welcome_content=?, logo=?, cover=? WHERE id=1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ssss", $system_name, $welcome_content, $logo_path, $cover_path);
+    // Update settings
+    $stmt = $conn->prepare("UPDATE settings SET system_name=?, contact_email=?, logo=?");
+    $stmt->bind_param("sss", $system_name, $contact_email, $logo);
     $stmt->execute();
     $stmt->close();
 
-    echo "<script>alert('Settings updated successfully!');</script>";
+    header("Location: setting.php?success=1");
+    exit();
 }
-
-// Fetch user data from the database
-$query = "SELECT id, avatar, first_name, last_name, username, department, user_type, status FROM users";
-$result = mysqli_query($conn, $query);
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Settings</title>
     <link rel="stylesheet" href="reportstyle.css">
-    <link rel="stylesheet" href="view_report.css">
+    <link rel="stylesheet" href="modal.css">
     <link rel="stylesheet" href="../css/all.min.css">
     <link rel="stylesheet" href="../css/fontawesome.min.css">
     <link rel="icon" type="image/png" href="../REPORT.png">
-    <title> Settings </title>
+    <style>
+        .header{
+            position: fixed;
+            z-index: 1000;
+        }
+        .card{
+            max-width: 700px;
+            width: 90%;
+            margin: 90px auto 40px;
+            padding: 18px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        .form-header{
+            background: #003D73;
+            color: white;
+            padding: 15px;
+            margin: 0px;
+            margin-bottom:20px;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 10px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        label {
+            color: #003D73;
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            border-bottom: 1px solid #444;
+        }
+        input[type="file"] {
+            margin-top: 8px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button[type="submit"] {
+            background-color: #003D73;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+        button[type="submit"]:hover {
+            background-color: #002D57;
+        }
+        .logo-preview {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-
-<aside class="sidebar">
+    <aside class="sidebar">
         <nav>
             <ul>
-<li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
+                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
@@ -120,8 +178,8 @@ $result = mysqli_query($conn, $query);
             </ul>
         </nav>
     </aside>
-    <div class="main-content">
-   <header class="header">
+     <div class="main-content">
+    <header class="header">
     <button id="toggleSidebar" class="toggle-sidebar-btn">
         <i class="fa-solid fa-bars"></i>
     </button>
@@ -140,88 +198,40 @@ $result = mysqli_query($conn, $query);
         </div>
     </div>
 </header>
-        <br>
-           <div class="card">
-               <div class="form-header">
-    <h3> System Information </h3>
-    <hr>
-    </div>
-    <!--System Info Card--->
-    <form method="POST" enctype="multipart/form-data">
-        <div class = "form-group-container">
-        <div class="form-group">
-            <label for="name" class="control-label">System Name</label>
-            <input type="text" class="form-control form-control-sm" name="name" id="name" value="<?php echo htmlspecialchars($system_name); ?>">
+    <div class="card">
+        <div class="form-header">
+            <h2><i class="fa-solid fa-gear"></i> System Settings</h2>
         </div>
-        <div class="form-group">
-            <label for="content[about_us]" class="control-label">Welcome Content</label>
-<textarea type="text" class="form-control form-control-sm summernote" name="content[welcome]" id="welcome"><?php echo htmlspecialchars($welcome_content); ?></textarea>        </div>
-        <div class="form-group">
-            <label for="logo" class="control-label">System Logo</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="logo" name="img" accept="image/*">
-                <label for="logo" class="custom-file-label">Choose Logo</label>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert-success">Settings updated successfully!</div>
+        <?php endif; ?>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="system_name">System Name:</label>
+                <input type="text" name="system_name" id="system_name" value="<?php echo htmlspecialchars($settings['system_name'] ?? ''); ?>" required>
             </div>
-<img id="logoPreview" src="<?php echo htmlspecialchars($logo_path); ?>" alt="Logo Preview" style="margin-top: 10px; max-width: 200px;<?php echo empty($logo_path) ? 'display:none;' : ''; ?>"/>        </div>
-        <div class="form-group">
-            <label for="cover" class="control-label">Cover</label>
-            <div class="custom-file">
-                <input type="file" class="custom-file-input" id="cover" name="cover" accept="image/*">
+            <div class="form-group">
+                <label for="contact_email">Contact Email:</label>
+                <input type="email" name="contact_email" id="contact_email" value="<?php echo htmlspecialchars($settings['contact_email'] ?? ''); ?>" required>
             </div>
-<img id="coverPreview" src="<?php echo htmlspecialchars($cover_path); ?>" alt="Cover Preview" style="margin-top: 10px; max-width: 200px;<?php echo empty($cover_path) ? 'display:none;' : ''; ?>"/>        </div>
-             <button class="btn btn-primary" type="submit"> Save Changes </button>
-    </form>
-</div>
-            </section>
+            <div class="form-group">
+               <label for="logo" class="upload-btn">Choose Logo</label>
+<input type="file" name="logo" id="logo" accept="image/*" style="display:none;">
+                <?php if (!empty($settings['logo'])): ?>
+                    <div class="logo-preview">
+                        <img src="../webfonts/<?php echo htmlspecialchars($settings['logo']); ?>" width="80" style="border-radius:8px;">
+                    </div>
+                <?php endif; ?>
             </div>
-
-</body>
-</html>
-<script src = "../js/reportscript.js"></script>
-<script src = "../js/archivescript.js"></script>
-
-<script>
-document.querySelectorAll('.custom-file-input').forEach(input => {
-    input.addEventListener('change', function() {
-        const label = this.nextElementSibling; // Get the label next to the input
-        const fileName = this.files.length > 0 ? this.files[0].name : 'Choose file'; // Get the file name or default text
-        label.textContent = fileName; // Update the label text to the file name
-
-        // Display the selected image
-        const file = this.files[0]; // Get the selected file
-        const imgPreview = this.id === 'logo' ? document.getElementById('logoPreview') : document.getElementById('coverPreview'); // Get the corresponding img element
-
-        if (file) {
-            const reader = new FileReader(); // Create a FileReader object
-            reader.onload = function(e) {
-                imgPreview.src = e.target.result; // Set the img src to the file's data URL
-                imgPreview.style.display = 'block'; // Show the image preview
-            };
-            reader.readAsDataURL(file); // Read the file as a data URL
-        } else {
-            imgPreview.style.display = 'none'; // Hide the image if no file is selected
-        }
-    });
-});
-
-function toggleDropdown(event) {
-            event.preventDefault(); // Prevent the default anchor behavior
-            document.getElementById("profileDropdown").classList.toggle("show");
-        }
-
-        // Close the dropdown if clicked outside of it
-        window.onclick = function(event) {
-            if (!event.target.matches('.user-icon') && !event.target.matches('.user-icon *')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
-                }
-            }
-        }
-document.addEventListener('DOMContentLoaded', () => {
+            <div class="form-actions">
+                <button type="submit">Update Settings</button>
+            </div>
+        </form>
+    </div>
+    <script src = "../js/reportscript.js"></script>
+    <script src = "../js/archivescript.js"></script>
+    <script>
+              document.addEventListener('DOMContentLoaded', () => {
     const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
     toggles.forEach(toggle => {
@@ -248,8 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-
-
-
-</script>
+    </script>
+</body>
+</html>

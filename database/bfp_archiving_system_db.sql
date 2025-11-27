@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2025 at 08:07 AM
+-- Generation Time: Nov 27, 2025 at 06:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,57 +43,10 @@ CREATE TABLE `activity_logs` (
 --
 
 INSERT INTO `activity_logs` (`log_id`, `username`, `user_type`, `action`, `report_id`, `id`, `timestamp`, `details`) VALUES
-(1, 'admin', NULL, 'create', 1, NULL, '2025-11-18 21:25:03', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(2, 'admin', NULL, 'download', 1, NULL, '2025-11-18 21:25:08', 'Download: Hardware Inspection 1'),
-(3, 'admin', NULL, 'download', 1, NULL, '2025-11-18 21:26:18', 'Download: Hardware Inspection 1'),
-(4, 'admin', NULL, 'download', 1, NULL, '2025-11-18 21:26:28', 'Download: Hardware Inspection 1'),
-(5, 'admin', NULL, 'download', 1, NULL, '2025-11-18 21:26:41', 'Download: Hardware Inspection 1'),
-(6, 'sean', NULL, 'download', 1, NULL, '2025-11-18 21:29:36', 'Download: Hardware Inspection 1'),
-(7, 'admin', NULL, 'create', 1, NULL, '2025-11-20 12:46:17', 'Created report: Fire at Matalams'),
-(8, 'sean', NULL, 'delete', 1, NULL, '2025-11-20 13:07:26', 'Deleted Report: Fire at Matalams'),
-(9, 'sean', NULL, 'create', 2, NULL, '2025-11-20 13:20:00', 'Created report: Fire at Dalapitan Apartment'),
-(10, 'batman', NULL, 'create', 3, NULL, '2025-11-20 13:25:59', 'Created report: Fire at Dalapitan Apartment'),
-(11, 'batman', NULL, 'update', 3, NULL, '2025-11-20 13:26:17', 'Updated Fire Incident Report: Fire at Dalapitan Apartment'),
-(12, 'sean', NULL, 'delete', 2, NULL, '2025-11-20 13:27:18', 'Deleted Report: Fire at Dalapitan Apartment'),
-(13, 'sean', NULL, 'create', 4, NULL, '2025-11-20 13:28:07', 'Created report: Fire Incident at Matalam'),
-(14, 'admin', NULL, 'create', 5, NULL, '2025-11-20 13:28:47', 'Created report: Fire at Matalams'),
-(15, 'admin', NULL, 'update', 3, NULL, '2025-11-20 13:29:25', 'Updated Fire Incident Report: Fire at Dalapitan Apartment'),
-(16, 'batman', NULL, 'create', 6, NULL, '2025-11-20 13:43:46', 'Created report: Fire at Dalapitan Apartment'),
-(17, 'admin', NULL, 'delete', 3, NULL, '2025-11-20 13:50:16', 'Deleted Report: Fire at Dalapitan Apartment'),
-(18, 'sean', NULL, 'create', 2, NULL, '2025-11-20 13:54:27', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(19, 'sean', NULL, 'create', 3, NULL, '2025-11-20 13:59:51', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(20, 'admin', NULL, 'delete', 2, NULL, '2025-11-20 14:00:10', 'Deleted Fire Safety Inspection Report: Hardware Inspection 1'),
-(21, 'admin', NULL, 'delete', 1, NULL, '2025-11-20 14:00:14', 'Deleted Fire Safety Inspection Report: Hardware Inspection 1'),
-(22, 'sean', NULL, 'create', 7, NULL, '2025-11-20 14:04:21', 'Created report: Fire Incident at Matalam'),
-(23, 'sean', NULL, 'create', 8, NULL, '2025-11-20 14:06:05', 'Created report: Fire Incident at Matalam'),
-(24, 'me1', NULL, 'create', 9, NULL, '2025-11-20 14:11:28', 'Created report: Fire at Matalams'),
-(25, 'admin', NULL, 'delete', 8, NULL, '2025-11-20 14:11:49', 'Deleted Report: Fire Incident at Matalam'),
-(26, 'admin', NULL, 'delete', 6, NULL, '2025-11-20 14:11:53', 'Deleted Report: Fire at Dalapitan Apartment'),
-(27, 'admin', NULL, 'delete', 4, NULL, '2025-11-20 14:11:59', 'Delete Report: Fire Incident at Matalam'),
-(28, 'admin', NULL, 'delete', 5, NULL, '2025-11-20 14:11:59', 'Delete Report: Fire at Matalams'),
-(29, 'admin', NULL, 'delete', 7, NULL, '2025-11-20 14:11:59', 'Delete Report: Fire Incident at Matalam'),
-(30, 'batman', NULL, 'create', 10, NULL, '2025-11-20 14:13:20', 'Created report: Fire at Dalapitan Apartment'),
-(31, 'batman', NULL, 'create', 11, NULL, '2025-11-20 14:16:32', 'Created report: Fire at Dalapitan Apartment'),
-(32, 'batman', NULL, 'create', 12, NULL, '2025-11-20 14:18:32', 'Created report: Fire at Dalapitan Apartment'),
-(33, 'batman', NULL, 'create', 13, NULL, '2025-11-20 14:20:53', 'Created report: Fire at Dalapitan Apartment'),
-(34, 'batman', NULL, 'create', 14, NULL, '2025-11-20 14:23:06', 'Created report: Fire at Dalapitan Apartment'),
-(35, 'admin', NULL, 'delete', 9, NULL, '2025-11-20 14:24:27', 'Deleted Report: Fire at Matalams'),
-(36, 'admin', NULL, 'delete', 10, NULL, '2025-11-20 14:29:57', 'Delete Report: Fire at Dalapitan Apartment'),
-(37, 'admin', NULL, 'delete', 11, NULL, '2025-11-20 14:29:57', 'Delete Report: Fire at Dalapitan Apartment'),
-(38, 'admin', NULL, 'delete', 12, NULL, '2025-11-20 14:29:57', 'Delete Report: Fire at Dalapitan Apartment'),
-(39, 'admin', NULL, 'delete', 13, NULL, '2025-11-20 14:29:57', 'Delete Report: Fire at Dalapitan Apartment'),
-(40, 'admin', NULL, 'delete', 14, NULL, '2025-11-20 14:29:57', 'Delete Report: Fire at Dalapitan Apartment'),
-(41, 'admin', NULL, 'create', 15, NULL, '2025-11-20 14:31:01', 'Created report: Fire at Matalams'),
-(42, 'sean', NULL, 'create', 16, NULL, '2025-11-20 14:31:39', 'Created report: Fire Incident at Manubuan'),
-(43, 'admin', NULL, 'delete', 15, NULL, '2025-11-20 14:35:18', 'Deleted Report: Fire at Matalams'),
-(44, 'admin', NULL, 'update', 16, NULL, '2025-11-20 14:46:24', 'Updated Fire Incident Report: Fire Incident at Manubuan'),
-(45, 'sean', NULL, 'create', 4, NULL, '2025-11-20 14:50:24', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(46, 'admin', NULL, 'create', 5, NULL, '2025-11-20 14:53:26', 'Created Fire Safety Inspection Report: Permit'),
-(47, 'admin', NULL, 'create', 6, NULL, '2025-11-20 14:54:41', 'Created Fire Safety Inspection Report: Permit'),
-(48, 'admin', NULL, 'create', 7, NULL, '2025-11-20 14:57:51', 'Created Fire Safety Inspection Report: Permit'),
-(49, 'admin', NULL, 'delete', 6, NULL, '2025-11-20 14:57:56', 'Deleted Fire Safety Inspection Report: Permit'),
-(50, 'admin', NULL, 'delete', 5, NULL, '2025-11-20 14:57:59', 'Deleted Fire Safety Inspection Report: Permit'),
-(51, 'sean', NULL, 'create', 8, NULL, '2025-11-20 15:04:14', 'Created Fire Safety Inspection Report: Hardware Inspection 1');
+(1, 'admin', NULL, 'create', 1, NULL, '2025-11-26 20:22:58', 'Created report: Fire at Matalams'),
+(2, 'admin', NULL, 'create', 1, NULL, '2025-11-26 20:28:03', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
+(3, 'me1', NULL, 'create', 2, NULL, '2025-11-27 00:04:02', 'Created report: Fire at Matalams'),
+(4, 'me1', NULL, 'create', 2, NULL, '2025-11-27 00:06:28', 'Created Fire Safety Inspection Report: Hardware Inspection 1');
 
 -- --------------------------------------------------------
 
@@ -226,14 +179,8 @@ CREATE TABLE `fire_incident_reports` (
 --
 
 INSERT INTO `fire_incident_reports` (`report_id`, `report_title`, `fire_location`, `street`, `purok`, `municipality`, `incident_date`, `establishment`, `victims`, `firefighters`, `property_damage`, `fire_types`, `uploader`, `department`, `caller_name`, `responding_team`, `arrival_time`, `fireout_time`, `alarm_status`, `occupancy_type`, `documentation_photos`, `narrative_report`, `progress_report`, `final_investigation_report`, `deleted`, `deleted_at`) VALUES
-(9, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-20 14:11:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '14:11', '14:11', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-11-20 14:24:27'),
-(10, 'Fire at Dalapitan Apartment', 'Bato', 'Apartment Ave.', 'Purok 5', 'Matalam', '2025-11-20 14:13:00', 'Apartment', '', '', '18000', 'Lighted cigarette butt', 'batman', NULL, 'Carlos Dizon', 'Team E', '14:13', '14:13', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-11-20 14:29:57'),
-(11, 'Fire at Dalapitan Apartment', 'Lampayan', 'Apartment Ave.', 'Purok 5', 'Matalam', '2025-11-20 14:16:00', 'Apartment', '', '', '18000', 'Airplane crash', 'batman', 'Fire Safety and Prevention', 'Carlos Dizon', 'Team E', '14:16', '14:16', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-11-20 14:29:57'),
-(12, 'Fire at Dalapitan Apartment', 'Dalapitan', 'Apartment Ave.', 'Purok 5', 'Matalam', '2025-11-20 14:18:00', 'Apartment', '', '', '18000', 'Bomb explosion', 'batman', 'Fire Safety and Prevention', 'Carlos Dizon', 'Team E', '14:18', '14:18', '1st Alarm', 'Commercial', '', '', '', '', 0, '2025-11-20 14:29:57'),
-(13, 'Fire at Dalapitan Apartment', 'Bangbang', 'Apartment Ave.', 'Purok 5', 'Matalam', '2025-11-20 14:20:00', 'Apartment', '', '', '18000', 'Bomb explosion', 'batman', NULL, 'Carlos Dizon', 'Team E', '14:20', '14:20', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-11-20 14:29:57'),
-(14, 'Fire at Dalapitan Apartment', 'Bangbang', 'Apartment Ave.', 'Purok 5', 'Matalam', '2025-11-20 14:22:00', 'Apartment', '', '', '18000', 'Airplane crash', 'batman', 'Fire Safety and Prevention', 'Carlos Dizon', 'Team E', '14:22', '14:22', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-11-20 14:29:57'),
-(15, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-20 14:30:00', 'Warehouse', '', '', '1,000,000', 'Bomb explosion', 'admin', NULL, 'Sean Ernest Aguda', 'Team A', '14:30', '14:30', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-11-20 14:35:18'),
-(16, 'Fire Incident at Manubuan', 'Central Malamote', 'Tuscano', 'Purok 2 Lovers', 'Kabacan', '2025-11-20 14:31:00', 'BFP', '', '', '10000', 'Airplane crash', 'sean', 'Administrative', 'Sean Ernest Aguda', 'Team B', '14:31', '14:31', '1st Alarm', 'Residential', '', '', '', '', 0, NULL);
+(1, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-26 20:22:00', 'Warehouse', '', '', '1,000,000', 'Bomb explosion', 'admin', NULL, 'Sean Ernest Aguda', 'Team A', '20:22', '20:22', '2nd Alarm', 'Residential', '', '', '', '', 0, NULL),
+(2, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-27 00:03:00', 'Warehouse', '', '', '1,000,000', 'Chemicals/LPG leaking', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:03', '00:03', '2nd Alarm', 'Vehicular', '', '', '', '', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -289,12 +236,8 @@ CREATE TABLE `fire_safety_inspection_certificate` (
 --
 
 INSERT INTO `fire_safety_inspection_certificate` (`id`, `permit_name`, `inspection_establishment`, `owner`, `inspection_address`, `inspection_date`, `establishment_type`, `inspection_purpose`, `fire_alarms`, `fire_extinguishers`, `emergency_exits`, `sprinkler_systems`, `fire_drills`, `exit_signs`, `electrical_wiring`, `emergency_evacuations`, `inspected_by`, `contact_person`, `contact_number`, `number_of_occupants`, `nature_of_business`, `number_of_floors`, `floor_area`, `classification_of_hazards`, `building_construction`, `possible_problems`, `hazardous_materials`, `application_form`, `proof_of_ownership`, `building_plans`, `fire_safety_equipment`, `evacuation_plan`, `fire_safety_personnel`, `fire_insurance_policy`, `occupancy_permit`, `business_permit`, `created_at`, `deleted_at`, `uploader`, `department`) VALUES
-(3, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-11-20', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Lourdes Garcia', '09777461096', 11, 'None', 2, '750', 'Class_B', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-20 05:59:51', NULL, 'sean', ''),
-(4, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-20 06:50:24', NULL, 'sean', ''),
-(5, 'Permit', '123', '123', 'Poblacion, Matalam, Cotabato', '2025-11-20', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 12, 'none', 5, '750 sqm', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-20 06:53:26', '2025-11-20 14:57:59', '', ''),
-(6, 'Permit', 'Matalam Hardware', '123', 'Poblacion, Matalam, Cotabato', '2025-11-20', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 12, 'none', 5, '750 sqm', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-20 06:54:41', '2025-11-20 14:57:56', '', ''),
-(7, 'Permit', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-11-20', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 12, 'none', 12, '750s', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-20 06:57:51', NULL, 'admin', ''),
-(8, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-20 07:04:14', NULL, 'sean', '');
+(1, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-26 12:28:03', NULL, 'admin', 'N/A'),
+(2, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-26 16:06:28', NULL, 'me1', 'Administrative');
 
 -- --------------------------------------------------------
 
@@ -333,6 +276,27 @@ INSERT INTO `fire_types` (`fire_types_id`, `fire_types`, `description`) VALUES
 (18, 'Bomb explosion', 'Fires caused by explosions from bombs or similar devices, causing widespread damage and ignition.'),
 (20, 'Others', 'Fires caused by various uncommon or undefined factors not covered in the listed categories.'),
 (40, 'Electrical connection', 'Fires caused by faulty or poor electrical connections, resulting in overheating or sparks.');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` int(11) NOT NULL,
+  `system_name` varchar(255) NOT NULL,
+  `contact_email` varchar(255) NOT NULL,
+  `logo` varchar(255) DEFAULT NULL,
+  `about` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `system_name`, `contact_email`, `logo`, `about`) VALUES
+(1, 'BUREAU OF FIRE PROTECTION REPORT ARCHIVING SYSTEM', 'admin@example.com', 'REPORT.png', '            <p>The Bureau of Fire Protection Archiving System is designed to securely manage, store, and retrieve official fire protection reports and documents. Our platform streamlines the archiving process, ensuring efficiency, accuracy, and accessibility for authorized personnel.</p><p><strong>Features:</strong><ul><li>Search and retrieve archived reports quickly</li><li>Create and manage new archive entries</li><li>Generate and export comprehensive reports</li><li>Role-based access for employees and administrators</li></ul></p><p>We are committed to providing a reliable and user-friendly system to support the Bureau of Fire Protection\\\'s mission of safeguarding lives and property.</p>\r\n');
 
 -- --------------------------------------------------------
 
@@ -430,6 +394,12 @@ ALTER TABLE `fire_types`
   ADD PRIMARY KEY (`fire_types_id`);
 
 --
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `system_settings`
 --
 ALTER TABLE `system_settings`
@@ -450,7 +420,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `admins`
@@ -474,19 +444,25 @@ ALTER TABLE `departments`
 -- AUTO_INCREMENT for table `fire_incident_reports`
 --
 ALTER TABLE `fire_incident_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `fire_safety_inspection_certificate`
 --
 ALTER TABLE `fire_safety_inspection_certificate`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `fire_types`
 --
 ALTER TABLE `fire_types`
   MODIFY `fire_types_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `system_settings`

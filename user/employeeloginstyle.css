@@ -127,18 +127,36 @@ h2 {
     width: 100%;
     padding: 10px;
     font-size: 1rem;
-    background: #ffffff;
-    color: #003d73;
+    background: #003D73;
+    color: #ffffff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    border: 1px solid #003D73;
+    border: 1px solid #ffffff;
     font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+}
+
+.form-actions button:active {
+    transform: scale(0.98);
 }
 
 .form-actions button:hover {
-    background: #003d73;
-    color: #ffffff;
+    background: #ffffff;
+    color: #003D73;
+    animation:alternate-reverse;
+    border: 1.5px solid #003D73;
+}
+
+@keyframes buttonHover {
+    0% {
+        background-color: #ffffff;
+        color: #003d73;
+    }
+    100% {
+        background-color: #003d73;
+        color: #ffffff;
+    }
 }
 
 /* Flex container for aligning the forgot password and sign up links */

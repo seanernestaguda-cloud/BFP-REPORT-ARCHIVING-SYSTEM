@@ -131,10 +131,18 @@ h2 {
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s, color 0.3s;
+}
+
+.form-actions button:active {
+  transform: scale(0.98);
 }
 
 .form-actions button:hover {
-  background: #011e38;
+  background: #ffffff;
+  color:#003d73;
+  border: 1.5px solid #003d73;
+  animation: buttonHover 0.5s alternate-reverse;
 }
 
 /* Flex container for aligning the forgot password and sign up links */

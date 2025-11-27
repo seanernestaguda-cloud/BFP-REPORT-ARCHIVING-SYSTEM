@@ -23,80 +23,119 @@ $contact_email = $settings['contact_email'] ?? '';
     <link rel="stylesheet" href="css/fontawesome.min.css" />
     <title><?php echo htmlspecialchars($system_name); ?> — Home</title>
     <style>
-      /* Minimal hero styles here while you move the rest to style.css */
       .image-container {
-        min-height: 380px;
-        background-image: url("film archive.jpg");
-        background-size: 100%;
-        background-position: center;
+        min-height: 420px;
+        background: linear-gradient(90deg, #ffa700 0%, #bd000a 100%);
+        background-image: url(film\ archive.jpg);
         display: flex;
         align-items: center;
         justify-content: center;
         color: #fff;
         position: relative;
+        width: 100%;
       }
       .image-container::after {
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(
-          0,
-          0,
-          0,
-          0.35
-        ); /* subtle overlay to improve text contrast */
+        background: rgba(0,0,0,0.35);
+        z-index: 0;
       }
       .hero {
         position: relative;
         z-index: 1;
-        text-align: center;
-        max-width: 900px;
-        padding: 40px 20px;
+        text-align: left;
+        max-width: 700px;
+        padding: 60px 40px;
+        margin-left: 40px;
       }
-      .hero h1 {
-        font-size: 28px;
-        margin-bottom: 10px;
-      }
-      .hero p {
+      .hero-title {
+        font-size: 2.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #fff;
         margin-bottom: 18px;
+        line-height: 1.1;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.18);
       }
-      .hero-ctas .btn {
-        display: inline-block;
-        padding: 10px 18px;
-        border-radius: 6px;
-        text-decoration: none;
-        margin: 0 8px;
+      .hero-desc {
+        font-size: 1.25rem;
+        color: #f0f0f0;
+        margin-bottom: 32px;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.12);
       }
-      .btn.primary {
-        background: #d32f2f;
-        color: #fff;
+      .hero-ctas {
+        margin-top: 10px;
       }
-      .btn.outline {
-        background: transparent;
-        border: 2px solid #fff;
-        color: #fff;
+      .btn.cta {
+        background: #ffa700;
+        color: #6a1b9a;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 14px 32px;
+        font-size: 1.1rem;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: background 0.2s, color 0.2s;
+        cursor: pointer;
+      }
+      .btn.cta:hover {
+        background: #ffd54f;
+        color: #d32f2f;
+      }
+      .features {
+        padding: 48px 20px 36px 20px;
+        text-align: center;
+        background: #fff;
+      }
+      .features-title {
+        font-size: 2rem;
+        margin-bottom: 24px;
+        color: #d32f2f;
+        font-weight: 700;
+      }
+      .features .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+        max-width: 1000px;
+        margin: 18px auto;
+      }
+      .card {
+        padding: 28px 18px 22px 18px;
+        border-radius: 12px;
+        background: #f7f7f7;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        transition: box-shadow 0.2s, transform 0.2s;
+        position: relative;
+        text-align: left;
+      }
+      .card:hover {
+        box-shadow: 0 6px 24px rgba(211,47,47,0.12);
+        transform: translateY(-4px) scale(1.03);
+      }
+      .card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+        color: #d32f2f;
+        font-weight: 700;
+      }
+      .card p {
+        font-size: 1rem;
+        color: #444;
+      }
+      .card hr {
+        border: none;
+        border-top: 2px solid #ffa700;
+        margin: 10px 0 16px 0;
       }
       footer {
         position: static;
         z-index: 1;
         clear: both;
-      }
-      .features {
-        padding: 36px 20px;
-        text-align: center;
-      }
-      .features .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 16px;
-        max-width: 1000px;
-        margin: 18px auto;
-      }
-      .card {
-        padding: 18px;
-        border-radius: 8px;
-        background: #f7f7f7;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       }
     </style>
   </head>
@@ -117,49 +156,45 @@ $contact_email = $settings['contact_email'] ?? '';
 
     <header role="banner">
       <nav class="navbar" role="navigation" aria-label="Primary">
-        <div class="logo">
-          <a href="index.php"><?php echo htmlspecialchars($system_name); ?></a>
-        </div>
+    <a href="index.php" class="logo" style="display: flex; align-items: center; gap: 10px; color:#f7f7f7; text-decoration: none; font-weight: bold; font-size: 20px;">
+        <img src="<?php echo htmlspecialchars($logo); ?>" alt="Logo" style="height: 40px; width: auto; border: 1px solid #fff; border-radius:30px; background-color: #f7f7f7;">
+        <?php echo htmlspecialchars($system_name); ?>
+      </a>
         <ul class="nav-links">
-          <li><a href="user/signup.php">Register</a></li>
-          <li><a href="user/userlogin.php">Employee Login</a></li>
-          <li><a href="Admin/adminlogin.php">Admin Login</a></li>
+          <li><a href="About.php">ABOUT US</a></li>
+          <li><a href="user/signup.php">SIGN UP</a></li>
+          <li><a href="login.html">LOGIN</a></li>
         </ul>
       </nav>
 
-      <nav class="navbar2" role="navigation" aria-label="Secondary">
-        <ul class="nav-links">
-          <li><a class="active" href="index.php">Home</a></li>
-          <li><a href="About.html">About Us</a></li>
-        </ul>
-      </nav>
     </header>
 
     <main id="main" role="main">
       <section class="image-container" aria-label="Hero">
         <div class="hero">
-          <h1>Welcome to the <?php echo htmlspecialchars($system_name); ?></h1>
-          <p>
-            Search, create and manage official reports securely and efficiently.
-          </p>
-          <div class="hero-ctas"></div>
+          <div class="hero-title">BUREAU OF FIRE PROTECTION REPORT ARCHIVING SYSTEM</div>
+          <div class="hero-desc">Search, create and manage official reports securely and efficiently.</div>
+
         </div>
       </section>
 
       <section class="features">
-        <h2>What you can do</h2>
+        <div class="features-title">WHAT YOU CAN DO</div>
         <div class="cards">
           <article class="card">
-            <h3 id="f1">Search Archives</h3>
-            <p>Quickly find documents by name, date or tags.</p>
+            <h3>SEARCH ARCHIVES</h3>
+            <hr />
+          <p>Quickly find documents by name, date or tags.</p>
           </article>
           <article class="card">
-            <h3 id="f2">Create Archives</h3>
-            <p>Create and manage reports.</p>
+            <h3>CREATE REPORTS</h3>
+            <hr>
+            <p> Create and Manage Reports. </p>
           </article>
           <article class="card">
-            <h3 id="f3">Reports</h3>
-            <p>Generate and export archive reports.</p>
+            <h3>REPORTS</h3>
+            <hr>
+            <p>Generate detailed reports of archived documents.</p>
           </article>
         </div>
       </section>

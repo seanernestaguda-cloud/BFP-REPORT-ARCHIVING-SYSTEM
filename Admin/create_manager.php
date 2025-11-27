@@ -352,7 +352,7 @@ echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARC
 
     <div class="avatar-upload">
         <label for="avatar" class="avatar-label">
-            <img id="avatarPreview" src="../img/default-avatar.png" alt="Avatar Preview" class="avatar-circle">
+            <img id="avatarPreview" src="../avatars/default_avatar.png" alt="Avatar Preview" class="avatar-circle">
             <span class="avatar-edit-text">Click to upload avatar</span>
         </label>
         <input type="file" id="avatar" name="avatar" accept="image/*" style="display:none;">

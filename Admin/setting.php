@@ -17,9 +17,11 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
 }
 
 // Fetch current settings (assuming a 'settings' table with one row)
+
 $sql = "SELECT * FROM settings LIMIT 1";
 $result = $conn->query($sql);
 $settings = $result ? $result->fetch_assoc() : [];
+$about = $settings['about'] ?? '';
 
 // Fetch system name from settings BEFORE closing connection
 $sql_settings = "SELECT system_name FROM settings LIMIT 1";
@@ -30,9 +32,11 @@ if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
 }
 
 // Handle form submission
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $system_name = $_POST['system_name'];
     $contact_email = $_POST['contact_email'];
+    $about = $_POST['about'];
     $logo = $settings['logo'] ?? '';
 
     // Handle logo upload
@@ -45,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update settings
-    $stmt = $conn->prepare("UPDATE settings SET system_name=?, contact_email=?, logo=?");
-    $stmt->bind_param("sss", $system_name, $contact_email, $logo);
+    $stmt = $conn->prepare("UPDATE settings SET system_name=?, contact_email=?, logo=?, about=?");
+    $stmt->bind_param("ssss", $system_name, $contact_email, $logo, $about);
     $stmt->execute();
     $stmt->close();
 
@@ -215,8 +219,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="email" name="contact_email" id="contact_email" value="<?php echo htmlspecialchars($settings['contact_email'] ?? ''); ?>" required>
             </div>
             <div class="form-group">
+                <label for="about">About (HTML allowed):</label>
+                <textarea name="about" id="about" rows="7" style="width:100%;font-size:16px;"><?php echo htmlspecialchars($about); ?></textarea>
+            </div>
+            <div class="form-group">
                <label for="logo" class="upload-btn">Choose Logo</label>
-<input type="file" name="logo" id="logo" accept="image/*" style="display:none;">
+                <input type="file" name="logo" id="logo" accept="image/*" style="display:none;">
                 <?php if (!empty($settings['logo'])): ?>
                     <div class="logo-preview">
                         <img src="../webfonts/<?php echo htmlspecialchars($settings['logo']); ?>" width="80" style="border-radius:8px;">

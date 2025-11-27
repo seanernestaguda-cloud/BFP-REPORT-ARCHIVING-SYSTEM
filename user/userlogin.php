@@ -1,5 +1,6 @@
 <?php
 session_start();
+$error_message = '';
 
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];
@@ -105,10 +106,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
             <div class="form-actions">
-                <button type="submit">Login</button>
+                <button type="submit">LOGIN</button>
             </div>
             <div class="links-container">
-                <a href="/archiving system/index.php">Go to Home</a>
+                <a href="/archiving system/login.html">Go back</a>
                 <div class="sign-up-container">
                     <p>Don't have an account? <a href="signup.php">Sign up</a></p>
                 </div>

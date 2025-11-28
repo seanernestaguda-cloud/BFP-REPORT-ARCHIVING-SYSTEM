@@ -154,6 +154,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" type="image/png" href="../REPORT.png">
         <link rel="stylesheet" href="reportstyle.css">
+        <link rel="stylesheet" href="modal.css">
         <link rel="stylesheet" href="../css/all.min.css">
         <link rel="stylesheet" href="../css/fontawesome.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -423,7 +424,7 @@ h4{
             </a>
             <div id="profileDropdown" class="dropdown-content">
                 <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <a href="logout.php" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
         </div>
@@ -531,8 +532,17 @@ h4{
     <p class="card-number">₱<?php echo number_format($total_damage, 2); ?></p>
 </div>
 </body>
+<!-- Logout Confirmation Modal -->
+<div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
 </html>
-
 <script>
     // Sidebar toggle logic
     document.getElementById('toggleSidebar').addEventListener('click', function() {
@@ -590,8 +600,26 @@ h4{
     });
 });
 
+    // Logout confirmation modal logic
+    document.getElementById('logoutLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('logoutModal').style.display = 'flex';
+    });
 
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
 
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+
+    // Optional: Close modal when clicking outside the modal box
+    document.getElementById('logoutModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
 </script>
 
 

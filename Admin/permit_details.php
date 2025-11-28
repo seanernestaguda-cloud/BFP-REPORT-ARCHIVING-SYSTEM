@@ -412,7 +412,7 @@ iframe{
             </a>
             <div id="profileDropdown" class="dropdown-content">
                 <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
     </div>
@@ -882,6 +882,18 @@ iframe{
     </div>
 </div>
 
+<div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
+
+
+
 <div id="successModal" class="success-modal">
     <div class="success-modal-content">
     <i class="fa-regular fa-circle-check"></i>
@@ -891,9 +903,34 @@ iframe{
 </div>
 
 </div>
-<script src = "../js/archivescript.js"></script>
-<script src = "../js/reportscript.js"></script>
 <script>
+
+            document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
+
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};  
 // Show modal if update was successful
 window.onload = function() {
     if (<?php echo isset($_SESSION['update_success']) && $_SESSION['update_success'] ? 'true' : 'false'; ?>) {
@@ -1079,3 +1116,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+<script src = "../js/archivescript.js"></script>
+

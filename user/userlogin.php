@@ -5,7 +5,13 @@ $error_message = '';
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];
     $messageType = $_SESSION['message_type']; // success or error
-    $error_message = $message; // <-- Add this line
+    $error_message = $message;
+    if (isset($_SESSION['redirect_to_dashboard'])) {
+        $redirect_to_dashboard = true;
+        unset($_SESSION['redirect_to_dashboard']);
+    } else {
+        $redirect_to_dashboard = false;
+    }
     unset($_SESSION['message']);
     unset($_SESSION['message_type']);
 }
@@ -20,26 +26,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $query = "SELECT * FROM users WHERE username = '$username' AND status = 'verified'";
     $result = mysqli_query($conn, $query);
 
-   if ($result && mysqli_num_rows($result) > 0) {
-    $user = mysqli_fetch_assoc($result);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $user = mysqli_fetch_assoc($result);
 
-    // Prevent admin user type from logging in here
-    if ($user['user_type'] === 'admin') {
-        $_SESSION['message'] = "User not found";
-        $_SESSION['message_type'] = "error";
-        header("Location: userlogin.php");
-        exit();
-    }
+        // Prevent admin user type from logging in here
+        if ($user['user_type'] === 'admin') {
+            $_SESSION['message'] = "User not found";
+            $_SESSION['message_type'] = "error";
+            header("Location: userlogin.php");
+            exit();
+        }
 
-    // Verify hashed password
-    if (password_verify($password, $user['password'])) {
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['id'] = $user['id'];
-        $_SESSION['department'] = $user['department'];
-        header("Location: userdashboard.php");
-        exit();
+        // Verify hashed password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['id'] = $user['id'];
+            $_SESSION['department'] = $user['department'];
+            $_SESSION['message'] = "Login successful! Redirecting to dashboard...   ";
+            $_SESSION['message_type'] = "success";
+            $_SESSION['redirect_to_dashboard'] = true;
+            header("Location: userlogin.php");
+            exit();
+        }
     }
-}
     $_SESSION['message'] = "Invalid login credentials or account not verified.";
     $_SESSION['message_type'] = "error";
     header("Location: userlogin.php");
@@ -109,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit">LOGIN</button>
             </div>
             <div class="links-container">
-                <a href="/archiving system/login.html">Go back</a>
+                <a href="/archiving system/index.php">Back to Home</a>
                 <div class="sign-up-container">
                     <p>Don't have an account? <a href="signup.php">Sign up</a></p>
                 </div>
@@ -126,7 +135,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p id="errorMessage"></p>
     </div>
 </div>
-
+     
+        <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <i class="fa-regular fa-circle-check"></i> <h2>Success!</h2>
+        <p id="successMessage"></p>
+    </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
@@ -141,7 +155,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-<?php if ($error_message): ?>
+<?php if (isset($redirect_to_dashboard) && $redirect_to_dashboard): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('successMessage').textContent = "<?php echo htmlspecialchars($message); ?>";
+    document.getElementById('successModal').style.display = 'block';
+
+    setTimeout(function() {
+        window.location.href = "userdashboard.php";
+    }, 2000);
+
+    document.getElementById('closeSuccessModal')?.addEventListener('click', function() {
+        document.getElementById('successModal').style.display = 'none';
+        window.location.href = "userdashboard.php";
+    });
+    window.onclick = function(event) {
+        if (event.target === document.getElementById('successModal')) {
+            document.getElementById('successModal').style.display = 'none';
+            window.location.href = "userdashboard.php";
+        }
+    };
+});
+<?php elseif ($error_message): ?>
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('errorMessage').textContent = "<?php echo $error_message; ?>";
     document.getElementById('errorModal').style.display = 'block';

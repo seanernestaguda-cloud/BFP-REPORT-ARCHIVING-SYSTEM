@@ -106,6 +106,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../js/libs/Chart.min.js"></script>
     <link rel="stylesheet" href="reportstyle.css">
+    <link rel="stylesheet" href="modal.css">
     <link rel="stylesheet" href="../css/all.min.css">
     <link rel="stylesheet" href="../css/fontawesome.min.css">
     <link rel="icon" type="image/png" href="../REPORT.png">
@@ -218,7 +219,7 @@ $conn->close();
             </a>
             <div id="profileDropdown" class="dropdown-content">
                 <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
     </div>
@@ -289,9 +290,43 @@ $conn->close();
         </div>
     </div>
 </div>
-<script src="../js/reportscript.js"></script>
-<script src="../js/archivescript.js"></script>
+<div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
+
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
+
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};
 const barangayFilter = document.getElementById('barangayFilter');
 const tableBody = document.getElementById('tableBody');
 const originalTableRows = [...tableBody.querySelectorAll('tr')];
@@ -492,3 +527,4 @@ function printTable() {
 </script>
 </body>
 </html>
+<script src="../js/archivescript.js"></script>

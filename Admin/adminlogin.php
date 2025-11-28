@@ -3,6 +3,7 @@ session_start(); // Start the session
 include 'connection.php'; // Ensure this file is included to access the database
 
 $error_message = ""; // Initialize error message variable
+$show_success_modal = false; // Flag to show success modal
 
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -13,8 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($user === 'admin' && $pass === 'admin') {
         // Allow default admin to log in without verification check
         $_SESSION['username'] = $user;
-        header("Location: admindashboard.php");
-        exit();
+        $show_success_modal = true;
     }
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
@@ -36,8 +36,7 @@ if (mysqli_num_rows($result) > 0) {
         else if ($row['status'] == 'verified') {
             // Set session and redirect to dashboard
             $_SESSION['username'] = $user;
-            header("Location: admindashboard.php");
-            exit();
+            $show_success_modal = true;
         } else {
             // Display message if not verified
             $error_message = "Your account is not verified yet. Please contact an admin.";
@@ -139,7 +138,7 @@ if (mysqli_num_rows($result) > 0) {
                 <button type="submit">LOGIN</button>
             </div>
             <div class="links-container">
-                <a href="/archiving system/login.html">Go back</a>
+                <a href="/archiving system/index.php">Back to Home</a>
             </div>
         </form>
     </div>
@@ -154,6 +153,12 @@ if (mysqli_num_rows($result) > 0) {
     </div>
 </div>
 
+        <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <i class="fa-regular fa-circle-check"></i> <h2>Success!</h2>
+        <p id="successMessage"></p>
+    </div>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
@@ -176,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Auto-close modal after 2 seconds
     setTimeout(function() {
         document.getElementById('errorModal').style.display = 'none';
-    }, 2000);
+    }, 500);
 
     // Optional: manual close handlers (if you add a close button)
     document.getElementById('closeErrorModal')?.addEventListener('click', function() {
@@ -187,6 +192,16 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('errorModal').style.display = 'none';
         }
     };
+});
+<?php endif; ?>
+
+<?php if ($show_success_modal): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('successMessage').textContent = "Login successful! Redirecting to dashboard...";
+    document.getElementById('successModal').style.display = 'block';
+    setTimeout(function() {
+        window.location.href = "admindashboard.php";
+    }, 1000);
 });
 <?php endif; ?>
 </script>

@@ -9,6 +9,12 @@
 include('connection.php');
 include('auth_check.php');
 
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
 // Get user info and role
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar, user_type FROM users WHERE username = ? LIMIT 1";

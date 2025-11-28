@@ -145,7 +145,7 @@ h2 {
     background: #ffffff;
     color: #003D73;
     animation:alternate-reverse;
-    border: 1.5px solid #003D73;
+    box-shadow: 0 6px 24px hsla(236, 100%, 61%, 0.16);
 }
 
 @keyframes buttonHover {

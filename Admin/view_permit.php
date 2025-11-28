@@ -9,6 +9,12 @@
 include('connection.php');
 include('auth_check.php');
 
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
 // Get user info and role
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar, user_type FROM users WHERE username = ? LIMIT 1";
@@ -364,7 +370,7 @@ iframe{
 <body>
 
 <div class="dashboard">
-   <aside class="sidebar">
+<aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
@@ -411,7 +417,7 @@ iframe{
             </a>
             <div id="profileDropdown" class="dropdown-content">
                 <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
     </div>
@@ -879,6 +885,16 @@ iframe{
     </div>
 </div>
 
+<div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
+
 <div id="successModal" class="success-modal">
     <div class="success-modal-content">
     <i class="fa-regular fa-circle-check"></i>
@@ -887,10 +903,34 @@ iframe{
     </div>
 </div>
 
-</div>
-<script src = "../js/archivescript.js"></script>
-<script src = "../js/reportscript.js"></script>
+
 <script>
+                   document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
+
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};
 // Show modal if update was successful
 window.onload = function() {
     if (<?php echo isset($_SESSION['update_success']) && $_SESSION['update_success'] ? 'true' : 'false'; ?>) {
@@ -1076,3 +1116,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+<script src = "../js/archivescript.js"></script>

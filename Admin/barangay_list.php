@@ -124,6 +124,14 @@ $query = "SELECT * FROM barangays ORDER BY barangay_name LIMIT $per_page OFFSET 
 $result = mysqli_query($conn, $query);
 $barangays = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
+
+
 mysqli_close($conn);
 ?>
 
@@ -206,20 +214,20 @@ mysqli_close($conn);
     </head>
     <body>
     <div class="dashboard">
-   <aside class="sidebar">
+ <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4><?php echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'); ?></h4></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>

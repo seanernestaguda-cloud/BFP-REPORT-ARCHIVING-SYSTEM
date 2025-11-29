@@ -355,17 +355,17 @@ mysqli_close($conn);
   <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name)?></h4></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
                 <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-box-archive"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -744,6 +744,33 @@ mysqli_close($conn);
 </html>
 
 <script>
+       document.addEventListener('DOMContentLoaded', () => {
+    const toggles = document.querySelectorAll('.report-dropdown-toggle');
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            const dropdown = this.closest('.report-dropdown');
+            dropdown.classList.toggle('show');
+
+            // Close other dropdowns
+            document.querySelectorAll('.report-dropdown').forEach(item => {
+                if (item !== dropdown) {
+                    item.classList.remove('show');
+                }
+            });
+        });
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', event => {
+        if (!event.target.closest('.report-dropdown')) {
+            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+});
 // --- Tab Switching for Substantiating Documents ---
 function showTab(tab) {
     // Remove active class from all tab buttons

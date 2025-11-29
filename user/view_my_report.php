@@ -9,6 +9,14 @@
 include('connection.php');
 include('auth_check.php');
 
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
+
+
 
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar, user_type FROM users WHERE username = ? LIMIT 1";
@@ -345,10 +353,10 @@ mysqli_close($conn);
 </head>
 <body>
 <div class = "dashboard">
-    <aside class="sidebar">
+      <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
@@ -377,13 +385,12 @@ mysqli_close($conn);
             </ul>
         </nav>
     </aside>
-
-<div class="main-content">
-<header class="header">
+    <div class="main-content">
+   <header class="header">
     <button id="toggleSidebar" class="toggle-sidebar-btn">
         <i class="fa-solid fa-bars"></i>
     </button>
-    <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+        <h2><?php echo htmlspecialchars($system_name); ?></h2>
     <div class="header-right">
         <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
@@ -393,7 +400,7 @@ mysqli_close($conn);
             </a>
             <div id="profileDropdown" class="dropdown-content">
                 <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
     </div>
@@ -722,11 +729,16 @@ mysqli_close($conn);
         <img id="modalPhoto" src="" alt="Photo" style="max-width:90vw; max-height:80vh; display:block; margin:auto;">
     </div>
 </div>
-</body>
 
-</html>
-<script src = "../js/reportscript.js"></script>
-<script src = "../js/archivescript.js"></script>
+    <div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
 
 
 <script>
@@ -976,4 +988,62 @@ document.getElementById('closePhotoModal').onclick = function() {
 document.addEventListener('DOMContentLoaded', function() {
     showTab('spot');
 });
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const toggles = document.querySelectorAll('.report-dropdown-toggle');
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            const dropdown = this.closest('.report-dropdown');
+            dropdown.classList.toggle('show');
+
+            // Close other dropdowns
+            document.querySelectorAll('.report-dropdown').forEach(item => {
+                if (item !== dropdown) {
+                    item.classList.remove('show');
+                }
+            });
+        });
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', event => {
+        if (!event.target.closest('.report-dropdown')) {
+            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
+
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};
 </script>
+</body>
+</html>
+<script src = "../js/archivescript.js"></script>

@@ -9,6 +9,7 @@
 include('connection.php');
 include('auth_check.php');
 
+
 $sql_settings = "SELECT system_name FROM settings LIMIT 1";
 $result_settings = $conn->query($sql_settings);
 $system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
@@ -363,10 +364,10 @@ iframe{
 <body>
 
 <div class="dashboard">
-    <aside class="sidebar">
+     <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
@@ -395,26 +396,25 @@ iframe{
             </ul>
         </nav>
     </aside>
-    <div class="main-content">
+<div class="main-content">
     <header class="header">
-    <button id="toggleSidebar" class="toggle-sidebar-btn">
-        <i class="fa-solid fa-bars"></i>
-    </button>
-    <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
-    <div class="header-right">
-        <div class="dropdown">
-            <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
-                <!-- Add avatar image here -->
-                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
-            </a>
-            <div id="profileDropdown" class="dropdown-content">
-                <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <button id="toggleSidebar" class="toggle-sidebar-btn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <h2><?php echo htmlspecialchars($system_name); ?></h2>
+        <div class="header-right">
+            <div class="dropdown">
+                <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
+                    <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                    <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+                </a>
+                <div id="profileDropdown" class="dropdown-content">
+                    <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 <div class="card">
     <div class="form-header">
     <div class = "form-actions">
@@ -887,9 +887,35 @@ iframe{
 </div>
 
 </div>
-<script src = "../js/archivescript.js"></script>
-<script src = "../js/reportscript.js"></script>
 <script>
+
+          document.addEventListener('DOMContentLoaded', () => {
+    const toggles = document.querySelectorAll('.report-dropdown-toggle');
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            const dropdown = this.closest('.report-dropdown');
+            dropdown.classList.toggle('show');
+
+            // Close other dropdowns
+            document.querySelectorAll('.report-dropdown').forEach(item => {
+                if (item !== dropdown) {
+                    item.classList.remove('show');
+                }
+            });
+        });
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', event => {
+        if (!event.target.closest('.report-dropdown')) {
+            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+});
 // Show modal if update was successful
 window.onload = function() {
     if (<?php echo isset($_SESSION['update_success']) && $_SESSION['update_success'] ? 'true' : 'false'; ?>) {
@@ -1070,8 +1096,44 @@ function showTab(sectionId) {
 document.addEventListener('DOMContentLoaded', function() {
     showTab('application_form_section');
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
+
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};
 </script>
 
-
+   <div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
 </body>
 </html>
+<script src="../js/archivescript.js"></script>

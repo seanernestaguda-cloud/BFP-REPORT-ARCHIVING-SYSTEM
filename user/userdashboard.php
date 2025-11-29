@@ -12,6 +12,13 @@ include('auth_check.php');
 $username = $_SESSION['username'];
 $avatar = '../avatars/default_avatar.png';
 
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
+
 // Use prepared statement to prevent SQL injection
 $stmt = $conn->prepare("SELECT avatar FROM users WHERE username = ? LIMIT 1");
 $stmt->bind_param("s", $username);
@@ -241,7 +248,6 @@ $conn->close();
 h4{
     text-align: left;
     padding-bottom: 10px;
-    border-bottom:1px solid #444;
 }
 
 .report-dropdown .fa-chevron-right {
@@ -371,7 +377,7 @@ h4{
     <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h4></li>
+                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
@@ -405,7 +411,7 @@ h4{
     <button id="toggleSidebar" class="toggle-sidebar-btn">
                     <i class="fa-solid fa-bars"></i> <!-- Sidebar toggle icon -->
                 </button>
-        <h2>BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM</h2>
+        <h2><?php echo htmlspecialchars($system_name); ?></h2>
         <div class="header-right">
        <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleDropdown(event)" style="display:flex;align-items:center;gap:0px;">
@@ -414,7 +420,7 @@ h4{
             </a>
             <div id="profileDropdown" class="dropdown-content">
                 <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
         </div>
         </div>
@@ -519,9 +525,16 @@ h4{
     <h2>Total Property Damage</h2>
     <p class="card-number">₱<?php echo number_format($total_damage, 2); ?></p>
 </div>
-</body>
-</html>
 
+<div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
 <script>
     // Sidebar toggle logic
     document.getElementById('toggleSidebar').addEventListener('click', function() {
@@ -580,7 +593,36 @@ h4{
 });
 
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
 
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};
 </script>
+
+</body>
+</html>
+
 
 

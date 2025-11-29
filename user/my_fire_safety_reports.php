@@ -3,7 +3,7 @@ include('connection.php');
 include('auth_check.php');
 
 // if (!isset($_SESSION['username'])) {
-//     header('Location: userlogin.php');
+//     header('Location: adminlogin.php');
 //     exit();
 // }
 
@@ -240,20 +240,20 @@ $stmt->close();
         </style>
 </head>
 <body>
-    <aside class="sidebar">
+   <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-chart-column"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -286,7 +286,7 @@ $stmt->close();
                 </a>
                 <div id="profileDropdown" class="dropdown-content">
                     <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                    <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
                 </div>
             </div>
         </div>
@@ -294,7 +294,7 @@ $stmt->close();
     <br>
     <div class="card">
         
-            <section class="archive-section">     
+            <section class="archive-section">
             <h3><?php echo htmlspecialchars($_SESSION['username']); ?>'s Fire Safety Inspection Reports</h3>
                 <p> List of Fire Safety Inspection Reports </p>
                 <hr class="section-separator full-bleed">
@@ -436,10 +436,8 @@ $required_fields = [
     $row['hazardous_materials'],
     $row['application_form'],
     $row['proof_of_ownership'],
-    $row['building_plans'],
-    $row['fire_safety_equipment'],
-    $row['evacuation_plan'],
-    $row['fire_safety_personnel'],
+    $row['fire_safety_inspection_checklist'],
+    $row['affidavit_of_undertaking'],
     $row['fire_insurance_policy'],
     $row['occupancy_permit'],
     $row['business_permit'],
@@ -532,10 +530,17 @@ if ($total_pages > 1): ?>
     <button id="cancelLogout" class = "cancel-btn">Cancel</button>
   </div>
 </div>
+        <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <i class="fa-regular fa-circle-check"></i> <h2>Success!</h2>
+        <p id="successMessage"></p>
+    </div>
+</div>
 
     <script>
-
-            document.addEventListener('DOMContentLoaded', () => {
+   
+   
+    document.addEventListener('DOMContentLoaded', () => {
     const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
     toggles.forEach(toggle => {
@@ -563,7 +568,6 @@ if ($total_pages > 1): ?>
     });
 });
 
-    // JS logic similar to my_fire_incident_reports.php
     let selectedToDelete = [];
     let singleDeleteId = null;
 
@@ -720,8 +724,7 @@ if ($total_pages > 1): ?>
         }
     });
 
-    
-document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener('DOMContentLoaded', function() {
     // Show Confirm Logout Modal
    document.getElementById('logoutLink').addEventListener('click', function(e) {
     e.preventDefault();
@@ -747,6 +750,7 @@ window.onclick = function(event) {
         logoutModal.style.display = 'none';
     }
 };
+
     </script>
 </body>
 </html>

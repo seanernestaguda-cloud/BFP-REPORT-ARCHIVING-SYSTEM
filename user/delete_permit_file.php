@@ -3,7 +3,7 @@ session_start();
 include('connection.php');
 
 if (!isset($_SESSION['username'])) {
-    header("Location: adminlogin.php");
+    header("Location: userlogin.php");
     exit();
 }
 
@@ -16,9 +16,8 @@ if (isset($_GET['id']) && isset($_GET['field'])) {
         'application_form',
         'proof_of_ownership',
         'building_plans',
-        'fire_safety_equipment',
-        'evacuation_plan',
-        'fire_safety_personnel',
+        'affidavit_of_undertaking',
+        'fire_safety_inspection_checklist',
         'fire_insurance_policy',
         'occupancy_permit',
         'business_permit'

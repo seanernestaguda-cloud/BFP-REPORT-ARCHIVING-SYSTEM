@@ -246,7 +246,7 @@ button[type = "submit"], button[type="button"].btn-primary {
     text-decoration: none;
 }
 
-button[type = "submit"]:hover {
+button[type = "submit"]:hover, button[type="button"].btn-primary:hover {
     background-color: #002D57; /* Darker Blue on hover */
 }   
 

@@ -436,10 +436,8 @@ $required_fields = [
     $row['hazardous_materials'],
     $row['application_form'],
     $row['proof_of_ownership'],
-    $row['building_plans'],
-    $row['fire_safety_equipment'],
-    $row['evacuation_plan'],
-    $row['fire_safety_personnel'],
+    $row['fire_safety_inspection_checklist'],
+    $row['affidavit_of_undertaking'],
     $row['fire_insurance_policy'],
     $row['occupancy_permit'],
     $row['business_permit'],
@@ -539,8 +537,6 @@ if ($total_pages > 1): ?>
     </div>
 </div>
 
-
-    <script src = "../js/archivescript.js"></script>
     <script>
    
    
@@ -758,3 +754,6 @@ window.onclick = function(event) {
     </script>
 </body>
 </html>
+
+
+    <script src = "../js/archivescript.js"></script>

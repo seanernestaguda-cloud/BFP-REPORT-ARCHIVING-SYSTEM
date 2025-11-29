@@ -19,19 +19,6 @@ if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar FROM users WHERE username = ? LIMIT 1";
 $stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param('s', $username);
-$stmt_user->execute();
-$result_user = $stmt_user->get_result();
-$avatar = '../avatars/default_avatar.png';
-if ($result_user && $row_user = $result_user->fetch_assoc()) {
-    if (!empty($row_user['avatar']) && file_exists('../avatars/' . $row_user['avatar'])) {
-        $avatar = '../avatars/' . $row_user['avatar'];
-    }
-}
-
-$username = $_SESSION['username'];
-$sql_user = "SELECT avatar FROM users WHERE username = ? LIMIT 1";
-$stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("s", $username);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
@@ -42,6 +29,19 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
     }
 }
 $stmt_user->close();
+
+// Ensure department is set in session
+if (!isset($_SESSION['department']) || empty($_SESSION['department'])) {
+    $sql_dept = "SELECT department FROM users WHERE username = ? LIMIT 1";
+    $stmt_dept = $conn->prepare($sql_dept);
+    $stmt_dept->bind_param("s", $username);
+    $stmt_dept->execute();
+    $result_dept = $stmt_dept->get_result();
+    if ($result_dept && $row_dept = $result_dept->fetch_assoc()) {
+        $_SESSION['department'] = $row_dept['department'];
+    }
+    $stmt_dept->close();
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get form data
@@ -82,10 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $attachments = [
         'application_form',
         'proof_of_ownership',
-        'building_plans',
-        'fire_safety_equipment',
-        'evacuation_plan',
-        'fire_safety_personnel',
+        'fire_safety_inspection_checklist',
+        'affidavit_of_undertaking',
         'fire_insurance_policy',
         'occupancy_permit',
         'business_permit'
@@ -110,18 +108,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     (permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
     fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
     contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
-    application_form, proof_of_ownership, building_plans, fire_safety_equipment, evacuation_plan, fire_safety_personnel, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 36 placeholders
+    application_form, proof_of_ownership, fire_safety_inspection_checklist, affidavit_of_undertaking, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 35 placeholders
 
+    // Insert default value for department if missing
+    $department = isset($_SESSION['department']) && !empty($_SESSION['department']) ? $_SESSION['department'] : 'N/A';
     $stmt->bind_param(
-        "sssssssssssssssssssssssssssssssssssss", // 36 "s"
+        "sssssssssssssssssssssssssssssssssss", // 35 "s"
         $permit_name, $inspection_establishment, $owner, $inspection_address, $inspection_date,
         $establishment_type, $inspection_purpose, $fire_alarms, $fire_extinguishers, $emergency_exits,
         $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
         $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
-        $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['building_plans'], $file_paths['fire_safety_equipment'],
-        $file_paths['evacuation_plan'], $file_paths['fire_safety_personnel'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
-        $file_paths['business_permit'], $username, $_SESSION['department']
+        $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['fire_safety_inspection_checklist'],
+        $file_paths['affidavit_of_undertaking'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
+        $file_paths['business_permit'], $username, $department
     );
 
     // Execute the statement
@@ -139,15 +139,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $_SESSION['error_message'] = "There was an error creating the report. Please try again.";
     }
-
-    // Close the prepared statement
+    // Close the prepared statement and connection
     $stmt->close();
+    mysqli_close($conn);
 }
-
-mysqli_close($conn);
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -231,7 +227,7 @@ button[type = "submit"], button[type="button"].btn-primary {
     text-decoration: none;
 }
 
-button[type = "submit"]:hover {
+button[type = "submit"]:hover, button[type="button"].btn-primary:hover {
     background-color: #002D57; /* Darker Blue on hover */
 }   
 
@@ -462,20 +458,20 @@ input[type="file"] {
 
 <body>
 
-      <aside class="sidebar">
+<aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-chart-column"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -494,34 +490,40 @@ input[type="file"] {
             </ul>
         </nav>
     </aside>
-<div class="main-content">
-    <header class="header">
-        <button id="toggleSidebar" class="toggle-sidebar-btn">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-        <h2><?php echo htmlspecialchars($system_name); ?></h2>
-        <div class="header-right">
-            <div class="dropdown">
-                <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
-                    <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                    <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
-                </a>
-                <div id="profileDropdown" class="dropdown-content">
-                    <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
+<div class = "main-content">
+ <header class="header">
+    <button id="toggleSidebar" class="toggle-sidebar-btn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <h2><?php echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'); ?></h2>
+    <div class="header-right">
+        <div class="dropdown">
+            <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
+                <!-- Add avatar image here -->
+                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+            </a>
+            <div id="profileDropdown" class="dropdown-content">
+                <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
                 <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-                </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 <br>
 <div class="card">
     <div class = "form-header"> <h2>Fire Safety Inspection Report<h2></div>
-            <?php if (isset($success_message)) { ?>
-            <div class="alert alert-success"><?php echo $success_message; ?></div>
-        <?php } ?>
-        <?php if (isset($error_message)) { ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php } ?>
+            <!-- <?php
+            // Use session variable for success and error messages
+            if (isset($_SESSION['success_message'])) {
+                $success_message = $_SESSION['success_message'];
+                echo '<div class="alert alert-success">' . htmlspecialchars($success_message) . '</div>';
+            }
+            if (isset($_SESSION['error_message'])) {
+                $error_message = $_SESSION['error_message'];
+                echo '<div class="alert alert-danger">' . htmlspecialchars($error_message) . '</div>';
+            }
+            ?> -->
 
 <div class="stepper-container">
     <div class="stepper">
@@ -546,35 +548,35 @@ input[type="file"] {
     <fieldset>
     <legend> Inspection Details </legend>
 <div class="form-group-container">
-      <div class="form-group" style="width: 48%; display: inline-block;">
+      <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="permit_name">Title:</label>
         <input type="text" id="permit_name" name="permit_name" class="form-control" placeholder="Report Name" required>
     </div>
 
     
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="owner">Owner of the Establishment:</label>
         <input type="text" id="owner" name="owner" class="form-control" placeholder="Name of the Owner" required>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="contact_person">Contact Person:</label>
         <input type="text" id="contact_person" name="contact_person" class="form-control" placeholder="Name of the Contact Person" required>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="contact_number">Contact Number:</label>
         <input type="number" id="contact_number" name="contact_number" class="form-control" placeholder="Contact Number" required>
         </div>
         <hr class="section-separator full-bleed">
 <h4 style="text-align: center;"> Establishment Details </h4>
 <hr class="section-separator full-bleed">
-      <div class="form-group" style="width: 48%; display: inline-block;">
+      <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="inspection_establishment">Establishment Name:</label>
         <input type="text" id="inspection_establishment" name="inspection_establishment" class="form-control" placeholder="Establishment" required>
     </div>
     
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width:45%; display: inline-block;">
         <label for="establishment_type">Establishment Type:</label>
         <select id="establishment_type" name="establishment_type" class="form-control" required>
             <option value="" disabled selected>Select Establishment Type</option>
@@ -590,35 +592,35 @@ input[type="file"] {
     
        <div class="form-group-container"></div>
 
-        <div class="form-group" style="width: 48%; display: inline-block;">
+        <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="inspection_address">Address of the Establishment:</label>
         <input type="text" id="inspection_address" name="inspection_address" class="form-control" placeholder="Address of the Establishment" required>
     </div>
 
 
 
-        <div class="form-group" style="width: 48%; display: inline-block;">
+        <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="number_of_occupants">Number of Occupants:</label>
         <input type="number" id="number_of_occupants" name="number_of_occupants" class="form-control" placeholder="Number of Occupants" required>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="nature_of_business">Nature of Business:</label>
         <input type="text" id="nature_of_business" name="nature_of_business" class="form-control" placeholder="Nature of Business" required>
     </div>
             
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="number_of_floors">Number of Floors:</label>
         <input type="number" id="number_of_floors" name="number_of_floors" class="form-control" placeholder="Number of Floors" required>
     </div>
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="floor_area">Floor Area:</label>
         <input type="text" id="floor_area" name="floor_area" class="form-control" placeholder="Floor Area" required>
     </div>
 
 
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="building_construction">Building Construction:</label>
         <input type="text" id="building_construction" name="building_construction" class="form-control" placeholder="Building Construction" required>
     </div>
@@ -627,7 +629,7 @@ input[type="file"] {
  <hr class="section-separator full-bleed">
 
         <div class="form-group-container">
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="inspection_purpose">Purpose of Inspection:</label>
         <select id="inspection_purpose" name="inspection_purpose" class="form-control" required>
             <option value="" disabled selected>Select Purpose</option>
@@ -636,7 +638,7 @@ input[type="file"] {
             <option value="complaint">Complaint</option>
         </select>
     </div>
-      <div class="form-group" style="width: 48%; display: inline-block;">
+      <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="classification_of_hazards">Classification of Hazards:</label>
         <select id="classification_of_hazards" name="classification_of_hazards" class="form-control" required>
             <option value="" disabled selected>Select Classification</option>
@@ -647,20 +649,20 @@ input[type="file"] {
             <option value="Class_K">Class K: These fires involve cooking oils and fats.</option>
         </select>
     </div>
-    <div class="form-group" style="width: 48%; display: inline-block;">
+    <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="inspection_date">Date of Inspection:</label>
         <input type="date" id="inspection_date" name="inspection_date" class="form-control" placeholder="Date" required>
     </div>
-       <div class="form-group" style="width: 48%; display: inline-block;">
+       <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="inspected_by">Inspected By:</label>
         <input type="text" id="inspected_by" name="inspected_by" class="form-control" placeholder="Name of Inspector" required>
     </div>
     </div>
-     <div class="form-group" style="width: 48%; display: inline-block;">
+     <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="possible_problems">Possible Problems to be encountered during occurence of fire:</label>
     <textarea id="possible_problems" name="possible_problems" rows="10" cols="30" placeholder="Possible Problems During Fire" onfocus="addFirstNumber()" oninput="autoNumber()"></textarea><br><br>
     </div>
-        <div class="form-group" style="width: 48%; display: inline-block;">
+        <div class="form-group" style="width: 45%; display: inline-block;">
         <label for="hazardous_materials">Hazardous/Flammable Materials:</label>
     <textarea id="hazardous_materials" name="hazardous_materials" rows="10" cols="30" placeholder="Hazardous Materials" onfocus="addFirstNumber()" oninput="autoNumber()"></textarea><br><br>
     </div>
@@ -682,10 +684,8 @@ input[type="file"] {
         <div class="tab-container">
             <button type="button" class="tab-btn" onclick="showTab('application_form')">Application Form (BFP)</button>
             <button type="button" class="tab-btn" onclick="showTab('proof_of_ownership')">Proof of Ownership</button>
-            <button type="button" class="tab-btn" onclick="showTab('building_plans')">Building Plans</button>
-            <button type="button" class="tab-btn" onclick="showTab('fire_safety_equipment')">Fire Safety Equipment</button>
-            <button type="button" class="tab-btn" onclick="showTab('evacuation_plan')">Evacuation Plan</button>
-            <button type="button" class="tab-btn" onclick="showTab('fire_safety_personnel')">Fire Safety Personnel</button>
+            <button type="button" class="tab-btn" onclick="showTab('fire_safety_inspection_checklist')">Fire Safety Inspection Checklist</button>
+            <button type="button" class="tab-btn" onclick="showTab('affidavit_of_undertaking')">Affidavit of Undertaking</button>
             <button type="button" class="tab-btn" onclick="showTab('fire_insurance_policy')">Fire Insurance Policy</button>
             <button type="button" class="tab-btn" onclick="showTab('occupancy_permit')">Occupancy Permit</button>
             <button type="button" class="tab-btn" onclick="showTab('business_permit')">Business Permit/Tax Assessment</button>
@@ -722,63 +722,36 @@ input[type="file"] {
         </div>
     </div>
 
-    <!-- Building Plans Upload -->
-    <div id="building_plans_input" class="form-group tab-content" style="display:none;">
-        <label for="building_plans">Upload Building Plans:</label>
-        <div class="custom-file-upload" id="customFileUploadPlans">
-            <div class="drop-area" id="dropAreaPlans">
-                <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
-                <span>Drop file here, or click below!</span>
-                <input type="file" id="building_plans" name="building_plans" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-plans')">
-            </div>
-            <button type="button" class="upload-btn" onclick="document.getElementById('building_plans').click();">Upload</button>
-            <div class="max-size-info">You can upload files up to a maximum of 2 GB.</div>
-            <div id="file-preview-plans"></div>
-        </div>
-    </div>
 
     <!-- Fire Safety Equipment Upload -->
-    <div id="fire_safety_equipment_input" class="form-group tab-content" style="display:none;">
-        <label for="fire_safety_equipment">Upload Fire Safety Equipment Details:</label>
-        <div class="custom-file-upload" id="customFileUploadEquipment">
-            <div class="drop-area" id="dropAreaEquipment">
+    <div id="fire_safety_inspection_checklist_input" class="form-group tab-content" style="display:none;">
+        <label for="fire_safety_inspection_checklist">Upload Fire Safety Inspection Checklist:</label>
+        <div class="custom-file-upload" id="customFileUploadChecklist">
+            <div class="drop-area" id="dropAreaChecklist">
                 <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
                 <span>Drop file here, or click below!</span>
-                <input type="file" id="fire_safety_equipment" name="fire_safety_equipment" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-equipment')">
+                <input type="file" id="fire_safety_inspection_checklist" name="fire_safety_inspection_checklist" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-checklist')">
             </div>
-            <button type="button" class="upload-btn" onclick="document.getElementById('fire_safety_equipment').click();">Upload</button>
+            <button type="button" class="upload-btn" onclick="document.getElementById('fire_safety_inspection_checklist').click();">Upload</button>
             <div class="max-size-info">You can upload files up to a maximum of 2 GB.</div>
-            <div id="file-preview-equipment"></div>
+            <div id="file-preview-checklist"></div>
         </div>
     </div>
 
-    <!-- Evacuation Plan Upload -->
-    <div id="evacuation_plan_input" class="form-group tab-content" style="display:none;">
-        <label for="evacuation_plan">Upload Emergency Evacuation Plan:</label>
-        <div class="custom-file-upload" id="customFileUploadEvacuation">
-            <div class="drop-area" id="dropAreaEvacuation">
-                <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
-                <span>Drop file here, or click below!</span>
-                <input type="file" id="evacuation_plan" name="evacuation_plan" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-evacuation')">
-            </div>
-            <button type="button" class="upload-btn" onclick="document.getElementById('evacuation_plan').click();">Upload</button>
-            <div class="max-size-info">You can upload files up to a maximum of 2 GB.</div>
-            <div id="file-preview-evacuation"></div>
-        </div>
-    </div>
+    <!-- Mayor's Permit Upload removed -->
 
     <!-- Fire Safety Personnel Upload -->
-    <div id="fire_safety_personnel_input" class="form-group tab-content" style="display:none;">
-        <label for="fire_safety_personnel">Upload Fire Safety Personnel:</label>
-        <div class="custom-file-upload" id="customFileUploadPersonnel">
-            <div class="drop-area" id="dropAreaPersonnel">
+    <div id="affidavit_of_undertaking_input" class="form-group tab-content" style="display:none;">
+        <label for="affidavit_of_undertaking">Upload Affidavit of Undertaking:</label>
+        <div class="custom-file-upload" id="customFileUploadAffidavit">
+            <div class="drop-area" id="dropAreaAffidavit">
                 <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
                 <span>Drop file here, or click below!</span>
-                <input type="file" id="fire_safety_personnel" name="fire_safety_personnel" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-personnel')">
+                <input type="file" id="affidavit_of_undertaking" name="affidavit_of_undertaking" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-affidavit')">
             </div>
-            <button type="button" class="upload-btn" onclick="document.getElementById('fire_safety_personnel').click();">Upload</button>
+            <button type="button" class="upload-btn" onclick="document.getElementById('affidavit_of_undertaking').click();">Upload</button>
             <div class="max-size-info">You can upload files up to a maximum of 2 GB.</div>
-            <div id="file-preview-personnel"></div>
+            <div id="file-preview-affidavit"></div>
         </div>
     </div>
 
@@ -857,7 +830,7 @@ input[type="file"] {
     </div>
 </div>
 
-    <div id="logoutModal" class = "confirm-delete-modal">
+<div id="logoutModal" class = "confirm-delete-modal">
 <div class = "modal-content">   
 <h3 style="margin-bottom:10px;">Confirm Logout?</h3>
 <hr>
@@ -865,6 +838,8 @@ input[type="file"] {
     <button id="confirmLogout" class = "confirm-btn">Logout</button>
     <button id="cancelLogout" class = "cancel-btn">Cancel</button>
   </div>
+</div>
+
 </div>
 
 <!-- Add this JS before </body> -->
@@ -927,10 +902,9 @@ function setupDropArea(dropAreaId, inputId, previewId) {
 // Setup drop areas for each document
 setupDropArea('dropAreaApplication', 'application_form', 'file-preview-application');
 setupDropArea('dropAreaOwnership', 'proof_of_ownership', 'file-preview-ownership');
-setupDropArea('dropAreaPlans', 'building_plans', 'file-preview-plans');
-setupDropArea('dropAreaEquipment', 'fire_safety_equipment', 'file-preview-equipment');
-setupDropArea('dropAreaEvacuation', 'evacuation_plan', 'file-preview-evacuation');
-setupDropArea('dropAreaPersonnel', 'fire_safety_personnel', 'file-preview-personnel');
+setupDropArea('dropAreaChecklist', 'fire_safety_inspection_checklist', 'file-preview-checklist');
+// Mayor's Permit drop area removed
+setupDropArea('dropAreaAffidavit', 'affidavit_of_undertaking', 'file-preview-affidavit');
 setupDropArea('dropAreaInsurance', 'fire_insurance_policy', 'file-preview-insurance');
 setupDropArea('dropAreaOccupancy', 'occupancy_permit', 'file-preview-occupancy');
 setupDropArea('dropAreaBusiness', 'business_permit', 'file-preview-business');
@@ -960,9 +934,7 @@ function previewReport(event, previewContainerId) {
         previewContainer.innerHTML = `<p>Invalid file format.</p>`;
     }
 }
-
-    
-        let lineCount = 1;  // Keeps track of the current line number
+ let lineCount = 1;  // Keeps track of the current line number
 
         function addFirstNumber() {
             var textarea = document.getElementById('victims');
@@ -1034,15 +1006,16 @@ function closeModal() {
     document.getElementById('successModal').style.display = "none";
 }
 
+
 // Trigger the modal if a success message is set
 <?php if (isset($_SESSION['success_message'])): ?>
-    showSuccessModal("<?php echo $_SESSION['success_message']; ?>");
+    showSuccessModal("<?php echo addslashes($_SESSION['success_message']); ?>");
     <?php unset($_SESSION['success_message']); // Clear the session message ?>
 <?php endif; ?>
 
 // Check for error message
 <?php if (isset($_SESSION['error_message'])): ?>
-    alert("<?php echo $_SESSION['error_message']; ?>");
+    alert("<?php echo addslashes($_SESSION['error_message']); ?>");
     <?php unset($_SESSION['error_message']); ?>
 <?php endif; ?>
 
@@ -1102,10 +1075,8 @@ function toggleAttachmentInputs() {
     var fields = [
         "application_form",
         "proof_of_ownership",
-        "building_plans",
-        "fire_safety_equipment",
-        "evacuation_plan",
-        "fire_safety_personnel",
+        "fire_safety_inspection_checklist",
+        "affidavit_of_undertaking",
         "fire_insurance_policy",
         "occupancy_permit",
         "business_permit"
@@ -1135,7 +1106,7 @@ function handleDrop(event, field) {
     displayCustomFileName(input, field);
     previewAttachment(input);
 }
-
+ 
 document.addEventListener('DOMContentLoaded', function() {
     // Show Confirm Logout Modal
    document.getElementById('logoutLink').addEventListener('click', function(e) {
@@ -1162,7 +1133,8 @@ window.onclick = function(event) {
         logoutModal.style.display = 'none';
     }
 };
-    </script>
-    </body>
-    </html>
-    <script src = "../js/archivescript.js"></script>
+// Close modal when clicking outside of it
+</script>
+</body>
+</html>
+<script src = "../js/archivescript.js"></script>

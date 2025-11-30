@@ -76,9 +76,9 @@ $pdf->writeHTML($html, true, false, true, false, '');
 $attachments = [
     'Application Form' => $row['application_form'],
     'Proof of Ownership' => $row['proof_of_ownership'],
-    'Affidavit of Undertaking' => $row['affidavit_of_undertaking'],
+    'Building Plans' => $row['building_plans'],
     'Fire Safety Inspection Checklist' => $row['fire_safety_inspection_checklist'],
-    'Fire Insurance Policy' => $row['fire_insurance_policy'],
+    'Fire Safety Inspection Certificate (FSIC)' => $row['fire_safety_inspection_certificate'],
     'Occupancy Permit' => $row['occupancy_permit'],
     'Business Permit' => $row['business_permit'],
 ];

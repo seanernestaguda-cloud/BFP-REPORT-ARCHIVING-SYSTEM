@@ -1055,7 +1055,7 @@ function showSuccessModal(message) {
 
     // Redirect after 2 seconds
     setTimeout(() => {
-        window.location.href = "fire_incident_report.php"; // Change URL as needed
+        window.location.href = "my_fire_incident_reports.php"; // Change URL as needed
     }, 2000);
 }
 

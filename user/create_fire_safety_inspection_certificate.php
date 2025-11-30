@@ -83,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'application_form',
         'proof_of_ownership',
         'fire_safety_inspection_checklist',
-        'affidavit_of_undertaking',
-        'fire_insurance_policy',
+        'building_plans',
+        'fire_safety_inspection_certificate',
         'occupancy_permit',
         'business_permit'
     ];
@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     (permit_name, inspection_establishment, owner, inspection_address, inspection_date, establishment_type, inspection_purpose, 
     fire_alarms, fire_extinguishers, emergency_exits, sprinkler_systems, fire_drills, exit_signs, electrical_wiring, emergency_evacuations, inspected_by,
     contact_person, contact_number, number_of_occupants, nature_of_business, number_of_floors, floor_area, classification_of_hazards, building_construction, possible_problems, hazardous_materials,
-    application_form, proof_of_ownership, fire_safety_inspection_checklist, affidavit_of_undertaking, fire_insurance_policy, occupancy_permit, business_permit, uploader, department)
+    application_form, proof_of_ownership, fire_safety_inspection_checklist, building_plans, fire_safety_inspection_certificate, occupancy_permit, business_permit, uploader, department)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"); // 35 placeholders
 
     // Insert default value for department if missing
@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
         $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
         $file_paths['application_form'], $file_paths['proof_of_ownership'], $file_paths['fire_safety_inspection_checklist'],
-        $file_paths['affidavit_of_undertaking'], $file_paths['fire_insurance_policy'], $file_paths['occupancy_permit'],
+        $file_paths['building_plans'], $file_paths['fire_safety_inspection_certificate'], $file_paths['occupancy_permit'],
         $file_paths['business_permit'], $username, $department
     );
 
@@ -453,6 +453,17 @@ input[type="file"] {
 .line.active {
     background: #003D73;
 }
+
+.card{
+    max-width: 950px;     /* change to desired max width (e.g. 700px for smaller) */
+    width: 90%;           /* responsive width */
+    margin: 80px auto 40px; /* center and control vertical spacing */
+    padding: 18px;        /* inner spacing */
+    box-sizing: border-box;
+    border-radius: 8px;   /* match existing look */
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
 </style>
 </head>
 
@@ -510,7 +521,6 @@ input[type="file"] {
         </div>
     </div>
 </header>
-<br>
 <div class="card">
     <div class = "form-header"> <h2>Fire Safety Inspection Report<h2></div>
             <!-- <?php
@@ -685,10 +695,10 @@ input[type="file"] {
             <button type="button" class="tab-btn" onclick="showTab('application_form')">Application Form (BFP)</button>
             <button type="button" class="tab-btn" onclick="showTab('proof_of_ownership')">Proof of Ownership</button>
             <button type="button" class="tab-btn" onclick="showTab('fire_safety_inspection_checklist')">Fire Safety Inspection Checklist</button>
-            <button type="button" class="tab-btn" onclick="showTab('affidavit_of_undertaking')">Affidavit of Undertaking</button>
-            <button type="button" class="tab-btn" onclick="showTab('fire_insurance_policy')">Fire Insurance Policy</button>
+            <button type="button" class="tab-btn" onclick="showTab('building_plans')">Building Plans</button>
+            <button type="button" class="tab-btn" onclick="showTab('fire_safety_inspection_certificate')">Fire Safety Inspection Certificate (FSIC)</button>
             <button type="button" class="tab-btn" onclick="showTab('occupancy_permit')">Occupancy Permit</button>
-            <button type="button" class="tab-btn" onclick="showTab('business_permit')">Business Permit/Tax Assessment</button>
+            <button type="button" class="tab-btn" onclick="showTab('business_permit')">Business Permit</button>
         </div>
     </div>
 
@@ -740,33 +750,33 @@ input[type="file"] {
 
     <!-- Mayor's Permit Upload removed -->
 
-    <!-- Fire Safety Personnel Upload -->
-    <div id="affidavit_of_undertaking_input" class="form-group tab-content" style="display:none;">
-        <label for="affidavit_of_undertaking">Upload Affidavit of Undertaking:</label>
-        <div class="custom-file-upload" id="customFileUploadAffidavit">
-            <div class="drop-area" id="dropAreaAffidavit">
+    <!-- Building Plans Upload -->
+    <div id="building_plans_input" class="form-group tab-content" style="display:none;">
+        <label for="building_plans">Upload Building Plans:</label>
+        <div class="custom-file-upload" id="customFileUploadBuildingPlans">
+            <div class="drop-area" id="dropAreaBuildingPlans">
                 <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
                 <span>Drop file here, or click below!</span>
-                <input type="file" id="affidavit_of_undertaking" name="affidavit_of_undertaking" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-affidavit')">
+                <input type="file" id="building_plans" name="building_plans" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-building-plans')">
             </div>
-            <button type="button" class="upload-btn" onclick="document.getElementById('affidavit_of_undertaking').click();">Upload</button>
+            <button type="button" class="upload-btn" onclick="document.getElementById('building_plans').click();">Upload</button>
             <div class="max-size-info">You can upload files up to a maximum of 2 GB.</div>
-            <div id="file-preview-affidavit"></div>
+            <div id="file-preview-building-plans"></div>
         </div>
     </div>
 
-    <!-- Fire Insurance Policy Upload -->
-    <div id="fire_insurance_policy_input" class="form-group tab-content" style="display:none;">
-        <label for="fire_insurance_policy">Upload Fire Insurance Policy:</label>
-        <div class="custom-file-upload" id="customFileUploadInsurance">
-            <div class="drop-area" id="dropAreaInsurance">
+    <!-- Fire Safety Inspection Certificate Upload -->
+    <div id="fire_safety_inspection_certificate_input" class="form-group tab-content" style="display:none;">
+        <label for="fire_safety_inspection_certificate">Upload Fire Safety Inspection Certificate:</label>
+        <div class="custom-file-upload" id="customFileUploadCertificate">
+            <div class="drop-area" id="dropAreaCertificate">
                 <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
                 <span>Drop file here, or click below!</span>
-                <input type="file" id="fire_insurance_policy" name="fire_insurance_policy" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-insurance')">
+                <input type="file" id="fire_safety_inspection_certificate" name="fire_safety_inspection_certificate" accept=".pdf,.doc,.docx,.txt,.rtf" style="display:none;" onchange="previewReport(event, 'file-preview-certificate')">
             </div>
-            <button type="button" class="upload-btn" onclick="document.getElementById('fire_insurance_policy').click();">Upload</button>
+            <button type="button" class="upload-btn" onclick="document.getElementById('fire_safety_inspection_certificate').click();">Upload</button>
             <div class="max-size-info">You can upload files up to a maximum of 2 GB.</div>
-            <div id="file-preview-insurance"></div>
+            <div id="file-preview-certificate"></div>
         </div>
     </div>
 
@@ -787,7 +797,7 @@ input[type="file"] {
 
     <!-- Business Permit Upload -->
     <div id="business_permit_input" class="form-group tab-content" style="display:none;">
-        <label for="business_permit">Upload Business Permit/Tax Assessment:</label>
+        <label for="business_permit">Upload Business Permit:</label>
         <div class="custom-file-upload" id="customFileUploadBusiness">
             <div class="drop-area" id="dropAreaBusiness">
                 <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
@@ -904,8 +914,8 @@ setupDropArea('dropAreaApplication', 'application_form', 'file-preview-applicati
 setupDropArea('dropAreaOwnership', 'proof_of_ownership', 'file-preview-ownership');
 setupDropArea('dropAreaChecklist', 'fire_safety_inspection_checklist', 'file-preview-checklist');
 // Mayor's Permit drop area removed
-setupDropArea('dropAreaAffidavit', 'affidavit_of_undertaking', 'file-preview-affidavit');
-setupDropArea('dropAreaInsurance', 'fire_insurance_policy', 'file-preview-insurance');
+setupDropArea('dropAreaBuildingPlans', 'building_plans', 'file-preview-building-plans');
+setupDropArea('dropAreaCertificate', 'fire_safety_inspection_certificate', 'file-preview-certificate');
 setupDropArea('dropAreaOccupancy', 'occupancy_permit', 'file-preview-occupancy');
 setupDropArea('dropAreaBusiness', 'business_permit', 'file-preview-business');
 
@@ -1076,8 +1086,8 @@ function toggleAttachmentInputs() {
         "application_form",
         "proof_of_ownership",
         "fire_safety_inspection_checklist",
-        "affidavit_of_undertaking",
-        "fire_insurance_policy",
+        "building_plans",
+        "fire_safety_inspection_certificate",
         "occupancy_permit",
         "business_permit"
     ];

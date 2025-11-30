@@ -16,9 +16,8 @@ if (isset($_GET['id']) && isset($_GET['field'])) {
         'application_form',
         'proof_of_ownership',
         'building_plans',
-        'affidavit_of_undertaking',
         'fire_safety_inspection_checklist',
-        'fire_insurance_policy',
+        'fire_safety_inspection_certificate',
         'occupancy_permit',
         'business_permit'
     ];

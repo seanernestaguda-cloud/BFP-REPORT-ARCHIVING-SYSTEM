@@ -2,10 +2,10 @@
 include('connection.php');
 include('auth_check.php');
 
-if (!isset($_SESSION['username'])) {
-    header('Location: adminlogin.php');
-    exit();
-}
+// if (!isset($_SESSION['username'])) {
+//     header('Location: adminlogin.php');
+//     exit();
+// }
 
 $sql_settings = "SELECT system_name FROM settings LIMIT 1";
 $result_settings = $conn->query($sql_settings);
@@ -437,8 +437,8 @@ $required_fields = [
     $row['application_form'],
     $row['proof_of_ownership'],
     $row['fire_safety_inspection_checklist'],
-    $row['affidavit_of_undertaking'],
-    $row['fire_insurance_policy'],
+    $row['building_plans'],
+    $row['fire_safety_inspection_certificate'],
     $row['occupancy_permit'],
     $row['business_permit'],
 ];
@@ -708,21 +708,38 @@ if ($total_pages > 1): ?>
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.querySelector('.search-input');
-        const permitsTableBody = document.getElementById('permitsTableBody');
-        if (searchInput && permitsTableBody) {
-            let searchTimeout;
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(function() {
-                    const query = searchInput.value;
-                    if (query === '') {
-                        window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
-                    }
-                }, 0);
-            });
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('start_month') || urlParams.get('end_month')) {
+            document.getElementById('monthFilterContainer').style.display = 'block';
         }
     });
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-input');
+    const reportsTableBody = document.getElementById('permitsTableBody');
+
+    if (searchInput && reportsTableBody) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                const query = searchInput.value;
+                if (query === '') {
+                    window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
+                } else {
+                    fetch(`my_fire_safety_reports_ajax.php?search=${encodeURIComponent(query)}`)
+                        .then(response => response.text())
+                        .then(html => {
+                                if (html.trim() === '') {
+                                    reportsTableBody.innerHTML = '<tr><td colspan="12" style="text-align:center;">No reports found.</td></tr>';
+                                } else {
+                                    reportsTableBody.innerHTML = html;
+                                }
+                        });
+                }
+            }, 0);
+        });
+    }
+});
 
       document.addEventListener('DOMContentLoaded', function() {
     // Show Confirm Logout Modal

@@ -101,9 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Get existing file paths from $row
     $application_form = handleFileUpload('application_form_file', $row['application_form'], $uploadDir);
     $proof_of_ownership = handleFileUpload('proof_of_ownership_file', $row['proof_of_ownership'], $uploadDir);
-    $affidavit_of_undertaking = handleFileUpload('affidavit_of_undertaking_file', $row['affidavit_of_undertaking'], $uploadDir);
+    $building_plans = handleFileUpload('building_plans_file', $row['building_plans'], $uploadDir);
     $fire_safety_inspection_checklist = handleFileUpload('fire_safety_inspection_checklist_file', $row['fire_safety_inspection_checklist'], $uploadDir);
-    $fire_insurance_policy = handleFileUpload('fire_insurance_policy_file', $row['fire_insurance_policy'], $uploadDir);
+    $fire_safety_inspection_certificate = handleFileUpload('fire_safety_inspection_certificate_file', $row['fire_safety_inspection_certificate'], $uploadDir);
     $occupancy_permit = handleFileUpload('occupancy_permit_file', $row['occupancy_permit'], $uploadDir);
     $business_permit = handleFileUpload('business_permit_file', $row['business_permit'], $uploadDir);
 
@@ -114,8 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         fire_extinguishers = ?, emergency_exits = ?, sprinkler_systems = ?, fire_drills = ?, exit_signs = ?, 
         electrical_wiring = ?, emergency_evacuations = ?, inspected_by = ?, contact_person = ?, contact_number = ?, 
         number_of_occupants = ?, nature_of_business = ?, number_of_floors = ?, floor_area = ?, classification_of_hazards = ?, 
-        building_construction = ?, possible_problems = ?, hazardous_materials = ?, application_form = ?, proof_of_ownership = ?,  affidavit_of_undertaking = ?,
-         fire_safety_inspection_checklist = ?, fire_insurance_policy = ?, occupancy_permit = ?, business_permit = ?
+        building_construction = ?, possible_problems = ?, hazardous_materials = ?, application_form = ?, proof_of_ownership = ?,  building_plans = ?,
+         fire_safety_inspection_checklist = ?, fire_safety_inspection_certificate = ?, occupancy_permit = ?, business_permit = ?
         WHERE id = ?");
 
   $stmt->bind_param(
@@ -125,8 +125,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sprinkler_systems, $fire_drills, $exit_signs, $electrical_wiring, $emergency_evacuations, $inspected_by,
     $contact_person, $contact_number, $number_of_occupants, $nature_of_business, $number_of_floors, $floor_area, 
     $classification_of_hazards, $building_construction, $possible_problems, $hazardous_materials,
-    $application_form, $proof_of_ownership, $affidavit_of_undertaking, $fire_safety_inspection_checklist,
-    $fire_insurance_policy, $occupancy_permit, $business_permit,
+    $application_form, $proof_of_ownership, $building_plans, $fire_safety_inspection_checklist,
+    $fire_safety_inspection_certificate, $occupancy_permit, $business_permit,
     $id
 );
 
@@ -403,8 +403,8 @@ iframe{
                         <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                     </ul>
                 </li>
-                
-                <!-- <li class="archive-text"><span>Maintenance</span></li>
+<!--                 
+                <li class="archive-text"><span>Maintenance</span></li>
                 <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
@@ -598,8 +598,8 @@ iframe{
             <button type="button" class="tab-btn" onclick="showTab('application_form_section')">Application Form (BFP)</button>
                 <button type="button" class="tab-btn" onclick="showTab('proof_of_ownership_section')">Proof of Ownership</button>
                     <button type="button" class="tab-btn" onclick="showTab('fire_safety_inspection_checklist_section')">Fire Safety Inspection Checklist</button>
-                <button type="button" class="tab-btn" onclick="showTab('affidavit_of_undertaking_section')">Affidavit of Undertaking</button>
-            <button type="button" class="tab-btn" onclick="showTab('fire_insurance_policy_section')">Fire Insurance Policy</button>
+                <button type="button" class="tab-btn" onclick="showTab('building_plans_section')">Building Plans</button>
+            <button type="button" class="tab-btn" onclick="showTab('fire_safety_inspection_certificate_section')">Fire Safety Inspection Certificate</button>
             <button type="button" class="tab-btn" onclick="showTab('occupancy_permit_section')">Occupancy Permit</button>
             <button type="button" class="tab-btn" onclick="showTab('business_permit_section')">Business Permit/Tax Assessment</button>
         </div>
@@ -612,7 +612,7 @@ iframe{
             <?php if (!empty($row['application_form'])): ?>
                  <a href="<?php echo $row['application_form']; ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
             <a href="<?php echo $row['application_form']; ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-<!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('application_form', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button> -->
+<button type="button" class="btn btn-delete" onclick="deleteReportFile('application_form', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>
             <?php else: ?>
             <?php endif; ?>
             <div id="application-preview" class="narrative-preview">
@@ -642,7 +642,8 @@ iframe{
             <?php if (!empty($row['proof_of_ownership'])): ?>
             <a href="<?php echo $row['proof_of_ownership']; ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
             <a href="<?php echo $row['proof_of_ownership']; ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-            <!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('proof_of_ownership', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>--->          
+            <button type="button" class="btn btn-delete" onclick="deleteReportFile('proof_of_ownership', <?php echo $id; ?>)">
+                <i class="fa-solid fa-trash"></i></button>            
             <?php else: ?>
             <?php endif; ?>
             <div id="ownership-preview" class="narrative-preview">
@@ -671,8 +672,7 @@ iframe{
             <?php if (!empty($row['fire_safety_inspection_checklist'])): ?>
             <a href="<?php echo $row['fire_safety_inspection_checklist']; ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
             <a href="<?php echo $row['fire_safety_inspection_checklist']; ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-            <!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('fire_safety_inspection_checklist', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>--->       
-              <?php else: ?>
+            <button type="button" class="btn btn-delete" onclick="deleteReportFile('fire_safety_inspection_checklist', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>            <?php else: ?>
             <?php endif; ?>
             <div id="checklist-preview" class="narrative-preview">
                 <?php if (!empty($row['fire_safety_inspection_checklist'])): ?>
@@ -696,63 +696,63 @@ iframe{
 
 
 <!-- Fire Safety Personnel -->
-<div id="affidavit_of_undertaking_section" class="permit-doc-section" style="display:none;">
+<div id="building_plans_section" class="permit-doc-section" style="display:none;">
     <div class="form-group">
         <div class="narrative-report">
-            <?php if (!empty($row['affidavit_of_undertaking'])): ?>
-                <a href="<?php echo htmlspecialchars($row['affidavit_of_undertaking']); ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
-                <a href="<?php echo htmlspecialchars($row['affidavit_of_undertaking']); ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-                <!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('affidavit_of_undertaking', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button> -->
+            <?php if (!empty($row['building_plans'])): ?>
+                <a href="<?php echo htmlspecialchars($row['building_plans']); ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
+                <a href="<?php echo htmlspecialchars($row['building_plans']); ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
+                <button type="button" class="btn btn-delete" onclick="deleteReportFile('building_plans', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>
             <?php else: ?>
             <?php endif; ?>
-            <div id="undertaking-preview" class="narrative-preview">
-                <?php if (!empty($row['affidavit_of_undertaking'])): ?>
+            <div id="building-plans-preview" class="narrative-preview">
+                <?php if (!empty($row['building_plans'])): ?>
                     <h4>Preview:</h4>
                     <?php 
-                    $file_extension = pathinfo($row['affidavit_of_undertaking'], PATHINFO_EXTENSION);
+                    $file_extension = pathinfo($row['building_plans'], PATHINFO_EXTENSION);
                     if (strtolower($file_extension) === 'pdf') { ?>
-                        <iframe src="<?php echo htmlspecialchars($row['affidavit_of_undertaking']); ?>" width="100%" height="300px"></iframe>
+                        <iframe src="<?php echo htmlspecialchars($row['building_plans']); ?>" width="100%" height="300px"></iframe>
                     <?php } else { ?>
-                        <p>Preview not available for this file type. <a href="<?php echo htmlspecialchars($row['affidavit_of_undertaking']); ?>" target="_blank">Download to view the file.</a></p>
+                        <p>Preview not available for this file type. <a href="<?php echo htmlspecialchars($row['building_plans']); ?>" target="_blank">Download to view the file.</a></p>
                     <?php } ?>
                 <?php endif; ?>
             </div>
         </div>
-        <label for="affidavit_of_undertaking_file">Change Affidavit of Undertaking:</label>
-        <label for="affidavit_of_undertaking_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
-        <input type="file" id="affidavit_of_undertaking_file" name="affidavit_of_undertaking_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'undertaking-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
+        <label for="building_plans_file">Change Building Plans:</label>
+        <label for="building_plans_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
+        <input type="file" id="building_plans_file" name="building_plans_file" class="form-control"
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'building-plans-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
 
 <!-- Fire Insurance Policy -->
-<div id="fire_insurance_policy_section" class="permit-doc-section" style="display:none;">
+<div id="fire_safety_inspection_certificate_section" class="permit-doc-section" style="display:none;">
     <div class="form-group">
         <div class="narrative-report">
-            <?php if (!empty($row['fire_insurance_policy'])): ?>
-                <a href="<?php echo htmlspecialchars($row['fire_insurance_policy']); ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
-                <a href="<?php echo htmlspecialchars($row['fire_insurance_policy']); ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-                <!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('fire_insurance_policy', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button> -->
+            <?php if (!empty($row['fire_safety_inspection_certificate'])): ?>
+                <a href="<?php echo htmlspecialchars($row['fire_safety_inspection_certificate']); ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
+                <a href="<?php echo htmlspecialchars($row['fire_safety_inspection_certificate']); ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
+                <button type="button" class="btn btn-delete" onclick="deleteReportFile('fire_safety_inspection_certificate', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>
             <?php else: ?>
             <?php endif; ?>
-            <div id="insurance-preview" class="narrative-preview">
-                <?php if (!empty($row['fire_insurance_policy'])): ?>
+            <div id="certificate-preview" class="narrative-preview">
+                <?php if (!empty($row['fire_safety_inspection_certificate'])): ?>
                     <h4>Preview:</h4>
                     <?php 
-                    $file_extension = pathinfo($row['fire_insurance_policy'], PATHINFO_EXTENSION);
+                    $file_extension = pathinfo($row['fire_safety_inspection_certificate'], PATHINFO_EXTENSION);
                     if (strtolower($file_extension) === 'pdf') { ?>
-                        <iframe src="<?php echo htmlspecialchars($row['fire_insurance_policy']); ?>" width="100%" height="300px"></iframe>
+                        <iframe src="<?php echo htmlspecialchars($row['fire_safety_inspection_certificate']); ?>" width="100%" height="300px"></iframe>
                     <?php } else { ?>
-                        <p>Preview not available for this file type. <a href="<?php echo htmlspecialchars($row['fire_insurance_policy']); ?>" target="_blank">Download to view the file.</a></p>
+                        <p>Preview not available for this file type. <a href="<?php echo htmlspecialchars($row['fire_safety_inspection_certificate']); ?>" target="_blank">Download to view the file.</a></p>
                     <?php } ?>
                 <?php endif; ?>
             </div>
         </div>
-        <label for="fire_insurance_policy">Change Fire Insurance Policy:</label>
-        <label for="fire_insurance_policy_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
-        <input type="file" id="fire_insurance_policy_file" name="fire_insurance_policy_file" class="form-control"
-            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'insurance-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
+        <label for="fire_safety_inspection_certificate_file">Change Fire Safety Inspection Certificate:</label>
+        <label for="fire_safety_inspection_certificate_file" class="custom-file-upload"><i class="fa-solid fa-pen-to-square"></i></label>
+        <input type="file" id="fire_safety_inspection_certificate_file" name="fire_safety_inspection_certificate_file" class="form-control"
+            accept=".pdf,.doc,.docx,.txt,.rtf" onchange="previewPermitFile(event, 'certificate-preview')" <?php echo !$can_edit ? 'disabled' : ''; ?>>
     </div>
 </div>
 
@@ -763,8 +763,7 @@ iframe{
             <?php if (!empty($row['occupancy_permit'])): ?>
                 <a href="<?php echo htmlspecialchars($row['occupancy_permit']); ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
                 <a href="<?php echo htmlspecialchars($row['occupancy_permit']); ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-                <!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('occupancy_permit', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>--> 
-                 <?php else: ?>
+                <button type="button" class="btn btn-delete" onclick="deleteReportFile('occupancy_permit', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>            <?php else: ?>
             <?php endif; ?>
             <div id="occupancy-preview" class="narrative-preview">
                 <?php if (!empty($row['occupancy_permit'])): ?>
@@ -793,7 +792,7 @@ iframe{
             <?php if (!empty($row['business_permit'])): ?>
                 <a href="<?php echo htmlspecialchars($row['business_permit']); ?>" target="_blank" class="btn-view"><i class="fa-solid fa-eye"></i></a>
                 <a href="<?php echo htmlspecialchars($row['business_permit']); ?>" download class="btn-download"><i class="fa-solid fa-download"></i></a>
-                <!-- <button type="button" class="btn btn-delete" onclick="deleteReportFile('business_permit', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button> -->
+                <button type="button" class="btn btn-delete" onclick="deleteReportFile('business_permit', <?php echo $id; ?>)"><i class="fa-solid fa-trash"></i></button>
             <?php else: ?>
             <?php endif; ?>
             <div id="business-preview" class="narrative-preview">

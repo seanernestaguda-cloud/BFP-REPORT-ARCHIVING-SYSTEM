@@ -3,15 +3,15 @@
 include('connection.php');
 include('auth_check.php');
 
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 $sql_settings = "SELECT system_name FROM settings LIMIT 1";
 $result_settings = $conn->query($sql_settings);
 $system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
 if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
     $system_name = $row_settings['system_name'];
-}
-
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
 }
 
 
@@ -260,13 +260,13 @@ if ($where_clauses) {
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-chart-column"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -285,25 +285,26 @@ if ($where_clauses) {
             </ul>
         </nav>
     </aside>
-<div class="main-content">
-    <header class="header">
-        <button id="toggleSidebar" class="toggle-sidebar-btn">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-        <h2><?php echo htmlspecialchars($system_name); ?></h2>
-        <div class="header-right">
-            <div class="dropdown">
-                <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
-                    <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                    <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
-                </a>
-                <div id="profileDropdown" class="dropdown-content">
-                    <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
+    <div class="main-content">
+     <header class="header">
+    <button id="toggleSidebar" class="toggle-sidebar-btn">
+        <i class="fa-solid fa-bars"></i>
+    </button>
+    <h2><?php echo htmlspecialchars($system_name); ?></h2>
+    <div class="header-right">
+        <div class="dropdown">
+            <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
+                <!-- Add avatar image here -->
+                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+            </a>
+            <div id="profileDropdown" class="dropdown-content">
+                <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
                 <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-                </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>
     <!-- Card for the Archive Section -->
     <div class="card">
 
@@ -323,9 +324,9 @@ if ($where_clauses) {
         <button id="toggleSelectBtn" class="select-multi-btn" onclick="toggleSelectMode()">
             <i class="fa-solid fa-check-square"></i> Select
         </button>
-        <!-- <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedPermits()">
+        <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedPermits()">
             <i class="fa-solid fa-trash"></i>
-            <label for="">Delete Selected</label> -->
+            <label for="">Delete Selected</label>
         </button>
         <button id="downloadSelectedBtn" class="select-multi-btn" style="display:none;" onclick="downloadSelectedPermits()">
             <i class="fa-solid fa-download"></i>
@@ -390,8 +391,8 @@ if ($where_clauses) {
                 <th>Purpose</th>
                 <th>Address</th>
                 <th>Date of Inspection</th>
-                <th>Uploader</th>
-                <th>Department</th>
+                <!-- <th>Uploader</th>
+                <th>Department</th> -->
                 <th>Status</th>
                 <th> Action </th>
             </tr>
@@ -415,8 +416,8 @@ if ($where_clauses) {
             <td><?php echo htmlspecialchars($row['inspection_purpose']); ?></td>
             <td><?php echo htmlspecialchars($row['inspection_address']); ?></td>
             <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($row['inspection_date']))) ?></td>
-            <td><?php echo htmlspecialchars($row['uploader']); ?></td>
-            <td><?php echo htmlspecialchars($row['department']); ?></td>
+            <!-- <td><?php echo htmlspecialchars($row['uploader']); ?></td>
+                <td><?php echo (isset($row['department']) && trim($row['department']) !== '') ? htmlspecialchars($row['department']) : 'N/A'; ?></td> -->
             <td>
             <?php
      // List all required fields from your create form
@@ -450,8 +451,8 @@ $required_fields = [
     $row['application_form'],
     $row['proof_of_ownership'],
     $row['fire_safety_inspection_checklist'],
-    $row['affidavit_of_undertaking'],
-    $row['fire_insurance_policy'],
+    $row['fire_safety_inspection_certificate'],
+    $row['building_plans'],
     $row['occupancy_permit'],
     $row['business_permit'],
 ];
@@ -535,8 +536,45 @@ if ($total_pages > 1): ?>
     </div>
 </div>
 
+<div id="logoutModal" class = "confirm-delete-modal">
+<div class = "modal-content">   
+<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+<hr>
+    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+    <button id="confirmLogout" class = "confirm-btn">Logout</button>
+    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
+  </div>
+</div>
+
     <script>
         
+        document.addEventListener('DOMContentLoaded', function() {
+    // Show Confirm Logout Modal
+   document.getElementById('logoutLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('logoutModal').style.display = 'flex';
+    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+});
+
+    // Handle Confirm Logout
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+        window.location.href = 'logout.php';
+    });
+
+    // Handle Cancel Logout
+    document.getElementById('cancelLogout').addEventListener('click', function() {
+        document.getElementById('logoutModal').style.display = 'none';
+    });
+});
+
+window.onclick = function(event) {
+    // ...existing code...
+    const logoutModal = document.getElementById('logoutModal');
+    if (event.target === logoutModal) {
+        logoutModal.style.display = 'none';
+    }
+};  
+
     document.addEventListener('DOMContentLoaded', () => {
     const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
@@ -566,8 +604,10 @@ if ($total_pages > 1): ?>
 });
 
 function toggleSelectMode() {
+    // Toggle visibility of checkbox columns
     const header = document.querySelector('.select-checkbox-header');
     const cells = document.querySelectorAll('.select-checkbox-cell');
+    // const deleteBtn = document.getElementById('deleteSelectedBtn');
     const downloadBtn = document.getElementById('downloadSelectedBtn');
     const isVisible = header && header.style.display !== 'none';
 
@@ -575,14 +615,16 @@ function toggleSelectMode() {
         if (isVisible) {
             header.style.display = 'none';
             cells.forEach(cell => cell.style.display = 'none');
+            // deleteBtn.style.display = 'none';
             downloadBtn.style.display = 'none';
         } else {
             header.style.display = '';
             cells.forEach(cell => cell.style.display = '');
+            // deleteBtn.style.display = '';
             downloadBtn.style.display = '';
         }
     }
-}   
+}
 
 // "Select All" functionality
 function toggleSelectAll(source) {
@@ -744,45 +786,9 @@ function toggleSortMenu() {
     }
 });
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Show Confirm Logout Modal
-   document.getElementById('logoutLink').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('logoutModal').style.display = 'flex';
-    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
-});
-
-    // Handle Confirm Logout
-    document.getElementById('confirmLogout').addEventListener('click', function() {
-        window.location.href = 'logout.php';
-    });
-
-    // Handle Cancel Logout
-    document.getElementById('cancelLogout').addEventListener('click', function() {
-        document.getElementById('logoutModal').style.display = 'none';
-    });
-});
-
-window.onclick = function(event) {
-    // ...existing code...
-    const logoutModal = document.getElementById('logoutModal');
-    if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-    }
-};
-
     </script>
 
-<div id="logoutModal" class = "confirm-delete-modal">
-<div class = "modal-content">   
-<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
-<hr>
-    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
-    <button id="confirmLogout" class = "confirm-btn">Logout</button>
-    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
-  </div>
-</div>
+
     </body>
     </html>
-<script src = "../js/archivescript.js"></script>
+    <script src = "../js/archivescript.js"></script>

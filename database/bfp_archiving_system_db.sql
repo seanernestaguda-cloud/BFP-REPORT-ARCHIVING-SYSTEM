@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2025 at 06:49 PM
+-- Generation Time: Nov 30, 2025 at 06:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,7 +46,38 @@ INSERT INTO `activity_logs` (`log_id`, `username`, `user_type`, `action`, `repor
 (1, 'admin', NULL, 'create', 1, NULL, '2025-11-26 20:22:58', 'Created report: Fire at Matalams'),
 (2, 'admin', NULL, 'create', 1, NULL, '2025-11-26 20:28:03', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
 (3, 'me1', NULL, 'create', 2, NULL, '2025-11-27 00:04:02', 'Created report: Fire at Matalams'),
-(4, 'me1', NULL, 'create', 2, NULL, '2025-11-27 00:06:28', 'Created Fire Safety Inspection Report: Hardware Inspection 1');
+(4, 'me1', NULL, 'create', 2, NULL, '2025-11-27 00:06:28', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
+(5, 'admin', NULL, 'download', 1, NULL, '2025-11-30 23:18:00', 'Download: Hardware Inspection 1'),
+(6, 'admin', NULL, 'create', 3, NULL, '2025-11-30 23:52:21', 'Created Fire Safety Inspection Report: Inspection 1'),
+(7, 'admin', NULL, 'delete', 1, NULL, '2025-12-01 00:01:12', 'Deleted Fire Safety Inspection Report: Hardware Inspection 1'),
+(8, 'admin', NULL, 'update', 3, NULL, '2025-12-01 00:10:43', 'Updated Fire Safety Inspection Report: Inspection 1'),
+(9, 'admin', NULL, 'delete', 2, NULL, '2025-12-01 00:12:22', 'Deleted Fire Safety Inspection Report: Hardware Inspection 1'),
+(10, 'admin', NULL, 'delete', 3, NULL, '2025-12-01 00:12:26', 'Deleted Fire Safety Inspection Report: Inspection 1'),
+(11, 'admin', NULL, 'create', 4, NULL, '2025-12-01 00:15:16', 'Created Fire Safety Inspection Report: Inspection 1'),
+(12, 'admin', NULL, 'download', 4, NULL, '2025-12-01 00:15:20', 'Download: Inspection 1'),
+(13, 'me1', NULL, 'create', 5, NULL, '2025-12-01 00:19:15', 'Created Fire Safety Inspection Report: Inspection 1'),
+(14, 'me1', NULL, 'update', 2, NULL, '2025-12-01 00:20:13', 'Updated Fire Incident Report: Fire at Matalams'),
+(15, 'me1', NULL, 'update', 5, NULL, '2025-12-01 00:22:15', 'Updated Fire Safety Inspection Report: Inspection 1'),
+(16, 'sean', NULL, 'create', 6, NULL, '2025-12-01 00:28:49', 'Created Fire Safety Inspection Report: Inspection 1'),
+(17, 'sean', NULL, 'create', 3, NULL, '2025-12-01 00:34:42', 'Created report: Fire at Patadon West Farm'),
+(18, 'me1', NULL, 'create', 4, NULL, '2025-12-01 00:36:01', 'Created report: Fire at Patadon West Farm'),
+(19, 'me1', NULL, 'create', 7, NULL, '2025-12-01 00:59:50', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
+(20, 'me1', NULL, 'delete', 5, NULL, '2025-12-01 01:00:29', 'Deleted Fire Safety Inspection Report: Inspection 1'),
+(21, 'me1', NULL, 'create', 8, NULL, '2025-12-01 01:01:17', 'Created Fire Safety Inspection Report: Mel & Jade'),
+(22, 'me1', NULL, 'delete', 7, NULL, '2025-12-01 01:03:00', 'Deleted Fire Safety Inspection Report: Hardware Inspection 1'),
+(23, 'me1', NULL, 'delete', 6, NULL, '2025-12-01 01:08:33', 'Deleted Fire Safety Inspection Report: Inspection 1'),
+(24, 'sean', NULL, 'create', 9, NULL, '2025-12-01 01:10:39', 'Created Fire Safety Inspection Report: Mel & Jade'),
+(25, 'sean', NULL, 'download', 9, NULL, '2025-12-01 01:13:22', 'Download: Mel & Jade'),
+(26, 'sean', NULL, 'download', 9, NULL, '2025-12-01 01:14:13', 'Download: Mel & Jade'),
+(27, 'sean', NULL, 'download', 9, NULL, '2025-12-01 01:14:31', 'Download: Mel & Jade'),
+(28, 'sean', NULL, 'delete', 3, NULL, '2025-12-01 01:24:52', 'Deleted Report: Fire at Patadon West Farm'),
+(29, 'sean', NULL, 'create', 5, NULL, '2025-12-01 01:25:23', 'Created report: Fire at Patadon West Farm'),
+(30, 'me1', NULL, 'update', 8, NULL, '2025-12-01 01:30:59', 'Updated Fire Safety Inspection Report: Mel & Jade'),
+(31, 'me1', NULL, 'update', 8, NULL, '2025-12-01 01:32:36', 'Updated Fire Safety Inspection Report: Mel & Jade'),
+(32, 'me1', NULL, 'update', 9, NULL, '2025-12-01 01:34:59', 'Updated Fire Safety Inspection Report: Mel & Jade'),
+(33, 'me1', NULL, 'create', 10, NULL, '2025-12-01 01:38:18', 'Created Fire Safety Inspection Report: Mel & Jade'),
+(34, 'sean', NULL, 'create', 11, NULL, '2025-12-01 01:39:10', 'Created Fire Safety Inspection Report: Mel & Jade'),
+(35, 'sean', NULL, 'download', 4, NULL, '2025-12-01 01:41:35', 'Download: Inspection 1');
 
 -- --------------------------------------------------------
 
@@ -180,7 +211,10 @@ CREATE TABLE `fire_incident_reports` (
 
 INSERT INTO `fire_incident_reports` (`report_id`, `report_title`, `fire_location`, `street`, `purok`, `municipality`, `incident_date`, `establishment`, `victims`, `firefighters`, `property_damage`, `fire_types`, `uploader`, `department`, `caller_name`, `responding_team`, `arrival_time`, `fireout_time`, `alarm_status`, `occupancy_type`, `documentation_photos`, `narrative_report`, `progress_report`, `final_investigation_report`, `deleted`, `deleted_at`) VALUES
 (1, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-26 20:22:00', 'Warehouse', '', '', '1,000,000', 'Bomb explosion', 'admin', NULL, 'Sean Ernest Aguda', 'Team A', '20:22', '20:22', '2nd Alarm', 'Residential', '', '', '', '', 0, NULL),
-(2, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-27 00:03:00', 'Warehouse', '', '', '1,000,000', 'Chemicals/LPG leaking', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:03', '00:03', '2nd Alarm', 'Vehicular', '', '', '', '', 0, NULL);
+(2, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-11-27 00:03:00', 'Warehouse', '', '', '1,000,000', 'Chemicals/LPG leaking', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:03', '00:03', '2nd Alarm', 'Vehicular', '../uploads/1764519613_fire 1 - Copy.jpg', NULL, '', '', 0, NULL),
+(3, 'Fire at Patadon West Farm', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-01 00:34:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'sean', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:34', '00:34', '1st Alarm', 'Residential', '', '', '', '', 0, '2025-12-01 01:24:52'),
+(4, 'Fire at Patadon West Farm', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-01 00:35:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:35', '00:35', '1st Alarm', 'Commercial', '', '', '', '', 0, NULL),
+(5, 'Fire at Patadon West Farm', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-01 01:25:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'sean', 'Administrative', 'Sean Ernest Aguda', 'Team A', '01:25', '01:25', '1st Alarm', 'Residential', '', '', '', '', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -219,10 +253,8 @@ CREATE TABLE `fire_safety_inspection_certificate` (
   `application_form` varchar(255) DEFAULT NULL,
   `proof_of_ownership` varchar(255) DEFAULT NULL,
   `building_plans` varchar(255) DEFAULT NULL,
-  `fire_safety_equipment` varchar(255) DEFAULT NULL,
-  `evacuation_plan` varchar(255) DEFAULT NULL,
-  `fire_safety_personnel` varchar(255) DEFAULT NULL,
-  `fire_insurance_policy` varchar(255) DEFAULT NULL,
+  `fire_safety_inspection_certificate` varchar(255) DEFAULT NULL,
+  `fire_safety_inspection_checklist` varchar(255) DEFAULT NULL,
   `occupancy_permit` varchar(255) DEFAULT NULL,
   `business_permit` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -235,9 +267,18 @@ CREATE TABLE `fire_safety_inspection_certificate` (
 -- Dumping data for table `fire_safety_inspection_certificate`
 --
 
-INSERT INTO `fire_safety_inspection_certificate` (`id`, `permit_name`, `inspection_establishment`, `owner`, `inspection_address`, `inspection_date`, `establishment_type`, `inspection_purpose`, `fire_alarms`, `fire_extinguishers`, `emergency_exits`, `sprinkler_systems`, `fire_drills`, `exit_signs`, `electrical_wiring`, `emergency_evacuations`, `inspected_by`, `contact_person`, `contact_number`, `number_of_occupants`, `nature_of_business`, `number_of_floors`, `floor_area`, `classification_of_hazards`, `building_construction`, `possible_problems`, `hazardous_materials`, `application_form`, `proof_of_ownership`, `building_plans`, `fire_safety_equipment`, `evacuation_plan`, `fire_safety_personnel`, `fire_insurance_policy`, `occupancy_permit`, `business_permit`, `created_at`, `deleted_at`, `uploader`, `department`) VALUES
-(1, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-26 12:28:03', NULL, 'admin', 'N/A'),
-(2, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-26 16:06:28', NULL, 'me1', 'Administrative');
+INSERT INTO `fire_safety_inspection_certificate` (`id`, `permit_name`, `inspection_establishment`, `owner`, `inspection_address`, `inspection_date`, `establishment_type`, `inspection_purpose`, `fire_alarms`, `fire_extinguishers`, `emergency_exits`, `sprinkler_systems`, `fire_drills`, `exit_signs`, `electrical_wiring`, `emergency_evacuations`, `inspected_by`, `contact_person`, `contact_number`, `number_of_occupants`, `nature_of_business`, `number_of_floors`, `floor_area`, `classification_of_hazards`, `building_construction`, `possible_problems`, `hazardous_materials`, `application_form`, `proof_of_ownership`, `building_plans`, `fire_safety_inspection_certificate`, `fire_safety_inspection_checklist`, `occupancy_permit`, `business_permit`, `created_at`, `deleted_at`, `uploader`, `department`) VALUES
+(1, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-26 12:28:03', '2025-12-01 00:01:12', 'admin', 'N/A'),
+(2, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-26 16:06:28', '2025-12-01 00:12:22', 'me1', 'Administrative'),
+(3, 'Inspection 1', 'Mel & Jade Buy & Sell', 'Mel & Jade', 'Poblacion, Matalam, Cotabato', '2025-09-15', 'commercial', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'John Doe', 'Mel & Jade', '09777461096', 10, 'Agriculture', 1, '750 sqm', 'Class_A', 'concrete', 'Narrow Road\r\nNo fire hydrants nearby', 'wood\r\nplastic\r\npaper', '../uploads/692c6c8387c57_Application Form (BFP).pdf', '../uploads/20251130165221_Proof of Ownership.pdf', '../uploads/20251130165221_Building Plans.pdf', '../uploads/20251130165221_FSIC-Sample.pdf', '../uploads/20251130165221_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130165221_FSIC-Sample.pdf', '../uploads/20251130165221_Tax Assessment.pdf', '2025-11-30 15:52:21', '2025-12-01 00:12:26', 'admin', 'N/A'),
+(4, 'Inspection 1', 'Mel & Jade Buy & Sell', 'Mel & Jade', 'Poblacion, Matalam, Cotabato', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'John Doe', 'Mel & Jade', '09777461096', 10, 'Agriculture', 1, '750 sqm', 'Class_A', 'concrete', 'Narrow Road\r\nNo Fire Hydrants Nearby', 'Wood\r\nPaper\r\nPlastic', '../uploads/20251130171516_Application Form (BFP).pdf', '../uploads/20251130171516_Proof of Ownership.pdf', '../uploads/20251130171516_Building Plans.pdf', '../uploads/20251130171516_FSIC-Sample.pdf', '../uploads/20251130171516_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130171516_FSIC-Sample.pdf', '../uploads/20251130171516_Tax Assessment.pdf', '2025-11-30 16:15:16', NULL, 'admin', 'N/A'),
+(5, 'Inspection 1', 'Mel & Jade Buy & Sell', 'Mel & Jade', 'Poblacion, Matalam, Cotabato', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'John Doe', 'Mel & Jade', '09777461096', 10, 'Agriculture', 1, '750 sqm', 'Class_A', 'concrete', 'none', 'wood', '../uploads/20251130171915_Application Form (BFP).pdf', '../uploads/20251130171915_Proof of Ownership.pdf', '../uploads/692c6f376d86f_Building Plans.pdf', '../uploads/20251130171915_FSIC-Sample.pdf', '../uploads/20251130171915_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130171915_FSIC-Sample.pdf', '../uploads/20251130171915_Tax Assessment.pdf', '2025-11-30 16:19:15', '2025-12-01 01:00:29', 'me1', 'Administrative'),
+(6, 'Inspection 1', 'Mel & Jade Buy & Sell', 'Mel & Jade', 'Poblacion, Matalam, Cotabato', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'John Doe', 'Mel & Jade', '09777461096', 10, 'Agriculture', 1, '750 sqm', 'Class_A', 'concrete', 'none', 'wood', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-30 16:28:49', '2025-12-01 01:08:33', 'sean', 'Administrative'),
+(7, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-30 16:59:49', '2025-12-01 01:03:00', 'me1', 'Administrative'),
+(8, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', 'wood', 'wood', '../uploads/692c7fb4e45f9_Application Form (BFP).pdf', '../uploads/692c7f5302d57_Proof of Ownership.pdf', '../uploads/692c7f53031e9_Application Form (BFP).pdf', '../uploads/692c7f53038b7_FSIC-Sample.pdf', '../uploads/692c7f5303544_Fire-Safety-Inspection-Checklist.pdf', '../uploads/692c7f5303bd9_FSIC-Sample.pdf', '../uploads/692c7f5303f66_Tax Assessment.pdf', '2025-11-30 17:01:17', NULL, 'me1', 'Administrative'),
+(9, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-06', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', 'none', 'none\r\n', '../uploads/20251130181039_Application Form (BFP).pdf', '../uploads/20251130181039_Proof of Ownership.pdf', '../uploads/20251130181039_Building Plans.pdf', '../uploads/20251130181039_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130181039_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130181039_FSIC-Sample.pdf', '../uploads/20251130181039_Tax Assessment.pdf', '2025-11-30 17:10:39', NULL, 'sean', 'Administrative'),
+(10, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', '1', '2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-30 17:38:18', NULL, 'me1', 'Administrative'),
+(11, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '34', '45', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-30 17:39:10', NULL, 'sean', 'Administrative');
 
 -- --------------------------------------------------------
 
@@ -420,7 +461,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `admins`
@@ -444,13 +485,13 @@ ALTER TABLE `departments`
 -- AUTO_INCREMENT for table `fire_incident_reports`
 --
 ALTER TABLE `fire_incident_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `fire_safety_inspection_certificate`
 --
 ALTER TABLE `fire_safety_inspection_certificate`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `fire_types`

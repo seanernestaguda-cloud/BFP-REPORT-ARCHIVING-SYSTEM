@@ -854,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (query === '') {
                     window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
                 } else {
-                    fetch(`fire_incident_report_ajax.php?search=${encodeURIComponent(query)}`)
+                    fetch(`my_fire_incident_report_ajax.php?search=${encodeURIComponent(query)}`)
                         .then(response => response.text())
                         .then(html => {
                             reportsTableBody.innerHTML = html;

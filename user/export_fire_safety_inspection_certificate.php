@@ -84,9 +84,9 @@ while ($row = mysqli_fetch_assoc($result)) {
         $row['hazardous_materials'],
         $row['application_form'],
         $row['proof_of_ownership'],
-        $row['affidavit_of_undertaking'],
+        $row['building_plans'],
         $row['fire_safety_inspection_checklist'],
-        $row['fire_insurance_policy'],
+        $row['fire_safety_inspection_certificate'],
         $row['occupancy_permit'],
         $row['business_permit'],
     ];

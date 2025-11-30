@@ -450,9 +450,9 @@ $required_fields = [
     $row['hazardous_materials'],
     $row['application_form'],
     $row['proof_of_ownership'],
-    $row['affidavit_of_undertaking'],
     $row['fire_safety_inspection_checklist'],
-    $row['fire_insurance_policy'],
+    $row['fire_safety_inspection_certificate'],
+    $row['building_plans'],
     $row['occupancy_permit'],
     $row['business_permit'],
 ];
@@ -762,11 +762,11 @@ function toggleSortMenu() {
         }
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('.search-input');
-    const permitsTableBody = document.getElementById('permitsTableBody');
+    const reportsTableBody = document.getElementById('permitsTableBody');
 
-    if (searchInput && permitsTableBody) {
+    if (searchInput && reportsTableBody) {
         let searchTimeout;
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -778,10 +778,14 @@ function toggleSortMenu() {
                     fetch(`fire_safety_inspection_certificate_ajax.php?search=${encodeURIComponent(query)}`)
                         .then(response => response.text())
                         .then(html => {
-                            permitsTableBody.innerHTML = html;
+                                if (html.trim() === '') {
+                                    reportsTableBody.innerHTML = '<tr><td colspan="12" style="text-align:center;">No reports found.</td></tr>';
+                                } else {
+                                    reportsTableBody.innerHTML = html;
+                                }
                         });
                 }
-            }, 0); // instant, or use 300 for debounce
+            }, 0);
         });
     }
 });

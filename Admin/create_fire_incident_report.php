@@ -757,7 +757,7 @@ input[type="file"] {
 </div>
         </fieldset>
     <div class="form-actions">
-        <a href="fire_incident_report.php" class="btn btn-cancel">Cancel</a>
+        <a href="my_fire_incident_reports.php" class="btn btn-cancel">Cancel</a>
         <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
     </div>
 </div>

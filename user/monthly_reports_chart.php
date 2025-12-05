@@ -41,6 +41,7 @@ $sql_table_data = "SELECT
         END
     ) AS total_victims
 FROM fire_incident_reports
+WHERE deleted_at IS NULL
 GROUP BY YEAR(incident_date), MONTH(incident_date)
 ORDER BY YEAR(incident_date), MONTH(incident_date);";
 

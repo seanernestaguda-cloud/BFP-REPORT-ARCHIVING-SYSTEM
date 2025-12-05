@@ -110,7 +110,7 @@ if ($result_top_fire_type->num_rows > 0) {
     $fire_count_fire_type = $row['fire_count'];
 }
 
-$sql_damage = "SELECT SUM(property_damage) AS total_damage FROM fire_incident_reports WHERE deleted_at IS NULL";
+$sql_damage = "SELECT SUM(REPLACE(property_damage, ',', '')) AS total_damage FROM fire_incident_reports WHERE deleted_at IS NULL";
 $result_damage = $conn->query($sql_damage);
 $total_damage = 0;
 if ($result_damage && $row_damage = $result_damage->fetch_assoc()) {
@@ -250,9 +250,7 @@ $conn->close();
 
 h4{
     text-align: left;
-    padding-bottom: 10px;
-    border-bottom:1px solid #444;
-}
+    padding-bottom: 10px;}
 
 .report-dropdown .fa-chevron-right {
     transition: transform 0.3s ease; /* Smooth rotation animation */
@@ -529,9 +527,7 @@ h4{
 <div class="dashboard-card">
     <i class="fas fa-coins"></i>
     <h2>Total Property Damage</h2>
-    <p class="card-number">₱<?php echo number_format($total_damage, 2); ?></p>
-</div>
-</body>
+<p class="card-number">₱<?php echo number_format((float)str_replace(',', '', $total_damage), 2, '.', ','); ?></p></body>
 <!-- Logout Confirmation Modal -->
 <div id="logoutModal" class = "confirm-delete-modal">
 <div class = "modal-content">   

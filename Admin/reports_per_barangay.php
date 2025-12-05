@@ -32,7 +32,7 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
 $stmt_user->close();
 
 
-$sql_barangays = "SELECT DISTINCT fire_location AS barangay FROM fire_incident_reports ORDER BY barangay ASC";
+$sql_barangays = "SELECT DISTINCT fire_location AS barangay FROM fire_incident_reports WHERE deleted_at IS NULL ORDER BY barangay ASC";
 $result_barangays = $conn->query($sql_barangays);
 
 $sql_table_data = "SELECT fire_location AS barangay,
@@ -56,6 +56,7 @@ $sql_table_data = "SELECT fire_location AS barangay,
     ) AS total_firefighters
 
     FROM fire_incident_reports
+    WHERE deleted_at IS NULL
     GROUP BY fire_location
     ORDER BY fire_location ASC;";
 
@@ -67,6 +68,7 @@ $sql_monthly_reports = "SELECT fire_location,
                                MONTH(incident_date) AS month, 
                                COUNT(*) AS report_count
                         FROM fire_incident_reports
+                        WHERE deleted_at IS NULL
                         GROUP BY fire_location, MONTH(incident_date)
                         ORDER BY fire_location, month ASC";
 $result_monthly_reports = $conn->query($sql_monthly_reports);

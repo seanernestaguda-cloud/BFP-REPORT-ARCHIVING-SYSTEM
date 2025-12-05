@@ -88,38 +88,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     $property_damage = $_POST['property_damage'];
     $fire_types = $_POST['fire_types'];
     // Retrieve existing documentation photos
-        $existing_photos = [];
-            if (isset($_POST['existing_photos_input'])) {
-                $existing_photos = array_filter(array_map('trim', explode(',', $_POST['existing_photos_input'])));
+    $existing_photos = [];
+    if (isset($_POST['existing_photos_input'])) {
+        $existing_photos = array_filter(array_map('trim', explode(',', $_POST['existing_photos_input'])));
+    }
+
+    // Handle photos marked for deletion
+    if (isset($_POST['photos_to_delete']) && $_POST['photos_to_delete'] !== '') {
+        $photos_to_delete = array_filter(array_map('trim', explode(',', $_POST['photos_to_delete'])));
+        foreach ($photos_to_delete as $photo_path) {
+            // Remove from existing_photos array
+            $existing_photos = array_filter($existing_photos, function($p) use ($photo_path) { return $p !== $photo_path; });
+            // Delete file from disk
+            if (file_exists($photo_path)) {
+                @unlink($photo_path);
             }
+        }
+    }
 
-            // Handling file uploads (documentation photos)
-            if (isset($_FILES['documentation_photos']) && !empty($_FILES['documentation_photos']['name'][0])) {
-                foreach ($_FILES['documentation_photos']['tmp_name'] as $index => $tmp_name) {
-                    $file_name = $_FILES['documentation_photos']['name'][$index];
-                    $file_tmp = $_FILES['documentation_photos']['tmp_name'][$index];
-                    $file_error = $_FILES['documentation_photos']['error'][$index];
-
-                    if ($file_error === 0) {
-                        $upload_dir = '../uploads/';
-                        if (!is_dir($upload_dir)) {
-                            mkdir($upload_dir, 0777, true);
-                        }
-                        $unique_file_name = time() . "_" . basename($file_name);
-                        $upload_path = $upload_dir . $unique_file_name;
-                        if (move_uploaded_file($file_tmp, $upload_path)) {
-                            $existing_photos[] = $upload_path;
-                        }
-                    }
+    // Handling file uploads (documentation photos)
+    if (isset($_FILES['documentation_photos']) && !empty($_FILES['documentation_photos']['name'][0])) {
+        foreach ($_FILES['documentation_photos']['tmp_name'] as $index => $tmp_name) {
+            $file_name = $_FILES['documentation_photos']['name'][$index];
+            $file_tmp = $_FILES['documentation_photos']['tmp_name'][$index];
+            $file_error = $_FILES['documentation_photos']['error'][$index];
+            if ($file_error === 0) {
+                $upload_dir = '../uploads/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                $unique_file_name = time() . "_" . basename($file_name);
+                $upload_path = $upload_dir . $unique_file_name;
+                if (move_uploaded_file($file_tmp, $upload_path)) {
+                    $existing_photos[] = $upload_path;
                 }
             }
+        }
+    }
+
+    // Handle report files marked for deletion
+    if (isset($_POST['reports_to_delete']) && $_POST['reports_to_delete'] !== '') {
+        $reports_to_delete = array_filter(array_map('trim', explode(',', $_POST['reports_to_delete'])));
+        foreach ($reports_to_delete as $type) {
+            if ($type === 'narrative_report' && !empty($report['narrative_report']) && file_exists($report['narrative_report'])) {
+                @unlink($report['narrative_report']);
+                $narrative_report = '';
+            }
+            if ($type === 'progress_report' && !empty($report['progress_report']) && file_exists($report['progress_report'])) {
+                @unlink($report['progress_report']);
+                $progress_report = '';
+            }
+            if ($type === 'final_investigation_report' && !empty($report['final_investigation_report']) && file_exists($report['final_investigation_report'])) {
+                @unlink($report['final_investigation_report']);
+                $final_investigation_report = '';
+            }
+        }
+    } else {
+        $narrative_report = $report['narrative_report'];
+        $progress_report = $report['progress_report'];
+        $final_investigation_report = $report['final_investigation_report'];
+    }
 
     // Handle narrative report upload
-    $narrative_report = $report['narrative_report']; // Keep the original file if not updated
     if (isset($_FILES['narrative_report']) && $_FILES['narrative_report']['error'] === 0) {
         $narrative_report_name = $_FILES['narrative_report']['name'];
         $narrative_report_tmp = $_FILES['narrative_report']['tmp_name'];
-
         $narrative_report_path = '../uploads/' . time() . "_" . basename($narrative_report_name);
         if (move_uploaded_file($narrative_report_tmp, $narrative_report_path)) {
             $narrative_report = $narrative_report_path;
@@ -127,54 +160,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     }
 
     // Handle progress report upload
-$progress_report = $report['progress_report']; // Keep the original file if not updated
-if (isset($_FILES['progress_report']) && $_FILES['progress_report']['error'] === 0) {
-    $progress_report_name = $_FILES['progress_report']['name'];
-    $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
-
-    $progress_report_path = '../uploads/' . time() . "_" . basename($progress_report_name);
-    if (move_uploaded_file($progress_report_tmp, $progress_report_path)) {
-        $progress_report = $progress_report_path;
+    if (isset($_FILES['progress_report']) && $_FILES['progress_report']['error'] === 0) {
+        $progress_report_name = $_FILES['progress_report']['name'];
+        $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
+        $progress_report_path = '../uploads/' . time() . "_" . basename($progress_report_name);
+        if (move_uploaded_file($progress_report_tmp, $progress_report_path)) {
+            $progress_report = $progress_report_path;
+        }
     }
-}
 
-// Handle final investigation report upload
-$final_investigation_report = $report['final_investigation_report']; // Keep the original file if not updated
-if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation_report']['error'] === 0) {
-    $final_report_name = $_FILES['final_investigation_report']['name'];
-    $final_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
-
-    $final_report_path = '../uploads/' . time() . "_" . basename($final_report_name);
-    if (move_uploaded_file($final_report_tmp, $final_report_path)) {
-        $final_investigation_report = $final_report_path;
+    // Handle final investigation report upload
+    if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation_report']['error'] === 0) {
+        $final_report_name = $_FILES['final_investigation_report']['name'];
+        $final_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
+        $final_report_path = '../uploads/' . time() . "_" . basename($final_report_name);
+        if (move_uploaded_file($final_report_tmp, $final_report_path)) {
+            $final_investigation_report = $final_report_path;
+        }
     }
-}
-
 
     // Update report data in the database
     $query = "UPDATE fire_incident_reports 
     SET report_title = ?, caller_name = ?, responding_team = ?, fire_location = ?, street = ?, purok = ?, municipality = ?, incident_date = ?, arrival_time = ?, fireout_time = ?, establishment = ?, occupancy_type = ?, victims = ?, firefighters = ?, alarm_status = ?, property_damage = ?, fire_types = ?, documentation_photos = ?, narrative_report = ?, progress_report = ?, final_investigation_report = ? 
     WHERE report_id = ?";   
     $stmt = mysqli_prepare($conn, $query);
-    $documentation_photos = implode(',', $existing_photos);    mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssi", $report_title, $caller_name,  $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $occupancy_type, $victims, $firefighters, $alarm_status, $property_damage, $fire_types, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report, $report_id);
-if (mysqli_stmt_execute($stmt)) {
-    $success_message = "Report updated successfully!";
-    // Log activity
-    $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'update', ?, ?)";
-    $log_stmt = $conn->prepare($log_query);
-    $log_details = "Updated Fire Incident Report: " . $report_title;
-    $log_stmt->bind_param('sis', $username, $report_id, $log_details);
-    $log_stmt->execute();
-    $log_stmt->close();
-    // Set redirect target for JS
-    if (strtolower($user_type) === 'admin' && $report['uploader'] === $_SESSION['username']) {
-        $redirect_target = 'my_fire_incident_reports.php';
+    $documentation_photos = implode(',', $existing_photos);
+    mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssi", $report_title, $caller_name,  $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $occupancy_type, $victims, $firefighters, $alarm_status, $property_damage, $fire_types, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report, $report_id);
+    if (mysqli_stmt_execute($stmt)) {
+        $success_message = "Report updated successfully!";
+        // Log activity
+        $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'update', ?, ?)";
+        $log_stmt = $conn->prepare($log_query);
+        $log_details = "Updated Fire Incident Report: " . $report_title;
+        $log_stmt->bind_param('sis', $username, $report_id, $log_details);
+        $log_stmt->execute();
+        $log_stmt->close();
+        // Set redirect target for JS
+        if (strtolower($user_type) === 'admin' && $report['uploader'] === $_SESSION['username']) {
+            $redirect_target = 'my_fire_incident_reports.php';
+        } else {
+            $redirect_target = 'fire_incident_report.php';
+        }
     } else {
-        $redirect_target = 'fire_incident_report.php';
+        $error_message = "There was an error updating the report.";
     }
-} else {
-    $error_message = "There was an error updating the report.";
-}
 }
 
 $sql_settings = "SELECT system_name FROM settings LIMIT 1";
@@ -443,7 +472,9 @@ mysqli_close($conn);
                 <label for="establishment">Establishment Name:</label>
                 <input type="text" id="establishment" name="establishment" value="<?php echo htmlspecialchars($report['establishment']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
-<h4> Fire Location </h4>
+<hr class="section-separator full-bleed">
+<h4 style="text-align: center;"> Fire Location </h4>
+<hr class="section-separator full-bleed">
 
 <div class = "form-group-container">
             <div class="form-group" style="width: 45%; display: inline-block;">
@@ -474,8 +505,9 @@ mysqli_close($conn);
                 </select>
             </div>
             </div>
-
-<h4> Date and Time </h4>
+<hr class="section-separator full-bleed">
+<h4 style="text-align: center;"> Date and Time </h4>
+<hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
                 <label for="incident_date">Time and Date Reported:</label>
@@ -490,23 +522,8 @@ mysqli_close($conn);
                 <input type="time" id="fireout_time" name="fireout_time" value="<?php echo htmlspecialchars($report['fireout_time']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
             </div>
-
-<h4> Injured/Casualties </h4>
-<br>
-<div class="form-group-container">
-<div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="victims">Civilians:</label>
-                <textarea id="victims" name="victims" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['victims']); ?></textarea>
-            </div>
-
-            <div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="firefighters">Firefighters:</label>
-                <textarea id="victims" name="firefighters" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
-            </div>
-            </div>
-
-<h4></h4>
-<div class = "form-group-container"></div>
+<hr class="section-separator full-bleed">
+            <div class = "form-group-container"></div>
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="property_damage">Damage to Property (₱):</label>
                 <input type="text" id="property_damage" name="property_damage" value="<?php echo htmlspecialchars($report['property_damage']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
@@ -550,6 +567,22 @@ mysqli_close($conn);
                     <?php } ?>
                 </select>
             </div>
+ <hr class="section-separator full-bleed">           
+<h4 style="text-align: center;"> Injured/Casualties </h4>
+<hr class="section-separator full-bleed">
+<br>
+<div class="form-group-container">
+<div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="victims">Civilians:</label>
+                <textarea id="victims" name="victims" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['victims']); ?></textarea>
+            </div>
+
+            <div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="firefighters">Firefighters:</label>
+                <textarea id="victims" name="firefighters" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
+            </div>
+            </div>
+            <br>
 </fieldset>
 <br>
 <fieldset>
@@ -559,7 +592,7 @@ mysqli_close($conn);
         <!-- Photo Gallery -->
         <?php if ($report['documentation_photos']) { ?>
         <section class="photo-gallery">
-            <h3>Photos of the Scene</h3>
+           <h3>Photos of the Scene</h3>
             <input type="hidden" id="existing_photos_input" name="existing_photos_input" value="<?php echo htmlspecialchars($report['documentation_photos']); ?>">
            <div class="photo-grid">
                 <?php
@@ -885,37 +918,54 @@ document.getElementById('cancelDeleteBtn').onclick = function() {
     document.getElementById('confirmDeleteModal').style.display = 'none';
     pendingReportDelete = { type: null, id: null, section: null };
 };
+let reportsToDelete = [];
 document.getElementById('confirmDeleteBtn').onclick = function() {
-    if (!pendingReportDelete.type || !pendingReportDelete.id) return;
-    fetch('delete_report_file.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ report_type: pendingReportDelete.type, report_id: pendingReportDelete.id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (pendingReportDelete.section) pendingReportDelete.section.style.display = 'none';
-        } else {
-            alert('Failed to delete file: ' + data.error);
-        }
-        document.getElementById('confirmDeleteModal').style.display = 'none';
-        pendingReportDelete = { type: null, id: null, section: null };
-    })
-    .catch(error => {
-        alert('Error deleting file.');
-        document.getElementById('confirmDeleteModal').style.display = 'none';
-        pendingReportDelete = { type: null, id: null, section: null };
-    });
+    if (!pendingReportDelete.type) return;
+    // Mark report file for deletion
+    reportsToDelete.push(pendingReportDelete.type);
+    // Remove from UI
+    if (pendingReportDelete.section) pendingReportDelete.section.style.display = 'none';
+    document.getElementById('confirmDeleteModal').style.display = 'none';
+    pendingReportDelete = { type: null, id: null, section: null };
+    enableSave();
 };
 
-// --- Preview Images for New Uploads ---
+// Add hidden input to form for report files to delete
+document.addEventListener('DOMContentLoaded', function() {
+    const mainForm = document.querySelector('form[action^="view_report.php"]');
+    if (mainForm && !document.getElementById('reports_to_delete')) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'reports_to_delete';
+        input.id = 'reports_to_delete';
+        mainForm.appendChild(input);
+    }
+});
+// On form submit, update hidden input value
+document.querySelector('form[action^="view_report.php"]').addEventListener('submit', function() {
+    document.getElementById('reports_to_delete').value = reportsToDelete.join(',');
+});
+
+// --- Preview Images for New Uploads (Append, not Replace) ---
+let selectedFiles = [];
 function previewImages(event) {
-    enableSave();
+    const input = document.getElementById('documentation_photos');
     const previewDiv = document.getElementById('image-previews');
+    // Add new files to selectedFiles array
+    const newFiles = Array.from(event.target.files);
+    // If input was changed, browser replaces files, so we append manually
+    selectedFiles = selectedFiles.concat(newFiles);
+    // Remove duplicates (by name and size)
+    selectedFiles = selectedFiles.filter((file, idx, arr) =>
+        arr.findIndex(f => f.name === file.name && f.size === file.size) === idx
+    );
+    // Update input.files to match selectedFiles
+    const dt = new DataTransfer();
+    selectedFiles.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+    // Render previews
     previewDiv.innerHTML = '';
-    const files = Array.from(event.target.files);
-    files.forEach((file, i) => {
+    selectedFiles.forEach((file, i) => {
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -941,13 +991,21 @@ function previewImages(event) {
                 removeBtn.style.borderRadius = '50%';
                 removeBtn.style.cursor = 'pointer';
                 removeBtn.onclick = function() {
-                    wrapper.remove();
-                    const input = document.getElementById('documentation_photos');
-                    const newFiles = Array.from(input.files).filter((_, idx) => idx !== i);
-                    const dt = new DataTransfer();
-                    newFiles.forEach(f => dt.items.add(f));
-                    input.files = dt.files;
-                    enableSave();
+                    // Remove from selectedFiles
+                    selectedFiles.splice(i, 1);
+                    // Update input.files
+                    const dt2 = new DataTransfer();
+                    selectedFiles.forEach(f => dt2.items.add(f));
+                    input.files = dt2.files;
+                    // Re-render previews
+                    previewImages({ target: input });
+                    // Disable save if preview is empty
+                    if (selectedFiles.length === 0) {
+                        saveBtn.disabled = true;
+                        formChanged = false;
+                    } else {
+                        enableSave();
+                    }
                 };
                 wrapper.appendChild(img);
                 wrapper.appendChild(removeBtn);
@@ -956,10 +1014,18 @@ function previewImages(event) {
             reader.readAsDataURL(file);
         }
     });
+    // Enable/disable save button based on preview
+    if (selectedFiles.length === 0) {
+        saveBtn.disabled = true;
+        formChanged = false;
+    } else {
+        enableSave();
+    }
 }
 
 // --- Photo Deletion Modal (Existing Photos) ---
 let pendingPhotoDelete = null;
+let photosToDelete = [];
 document.addEventListener('click', function (event) {
     if (event.target.classList.contains('delete-photo-btn') && event.target.hasAttribute('data-path')) {
         pendingPhotoDelete = event.target;
@@ -973,35 +1039,34 @@ document.getElementById('cancelPhotoDeleteBtn').onclick = function() {
 document.getElementById('confirmPhotoDeleteBtn').onclick = function() {
     if (!pendingPhotoDelete) return;
     const photoPath = pendingPhotoDelete.getAttribute('data-path');
-    const photoIndex = pendingPhotoDelete.getAttribute('data-index');
-    fetch('delete_photo.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: photoPath, index: photoIndex, report_id: <?php echo $report_id; ?> }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const photoDiv = pendingPhotoDelete.parentElement;
-            photoDiv.remove();
-            let existingPhotos = document.getElementById('existing_photos_input').value.split(',');
-            existingPhotos = existingPhotos.filter(path => path !== photoPath);
-            document.getElementById('existing_photos_input').value = existingPhotos.join(',');
-            document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
-            pendingPhotoDelete = null;
-            enableSave();
-        } else {
-            alert('Failed to delete photo: ' + data.error);
-            document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
-            pendingPhotoDelete = null;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
-        pendingPhotoDelete = null;
-    });
+    // Mark photo for deletion
+    photosToDelete.push(photoPath);
+    // Remove from UI
+    const photoDiv = pendingPhotoDelete.parentElement;
+    photoDiv.remove();
+    let existingPhotos = document.getElementById('existing_photos_input').value.split(',');
+    existingPhotos = existingPhotos.filter(path => path !== photoPath);
+    document.getElementById('existing_photos_input').value = existingPhotos.join(',');
+    document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
+    pendingPhotoDelete = null;
+    enableSave();
 };
+
+// Add hidden input to form for photos to delete
+document.addEventListener('DOMContentLoaded', function() {
+    const mainForm = document.querySelector('form[action^="view_report.php"]');
+    if (mainForm && !document.getElementById('photos_to_delete')) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'photos_to_delete';
+        input.id = 'photos_to_delete';
+        mainForm.appendChild(input);
+    }
+});
+// On form submit, update hidden input value
+document.querySelector('form[action^="view_report.php"]').addEventListener('submit', function() {
+    document.getElementById('photos_to_delete').value = photosToDelete.join(',');
+});
 
 // --- Photo Modal Viewer ---
 document.querySelectorAll('.scene-photo').forEach(function(img) {

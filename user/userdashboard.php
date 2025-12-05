@@ -12,13 +12,6 @@ include('auth_check.php');
 $username = $_SESSION['username'];
 $avatar = '../avatars/default_avatar.png';
 
-$sql_settings = "SELECT system_name FROM settings LIMIT 1";
-$result_settings = $conn->query($sql_settings);
-$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
-if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
-    $system_name = $row_settings['system_name'];
-}
-
 // Use prepared statement to prevent SQL injection
 $stmt = $conn->prepare("SELECT avatar FROM users WHERE username = ? LIMIT 1");
 $stmt->bind_param("s", $username);
@@ -59,20 +52,6 @@ $total_barangays = 0;
 if ($result_barangays->num_rows > 0) {
     $row_barangays = $result_barangays->fetch_assoc();
     $total_barangays = $row_barangays['total_barangays'];
-}
-
-$sql_top_barangay = "SELECT fire_location, COUNT(*) AS cnt
-    FROM fire_incident_reports
-    WHERE deleted_at IS NULL
-    GROUP BY fire_location
-    ORDER BY cnt DESC
-    LIMIT 1";
-$result_top_barangay = $conn->query($sql_top_barangay);
-$top_barangay_name = null;
-$top_barangay_count = 0;
-if ($result_top_barangay && $row_tb = $result_top_barangay->fetch_assoc()) {
-    $top_barangay_name = $row_tb['fire_location'];
-    $top_barangay_count = $row_tb['cnt'];
 }
 
 $sql_not_verified_users = "SELECT COUNT(*) AS not_verified_users FROM users WHERE status = 'not verified'";
@@ -131,7 +110,7 @@ if ($result_top_fire_type->num_rows > 0) {
     $fire_count_fire_type = $row['fire_count'];
 }
 
-$sql_damage = "SELECT SUM(property_damage) AS total_damage FROM fire_incident_reports WHERE deleted_at IS NULL";
+$sql_damage = "SELECT SUM(REPLACE(property_damage, ',', '')) AS total_damage FROM fire_incident_reports WHERE deleted_at IS NULL";
 $result_damage = $conn->query($sql_damage);
 $total_damage = 0;
 if ($result_damage && $row_damage = $result_damage->fetch_assoc()) {
@@ -141,9 +120,32 @@ if ($result_damage && $row_damage = $result_damage->fetch_assoc()) {
 $sql_occupancy = "SELECT occupancy_type, COUNT(*) AS occupancy_count FROM fire_incident_reports WHERE deleted_at IS NULL GROUP BY occupancy_type ORDER BY occupancy_count DESC";
 $result_occupancy = $conn->query($sql_occupancy);
 
+
+$sql_top_barangay = "SELECT fire_location, COUNT(*) AS cnt
+    FROM fire_incident_reports
+    WHERE deleted_at IS NULL
+    GROUP BY fire_location
+    ORDER BY cnt DESC
+    LIMIT 1";
+$result_top_barangay = $conn->query($sql_top_barangay);
+$top_barangay_name = null;
+$top_barangay_count = 0;
+if ($result_top_barangay && $row_tb = $result_top_barangay->fetch_assoc()) {
+    $top_barangay_name = $row_tb['fire_location'];
+    $top_barangay_count = $row_tb['cnt'];
+}
+
+// Fetch system name from settings BEFORE closing connection
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
 $conn->close();
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

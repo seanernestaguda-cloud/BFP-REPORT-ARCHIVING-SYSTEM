@@ -162,6 +162,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     position: fixed;
     z-index: 1000;
 }
+/* Required field asterisk */
+.required {
+    color: red;
+    margin-left: 2px;
+    font-weight: bold;
+}
+/* Required text next to asterisk */
+.required-text {
+    color: red;
+    font-size: 13px;
+    margin-left: 2px;
+    font-weight: normal;
+    display: inline;
+    transition: opacity 0.2s;
+    opacity: 1;
+}
+.required-text.filled {
+    display: none;
+}
+/* Error highlight for required fields */
+.input-error {
+    border-color: #bd000a !important;
+    background: #fff0f0;
+}
 /* Title */
 .form-header{
  background: #003D73;
@@ -558,35 +582,35 @@ input[type="file"] {
     <legend> Inspection Details </legend>
 <div class="form-group-container">
       <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="permit_name">Title:</label>
+        <label for="permit_name">Title: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="permit_name" name="permit_name" class="form-control" placeholder="Report Name" required>
     </div>
 
     
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="owner">Owner of the Establishment:</label>
+        <label for="owner">Owner of the Establishment: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="owner" name="owner" class="form-control" placeholder="Name of the Owner" required>
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="contact_person">Contact Person:</label>
+        <label for="contact_person">Contact Person: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="contact_person" name="contact_person" class="form-control" placeholder="Name of the Contact Person" required>
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="contact_number">Contact Number:</label>
+        <label for="contact_number">Contact Number: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="number" id="contact_number" name="contact_number" class="form-control" placeholder="Contact Number" required>
         </div>
         <hr class="section-separator full-bleed">
 <h4 style="text-align: center;"> Establishment Details </h4>
 <hr class="section-separator full-bleed">
       <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="inspection_establishment">Establishment Name:</label>
+        <label for="inspection_establishment">Establishment Name: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="inspection_establishment" name="inspection_establishment" class="form-control" placeholder="Establishment" required>
     </div>
     
     <div class="form-group" style="width:45%; display: inline-block;">
-        <label for="establishment_type">Establishment Type:</label>
+        <label for="establishment_type">Establishment Type: <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="establishment_type" name="establishment_type" class="form-control" required>
             <option value="" disabled selected>Select Establishment Type</option>
             <option value="residential">Residential</option>
@@ -602,35 +626,35 @@ input[type="file"] {
        <div class="form-group-container"></div>
 
         <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="inspection_address">Address of the Establishment:</label>
+        <label for="inspection_address">Address of the Establishment: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="inspection_address" name="inspection_address" class="form-control" placeholder="Address of the Establishment" required>
     </div>
 
 
 
         <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="number_of_occupants">Number of Occupants:</label>
+        <label for="number_of_occupants">Number of Occupants: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="number" id="number_of_occupants" name="number_of_occupants" class="form-control" placeholder="Number of Occupants" required>
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="nature_of_business">Nature of Business:</label>
+        <label for="nature_of_business">Nature of Business: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="nature_of_business" name="nature_of_business" class="form-control" placeholder="Nature of Business" required>
     </div>
             
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="number_of_floors">Number of Floors:</label>
+        <label for="number_of_floors">Number of Floors: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="number" id="number_of_floors" name="number_of_floors" class="form-control" placeholder="Number of Floors" required>
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="floor_area">Floor Area:</label>
+        <label for="floor_area">Floor Area: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="floor_area" name="floor_area" class="form-control" placeholder="Floor Area" required>
     </div>
 
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="building_construction">Building Construction:</label>
+        <label for="building_construction">Building Construction: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="building_construction" name="building_construction" class="form-control" placeholder="Building Construction" required>
     </div>
  <hr class="section-separator full-bleed">
@@ -639,7 +663,7 @@ input[type="file"] {
 
         <div class="form-group-container">
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="inspection_purpose">Purpose of Inspection:</label>
+        <label for="inspection_purpose">Purpose of Inspection: <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="inspection_purpose" name="inspection_purpose" class="form-control" required>
             <option value="" disabled selected>Select Purpose</option>
             <option value="routine">Routine</option>
@@ -648,7 +672,7 @@ input[type="file"] {
         </select>
     </div>
       <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="classification_of_hazards">Classification of Hazards:</label>
+        <label for="classification_of_hazards">Classification of Hazards: <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="classification_of_hazards" name="classification_of_hazards" class="form-control" required>
             <option value="" disabled selected>Select Classification</option>
             <option value="Class_A">Class A: These fires involve ordinary combustibles like wood, paper, cloth, and some plastics.</option>
@@ -659,21 +683,21 @@ input[type="file"] {
         </select>
     </div>
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="inspection_date">Date of Inspection:</label>
+        <label for="inspection_date">Date of Inspection: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="date" id="inspection_date" name="inspection_date" class="form-control" placeholder="Date" required>
     </div>
        <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="inspected_by">Inspected By:</label>
+        <label for="inspected_by">Inspected By: <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="inspected_by" name="inspected_by" class="form-control" placeholder="Name of Inspector" required>
     </div>
     </div>
      <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="possible_problems">Possible Problems to be encountered during occurence of fire:</label>
-    <textarea id="possible_problems" name="possible_problems" rows="10" cols="30" placeholder="Possible Problems During Fire" onfocus="addFirstNumber()" oninput="autoNumber()"></textarea><br><br>
+        <label for="possible_problems">Possible Problems to be encountered during fire:<span class="required">*</span><span class="required-text"> required</span></label>
+    <textarea id="possible_problems" name="possible_problems" rows="10" cols="30" placeholder="Possible Problems During Fire" onfocus="addFirstNumber()" oninput="autoNumber()" required></textarea><br><br>
     </div>
         <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="hazardous_materials">Hazardous/Flammable Materials:</label>
-    <textarea id="hazardous_materials" name="hazardous_materials" rows="10" cols="30" placeholder="Hazardous Materials" onfocus="addFirstNumber()" oninput="autoNumber()"></textarea><br><br>
+        <label for="hazardous_materials">Hazardous/Flammable Materials:<span class="required">*</span><span class="required-text"> required</span></label>
+    <textarea id="hazardous_materials" name="hazardous_materials" rows="10" cols="30" placeholder="Hazardous Materials" onfocus="addFirstNumber()" oninput="autoNumber()" required></textarea><br><br>
     </div>
     </div>
 </fieldset>
@@ -866,7 +890,19 @@ input[type="file"] {
         else line.classList.remove('active');
     });
 }
+// Use browser-native required field validation for step 1
 function nextStep(step) {
+    if (step === 2) {
+        var step1 = document.getElementById('step-1');
+        var requiredFields = step1.querySelectorAll('[required]');
+        for (var i = 0; i < requiredFields.length; i++) {
+            if (!requiredFields[i].checkValidity()) {
+                requiredFields[i].reportValidity();
+                requiredFields[i].focus();
+                return;
+            }
+        }
+    }
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';
     updateStepper(step);
@@ -878,6 +914,24 @@ function prevStep(step) {
 }
 document.addEventListener('DOMContentLoaded', function() {
     updateStepper(1);
+    // Hide 'required' text when field is filled
+    function updateRequiredTextVisibility() {
+        document.querySelectorAll('#step-1 [required]').forEach(function(field) {
+            var reqText = field.parentElement.querySelector('.required-text');
+            if (reqText) {
+                if (field.value.trim()) {
+                    reqText.style.opacity = '0';
+                } else {
+                    reqText.style.opacity = '1';
+                }
+            }
+        });
+    }
+    updateRequiredTextVisibility();
+    document.querySelectorAll('#step-1 [required]').forEach(function(field) {
+        field.addEventListener('input', updateRequiredTextVisibility);
+        field.addEventListener('change', updateRequiredTextVisibility);
+    });
 });
 function showTab(type) {
     // Hide all tab contents

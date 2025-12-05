@@ -26,7 +26,7 @@ $stmt_user->close();
 
 
 // Fetch unique years from the incident_date column
-$sql_years = "SELECT DISTINCT YEAR(incident_date) AS year FROM fire_incident_reports ORDER BY year";
+$sql_years = "SELECT DISTINCT YEAR(incident_date) AS year FROM fire_incident_reports WHERE deleted_at IS NULL ORDER BY year";
 $result_years = $conn->query($sql_years);
 
 $year1 = isset($_GET['year1']) && is_numeric($_GET['year1']) ? intval($_GET['year1']) : null;
@@ -44,7 +44,7 @@ $sql_table_data = "
         SUM(CASE WHEN YEAR(incident_date) = ? THEN 1 ELSE 0 END) AS year1_total_incidents,
         SUM(CASE WHEN YEAR(incident_date) = ? THEN 1 ELSE 0 END) AS year2_total_incidents
     FROM fire_incident_reports
-    WHERE YEAR(incident_date) IN (?, ?)
+    WHERE YEAR(incident_date) IN (?, ?) AND deleted_at IS NULL
     GROUP BY MONTH(incident_date)
     ORDER BY MONTH(incident_date);
 ";

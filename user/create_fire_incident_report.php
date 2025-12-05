@@ -1,21 +1,11 @@
 <?php
-// session_start();
-
-// // Check if the user is logged in
-// if (!isset($_SESSION['username'])) {
-//     header("Location: adminlogin.php");
-// }
-
 include('connection.php');
 include('auth_check.php');
 
-$sql_settings = "SELECT system_name FROM settings LIMIT 1";
-$result_settings = $conn->query($sql_settings);
-$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
-if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
-    $system_name = $row_settings['system_name'];
-}
-
+// Fetch current settings (assuming a 'settings' table with one row)
+$sql = "SELECT * FROM settings LIMIT 1";
+$result = $conn->query($sql);
+$settings = $result ? $result->fetch_assoc() : [];
 
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar FROM users WHERE username = ? LIMIT 1";
@@ -68,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dept_stmt->execute();
     $dept_result = $dept_stmt->get_result();
     if ($dept_result && $dept_row = $dept_result->fetch_assoc()) {
-        $department = $dept_row['department'];
+        $department = !empty($dept_row['department']) ? $dept_row['department'] : 'N/A';
     }
     $dept_stmt->close();
 
@@ -144,23 +134,28 @@ if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation
     $documentation_photos = implode(',', $documentation_photos);  // Store multiple photo paths as a comma-separated string
     mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssss", $report_title, $caller_name, $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $victims, $firefighters, $property_damage, $fire_types, $alarm_status, $occupancy_type, $uploader, $department, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report);
     if (mysqli_stmt_execute($stmt)) {
-    $_SESSION['success_message'] = "Report created successfully!";
-    // Log activity
-    $new_report_id = mysqli_insert_id($conn);
-    $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'create', ?, ?)";
-    $log_stmt = $conn->prepare($log_query);
-    $log_details = "Created report: " . $report_title;
-    $log_stmt->bind_param('sis', $uploader, $new_report_id, $log_details);
-    $log_stmt->execute();
-    $log_stmt->close();
-    // No immediate redirection
-} else {
-    $_SESSION['error_message'] = "There was an error creating the report. Please try again.";
-}
+        $success_message = "Report created successfully!";
+        // Log activity
+        $new_report_id = mysqli_insert_id($conn);
+        $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'create', ?, ?)";
+        $log_stmt = $conn->prepare($log_query);
+        $log_details = "Created report: " . $report_title;
+        $log_stmt->bind_param('sis', $uploader, $new_report_id, $log_details);
+        $log_stmt->execute();
+        $log_stmt->close();
+        // No immediate redirect; let JS handle modal and redirect
+    } else {
+        $error_message = "There was an error creating the report. Please try again.";
+    }
     
 }
 
-
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
+}
 
 mysqli_close($conn);
 ?>
@@ -186,6 +181,24 @@ mysqli_close($conn);
 .header{
     position: fixed;
     z-index: 1000;
+}
+/* Required field asterisk */
+.required {
+    color: red;
+    margin-left: 2px;
+    font-weight: bold;
+}
+/* Required text next to asterisk */
+.required-text {
+    color: red;
+    font-size: 13px;
+    margin-left: 2px;
+    font-weight: normal;
+    display: inline;
+    transition: opacity 0.2s;
+}
+.required-text.filled {
+    display: none;
 }
 /* Title */
 .form-header{
@@ -251,7 +264,7 @@ button[type = "submit"], button[type="button"].btn-primary {
     text-decoration: none;
 }
 
-button[type = "submit"]:hover {
+button[type = "submit"]:hover, button[type="button"].btn-primary:hover {
     background-color: #002D57; /* Darker Blue on hover */
 }   
 
@@ -543,20 +556,20 @@ input[type="file"] {
 </style>
 <body>
 
-<aside class="sidebar">
+   <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-chart-column"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -566,8 +579,8 @@ input[type="file"] {
                         <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                     </ul>
                 </li>
-                
-                <!-- <li class="archive-text"><span>Maintenance</span></li>
+<!--                 
+                <li class="archive-text"><span>Maintenance</span></li>
                 <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
@@ -580,7 +593,7 @@ input[type="file"] {
     <button id="toggleSidebar" class="toggle-sidebar-btn">
         <i class="fa-solid fa-bars"></i>
     </button>
-        <h2><?php echo htmlspecialchars($system_name); ?></h2>
+    <h2><?php echo htmlspecialchars($settings['system_name'] ?? 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM'); ?></h2>
     <div class="header-right">
         <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
@@ -598,11 +611,15 @@ input[type="file"] {
     <div class = "card">
     <div class = "form-header"> <h2>Create Fire Incident Report</h2></div>
             <?php if (isset($success_message)) { ?>
-            <div class="alert alert-success"><?php echo $success_message; ?></div>
-        <?php } ?>
-        <?php if (isset($error_message)) { ?>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                showSuccessModal("<?php echo $success_message; ?>", true);
+            });
+            </script>
+            <?php } ?>
+            <?php if (isset($error_message)) { ?>
             <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php } ?>
+            <?php } ?>
 <!-- Fire Incident Report Form -->
 <div class="stepper-container">
     <div class="stepper">
@@ -635,37 +652,37 @@ input[type="file"] {
         <legend>Incident Details</legend>
         <!-- ...all your incident detail fields here... -->
         <div class="form-group" style="width: 45%; display: inline-block;">
-            <label for="report_title">Report Title</label>
+            <label for="report_title">Report Title <span class="required">*</span><span class="required-text"> required</span></label>
             <input type="text" id="report_title" name="report_title" required placeholder="Report Name">
         </div>
       <div class="form-group" style="width: 45%; display: inline-block;">
-      <label for="caller_name">Name of the Caller</label>
+    <label for="caller_name">Name of the Caller <span class="required">*</span><span class="required-text"> required</span></label>
       <input type="text" id="caller_name" name="caller_name" required placeholder="Caller Name">
     </div>
       <div class="form-group-container"></div>
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="responding_team">Responding Team</label>
+        <label for="responding_team">Responding Team <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="responding_team" name="responding_team" class="form-control" placeholder="Responding Team" required>
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="establishment">Establishment Burned</label>
+        <label for="establishment">Establishment Burned <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="establishment" name="establishment" class="form-control" placeholder="Name of the Establishment" required>
     </div>
 <hr class="section-separator full-bleed">
 <h4 style = "text-align: center;"> Fire Location </h4>
 <hr class="section-separator full-bleed">
 <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="street">Street</label>
+        <label for="street">Street <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="street" name="street" class="form-control" placeholder="street" required>
     </div>
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="purok">Purok</label>
+        <label for="purok">Purok <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="purok" name="purok" class="form-control" placeholder="purok" required>
     </div>
 <div class="form-group-container">
     <div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="fire_location">Barangay</label>
+                <label for="fire_location">Barangay <span class="required">*</span><span class="required-text"> required</span></label>
                 <select id="fire_location" name="fire_location" class="form-control" required>
                     <option value="" disabled selected>Select Barangay</option>
                     <?php while ($row = mysqli_fetch_assoc($result_barangays)) { ?>
@@ -677,7 +694,7 @@ input[type="file"] {
         
     
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="municipality">Municipality</label>
+        <label for="municipality">Municipality <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="municipality" name="municipality" class="form-control" placeholder="municipality" required>
     </div>
 <hr class="section-separator full-bleed">
@@ -685,23 +702,23 @@ input[type="file"] {
 <hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
-        <label for="incident_date">Time and Date Reported</label>
+        <label for="incident_date">Time and Date Reported <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="datetime-local" id="incident_date" name="incident_date" class="form-control" placeholder="Date" required>
     </div>
 
     <div class="form-group" style="width: 30%; display: inline-block;">
-        <label for="arrival_time">Time of Arrival</label>
+        <label for="arrival_time">Time of Arrival <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="time" id="arrival_time" name="arrival_time" class="form-control" placeholder="Time of Arrival" required>
     </div>
 
     <div class="form-group" style="width: 30%; display: inline-block;">
-        <label for="fireout_time">Time of Fire Out</label>
+        <label for="fireout_time">Time of Fire Out <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="time" id="fireout_time" name="fireout_time" class="form-control" placeholder="Time of Fire Out" required>
     </div>
   <hr class="section-separator full-bleed">
 <div class="form-group-container">
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="alarm_status">Alarm Status</label>
+        <label for="alarm_status">Alarm Status <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="alarm_status" name="alarm_status" class="form-control" required>
             <option value="" disabled selected>Select Alarm Status</option>
             <option value="1st Alarm">1st Alarm</option>
@@ -713,7 +730,7 @@ input[type="file"] {
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="occupancy_type">Type of Occupancy</label>
+        <label for="occupancy_type">Type of Occupancy <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="occupancy_type" name="occupancy_type" class="form-control" required>
             <option value="" disabled selected>Select Type of Occupancy</option>
             <option value="Residential">Residential</option>
@@ -729,7 +746,7 @@ input[type="file"] {
 
 <div class="form-group-container">
 <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="property_damage"> Estimated Damage to Property (₱)</label>
+        <label for="property_damage"> Estimated Damage to Property (₱) <span class="required">*</span><span class="required-text"> required</span></label>
         <input type = "text" id="property_damage" name="property_damage" class="form-control" placeholder= "Amount of Damage to Property" required></i>
     </div>
 
@@ -748,12 +765,12 @@ input[type="file"] {
     <h4 style="text-align: center;"> Injured/Casualties </h4>
     <hr class="section-separator full-bleed">
     <div class="form-group" style="width: 45%; display: inline-block;">
-    <label for="victims">Civilians</label><br>
+    <label for="victims">Civilians<br>
     <textarea id="victims" name="victims" rows="10" cols="30" placeholder="Enter each victim on a new line" onfocus="addFirstNumber()" oninput="autoNumber()" style="border-bottom: 1px solid #444;"></textarea><br><br>
 </div>
 
  <div class="form-group" style="width: 45%; display: inline-block;">
-    <label for="firefighters">Firefighters</label><br>
+    <label for="firefighters">Firefighters<br>
     <textarea id="victims" name="firefighters" rows="10" cols="30" placeholder="Enter each firefighter on a new line" onfocus="addFirstNumber()" oninput="autoNumber()" style="border-bottom: 1px solid #444;"></textarea><br><br>
 </div>
         </fieldset>
@@ -886,42 +903,66 @@ input[type="file"] {
     <button id="cancelLogout" class = "cancel-btn">Cancel</button>
   </div>
 </div>
+        <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <i class="fa-regular fa-circle-check"></i> <h2>Success!</h2>
+        <p id="successMessage"></p>
+    </div>
+</div>
 
 <script>
-        document.addEventListener('DOMContentLoaded', () => {
-    const toggles = document.querySelectorAll('.report-dropdown-toggle');
-
-    toggles.forEach(toggle => {
-        toggle.addEventListener('click', function (event) {
-            event.preventDefault();
-            const dropdown = this.closest('.report-dropdown');
-            dropdown.classList.toggle('show');
-
-            // Close other dropdowns
-            document.querySelectorAll('.report-dropdown').forEach(item => {
-                if (item !== dropdown) {
-                    item.classList.remove('show');
-                }
-            });
-        });
-    });
-
-    // Close dropdown when clicking outside
-    window.addEventListener('click', event => {
-        if (!event.target.closest('.report-dropdown')) {
-            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        }
-    });
-});
 
 // Update nextStep/prevStep for 4 steps
 function nextStep(step) {
+    // Only validate required fields when moving from step 1 to step 2
+    if (step === 2) {
+        var step1Fields = document.querySelectorAll('#step-1 [required]');
+        let valid = true;
+        step1Fields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+            }
+        });
+        if (!valid) {
+            // Show browser's native validation message for the first invalid field
+            for (let field of step1Fields) {
+                if (!field.value.trim()) {
+                    field.reportValidity();
+                    break;
+                }
+            }
+            return;
+        }
+    }
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';
     updateStepper(step);
 }
+
+// Hide 'required' text when field is filled
+function updateRequiredTextVisibility() {
+    document.querySelectorAll('#step-1 [required]').forEach(function(field) {
+        var label = field.closest('.form-group')?.querySelector('label') || field.closest('div')?.querySelector('label');
+        if (!label) return;
+        var reqText = label.querySelector('.required-text');
+        if (!reqText) return;
+        if (field.value.trim()) {
+            reqText.classList.add('filled');
+        } else {
+            reqText.classList.remove('filled');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial check
+    updateRequiredTextVisibility();
+    // Listen for input on all required fields in step 1
+    document.querySelectorAll('#step-1 [required]').forEach(function(field) {
+        field.addEventListener('input', updateRequiredTextVisibility);
+        field.addEventListener('change', updateRequiredTextVisibility);
+    });
+});
 function prevStep(step) {
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';
@@ -1019,7 +1060,14 @@ function setupDropArea(dropAreaId, inputId, previewId) {
 setupDropArea('dropAreaSpot', 'narrative_report', 'file-preview-narrative');
 setupDropArea('dropAreaProgress', 'progress_report', 'file-preview-progress');
 setupDropArea('dropAreaFinal', 'final_investigation_report', 'file-preview-final');
- document.addEventListener('DOMContentLoaded', () => {
+</script>
+</body>
+</html>
+<script src = "../js/archivescript.js"></script>
+<script src = "../js/createreport.js"></script>
+<script>
+
+        document.addEventListener('DOMContentLoaded', () => {
     const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
     toggles.forEach(toggle => {
@@ -1049,13 +1097,11 @@ setupDropArea('dropAreaFinal', 'final_investigation_report', 'file-preview-final
 
 // Function to show the modal
 // Function to show the modal
-function showSuccessModal(message) {
+function showSuccessModal(message, redirectToMyReports = false) {
     document.getElementById('successMessage').textContent = message;
     document.getElementById('successModal').style.display = "block";
-
-    // Redirect after 2 seconds
     setTimeout(() => {
-        window.location.href = "my_fire_incident_reports.php"; // Change URL as needed
+        window.location.href = redirectToMyReports ? "my_fire_incident_reports.php" : "fire_incident_report.php";
     }, 2000);
 }
 
@@ -1142,12 +1188,7 @@ function updateStepper(step) {
     });
 }
 
-// Call updateStepper in your nextStep/prevStep functions:
-function nextStep(step) {
-    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
-    document.getElementById('step-' + step).style.display = 'block';
-    updateStepper(step);
-}
+// ...existing code...
 function prevStep(step) {
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';
@@ -1159,35 +1200,8 @@ document.addEventListener('DOMContentLoaded', function() {
     updateStepper(1);
 });
 
-        document.addEventListener('DOMContentLoaded', () => {
-    const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
-    toggles.forEach(toggle => {
-        toggle.addEventListener('click', function (event) {
-            event.preventDefault();
-            const dropdown = this.closest('.report-dropdown');
-            dropdown.classList.toggle('show');
-
-            // Close other dropdowns
-            document.querySelectorAll('.report-dropdown').forEach(item => {
-                if (item !== dropdown) {
-                    item.classList.remove('show');
-                }
-            });
-        });
-    });
-
-    // Close dropdown when clicking outside
-    window.addEventListener('click', event => {
-        if (!event.target.closest('.report-dropdown')) {
-            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // Show Confirm Logout Modal
    document.getElementById('logoutLink').addEventListener('click', function(e) {
     e.preventDefault();
@@ -1205,17 +1219,5 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('logoutModal').style.display = 'none';
     });
 });
+    </script>
 
-window.onclick = function(event) {
-    // ...existing code...
-    const logoutModal = document.getElementById('logoutModal');
-    if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-    }
-};
-</script>
-<script src = "../js/archivescript.js"></script>
-
-
-</body>
-</html>

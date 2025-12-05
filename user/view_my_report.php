@@ -442,8 +442,9 @@ mysqli_close($conn);
                 <label for="establishment">Establishment Name:</label>
                 <input type="text" id="establishment" name="establishment" value="<?php echo htmlspecialchars($report['establishment']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
-<h4> Fire Location </h4>
-
+<hr class="section-separator full-bleed">
+<h4 style = "text-align: center;"> Fire Location </h4>
+<hr class="section-separator full-bleed">
 <div class = "form-group-container">
             <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="street">Street:</label>
@@ -473,8 +474,9 @@ mysqli_close($conn);
                 </select>
             </div>
             </div>
-
-<h4> Date and Time </h4>
+<hr class="section-separator full-bleed">
+<h4 style = "text-align:center;"> Date and Time </h4>
+<hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
                 <label for="incident_date">Time and Date Reported:</label>
@@ -489,23 +491,8 @@ mysqli_close($conn);
                 <input type="time" id="fireout_time" name="fireout_time" value="<?php echo htmlspecialchars($report['fireout_time']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
             </div>
-
-<h4> Injured/Casualties </h4>
-<br>
-<div class="form-group-container">
-<div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="victims">Civilians:</label>
-                <textarea id="victims" name="victims" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['victims']); ?></textarea>
-            </div>
-
-            <div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="firefighters">Firefighters:</label>
-                <textarea id="victims" name="firefighters" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
-            </div>
-            </div>
-
-<h4></h4>
-<div class = "form-group-container"></div>
+            <hr class="section-separator full-bleed">
+            <div class = "form-group-container"></div>
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="property_damage">Damage to Property (₱):</label>
                 <input type="text" id="property_damage" name="property_damage" value="<?php echo htmlspecialchars($report['property_damage']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
@@ -549,6 +536,23 @@ mysqli_close($conn);
                     <?php } ?>
                 </select>
             </div>
+<hr class="section-separator full-bleed">
+<h4 style = "text-align:center;"> Injured/Casualties </h4>
+<hr class="section-separator full-bleed">
+<br>
+<div class="form-group-container">
+<div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="victims">Civilians:</label>
+                <textarea id="victims" name="victims" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['victims']); ?></textarea>
+            </div>
+
+            <div class="form-group" style="width: 45%; display: inline-block;">
+                <label for="firefighters">Firefighters:</label>
+                <textarea id="victims" name="firefighters" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
+            </div>
+            </div>
+
+
 </fieldset>
 <br>
 <fieldset>
@@ -741,7 +745,36 @@ mysqli_close($conn);
 </div>
 
 
+
 <script>
+    
+    document.addEventListener('DOMContentLoaded', () => {
+    const toggles = document.querySelectorAll('.report-dropdown-toggle');
+
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            const dropdown = this.closest('.report-dropdown');
+            dropdown.classList.toggle('show');
+
+            // Close other dropdowns
+            document.querySelectorAll('.report-dropdown').forEach(item => {
+                if (item !== dropdown) {
+                    item.classList.remove('show');
+                }
+            });
+        });
+    });
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', event => {
+        if (!event.target.closest('.report-dropdown')) {
+            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+        }
+    });
+});
 // --- Tab Switching for Substantiating Documents ---
 function showTab(tab) {
     // Remove active class from all tab buttons
@@ -855,37 +888,54 @@ document.getElementById('cancelDeleteBtn').onclick = function() {
     document.getElementById('confirmDeleteModal').style.display = 'none';
     pendingReportDelete = { type: null, id: null, section: null };
 };
+let reportsToDelete = [];
 document.getElementById('confirmDeleteBtn').onclick = function() {
-    if (!pendingReportDelete.type || !pendingReportDelete.id) return;
-    fetch('delete_report_file.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ report_type: pendingReportDelete.type, report_id: pendingReportDelete.id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            if (pendingReportDelete.section) pendingReportDelete.section.style.display = 'none';
-        } else {
-            alert('Failed to delete file: ' + data.error);
-        }
-        document.getElementById('confirmDeleteModal').style.display = 'none';
-        pendingReportDelete = { type: null, id: null, section: null };
-    })
-    .catch(error => {
-        alert('Error deleting file.');
-        document.getElementById('confirmDeleteModal').style.display = 'none';
-        pendingReportDelete = { type: null, id: null, section: null };
-    });
+    if (!pendingReportDelete.type) return;
+    // Mark report file for deletion
+    reportsToDelete.push(pendingReportDelete.type);
+    // Remove from UI
+    if (pendingReportDelete.section) pendingReportDelete.section.style.display = 'none';
+    document.getElementById('confirmDeleteModal').style.display = 'none';
+    pendingReportDelete = { type: null, id: null, section: null };
+    enableSave();
 };
 
-// --- Preview Images for New Uploads ---
+// Add hidden input to form for report files to delete
+document.addEventListener('DOMContentLoaded', function() {
+    const mainForm = document.querySelector('form[action^="view_report.php"]');
+    if (mainForm && !document.getElementById('reports_to_delete')) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'reports_to_delete';
+        input.id = 'reports_to_delete';
+        mainForm.appendChild(input);
+    }
+});
+// On form submit, update hidden input value
+document.querySelector('form[action^="view_report.php"]').addEventListener('submit', function() {
+    document.getElementById('reports_to_delete').value = reportsToDelete.join(',');
+});
+
+// --- Preview Images for New Uploads (Accumulate) ---
+let selectedFiles = [];
 function previewImages(event) {
     enableSave();
+    const input = document.getElementById('documentation_photos');
     const previewDiv = document.getElementById('image-previews');
+    // Add new files to selectedFiles
+    const newFiles = Array.from(event.target.files);
+    selectedFiles = selectedFiles.concat(newFiles);
+    // Remove duplicates (by name and size)
+    selectedFiles = selectedFiles.filter((file, idx, arr) =>
+        arr.findIndex(f => f.name === file.name && f.size === file.size) === idx
+    );
+    // Update input.files
+    const dt = new DataTransfer();
+    selectedFiles.forEach(f => dt.items.add(f));
+    input.files = dt.files;
+    // Show previews
     previewDiv.innerHTML = '';
-    const files = Array.from(event.target.files);
-    files.forEach((file, i) => {
+    selectedFiles.forEach((file, i) => {
         if (file && file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -912,11 +962,12 @@ function previewImages(event) {
                 removeBtn.style.cursor = 'pointer';
                 removeBtn.onclick = function() {
                     wrapper.remove();
-                    const input = document.getElementById('documentation_photos');
-                    const newFiles = Array.from(input.files).filter((_, idx) => idx !== i);
-                    const dt = new DataTransfer();
-                    newFiles.forEach(f => dt.items.add(f));
-                    input.files = dt.files;
+                    selectedFiles.splice(i, 1);
+                    // Update input.files
+                    const dt2 = new DataTransfer();
+                    selectedFiles.forEach(f => dt2.items.add(f));
+                    input.files = dt2.files;
+                    previewImages({ target: input });
                     enableSave();
                 };
                 wrapper.appendChild(img);
@@ -930,6 +981,7 @@ function previewImages(event) {
 
 // --- Photo Deletion Modal (Existing Photos) ---
 let pendingPhotoDelete = null;
+let photosToDelete = [];
 document.addEventListener('click', function (event) {
     if (event.target.classList.contains('delete-photo-btn') && event.target.hasAttribute('data-path')) {
         pendingPhotoDelete = event.target;
@@ -943,35 +995,34 @@ document.getElementById('cancelPhotoDeleteBtn').onclick = function() {
 document.getElementById('confirmPhotoDeleteBtn').onclick = function() {
     if (!pendingPhotoDelete) return;
     const photoPath = pendingPhotoDelete.getAttribute('data-path');
-    const photoIndex = pendingPhotoDelete.getAttribute('data-index');
-    fetch('delete_photo.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: photoPath, index: photoIndex, report_id: <?php echo $report_id; ?> }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const photoDiv = pendingPhotoDelete.parentElement;
-            photoDiv.remove();
-            let existingPhotos = document.getElementById('existing_photos_input').value.split(',');
-            existingPhotos = existingPhotos.filter(path => path !== photoPath);
-            document.getElementById('existing_photos_input').value = existingPhotos.join(',');
-            document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
-            pendingPhotoDelete = null;
-            enableSave();
-        } else {
-            alert('Failed to delete photo: ' + data.error);
-            document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
-            pendingPhotoDelete = null;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
-        pendingPhotoDelete = null;
-    });
+    // Mark photo for deletion
+    photosToDelete.push(photoPath);
+    // Remove from UI
+    const photoDiv = pendingPhotoDelete.parentElement;
+    photoDiv.remove();
+    let existingPhotos = document.getElementById('existing_photos_input').value.split(',');
+    existingPhotos = existingPhotos.filter(path => path !== photoPath);
+    document.getElementById('existing_photos_input').value = existingPhotos.join(',');
+    document.getElementById('confirmPhotoDeleteModal').style.display = 'none';
+    pendingPhotoDelete = null;
+    enableSave();
 };
+
+// Add hidden input to form for photos to delete
+document.addEventListener('DOMContentLoaded', function() {
+    const mainForm = document.querySelector('form[action^="view_report.php"]');
+    if (mainForm && !document.getElementById('photos_to_delete')) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'photos_to_delete';
+        input.id = 'photos_to_delete';
+        mainForm.appendChild(input);
+    }
+});
+// On form submit, update hidden input value
+document.querySelector('form[action^="view_report.php"]').addEventListener('submit', function() {
+    document.getElementById('photos_to_delete').value = photosToDelete.join(',');
+});
 
 // --- Photo Modal Viewer ---
 document.querySelectorAll('.scene-photo').forEach(function(img) {
@@ -989,35 +1040,7 @@ document.addEventListener('DOMContentLoaded', function() {
     showTab('spot');
 });
 
-        document.addEventListener('DOMContentLoaded', () => {
-    const toggles = document.querySelectorAll('.report-dropdown-toggle');
-
-    toggles.forEach(toggle => {
-        toggle.addEventListener('click', function (event) {
-            event.preventDefault();
-            const dropdown = this.closest('.report-dropdown');
-            dropdown.classList.toggle('show');
-
-            // Close other dropdowns
-            document.querySelectorAll('.report-dropdown').forEach(item => {
-                if (item !== dropdown) {
-                    item.classList.remove('show');
-                }
-            });
-        });
-    });
-
-    // Close dropdown when clicking outside
-    window.addEventListener('click', event => {
-        if (!event.target.closest('.report-dropdown')) {
-            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // Show Confirm Logout Modal
    document.getElementById('logoutLink').addEventListener('click', function(e) {
     e.preventDefault();
@@ -1035,14 +1058,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('logoutModal').style.display = 'none';
     });
 });
-
-window.onclick = function(event) {
-    // ...existing code...
-    const logoutModal = document.getElementById('logoutModal');
-    if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-    }
-};
 </script>
 </body>
 </html>

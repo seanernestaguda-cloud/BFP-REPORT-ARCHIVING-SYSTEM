@@ -182,6 +182,24 @@ mysqli_close($conn);
     position: fixed;
     z-index: 1000;
 }
+/* Required field asterisk */
+.required {
+    color: red;
+    margin-left: 2px;
+    font-weight: bold;
+}
+/* Required text next to asterisk */
+.required-text {
+    color: red;
+    font-size: 13px;
+    margin-left: 2px;
+    font-weight: normal;
+    display: inline;
+    transition: opacity 0.2s;
+}
+.required-text.filled {
+    display: none;
+}
 /* Title */
 .form-header{
     background: #003D73;
@@ -634,37 +652,37 @@ input[type="file"] {
         <legend>Incident Details</legend>
         <!-- ...all your incident detail fields here... -->
         <div class="form-group" style="width: 45%; display: inline-block;">
-            <label for="report_title">Report Title</label>
+            <label for="report_title">Report Title <span class="required">*</span><span class="required-text"> required</span></label>
             <input type="text" id="report_title" name="report_title" required placeholder="Report Name">
         </div>
       <div class="form-group" style="width: 45%; display: inline-block;">
-      <label for="caller_name">Name of the Caller</label>
+    <label for="caller_name">Name of the Caller <span class="required">*</span><span class="required-text"> required</span></label>
       <input type="text" id="caller_name" name="caller_name" required placeholder="Caller Name">
     </div>
       <div class="form-group-container"></div>
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="responding_team">Responding Team</label>
+        <label for="responding_team">Responding Team <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="responding_team" name="responding_team" class="form-control" placeholder="Responding Team" required>
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="establishment">Establishment Burned</label>
+        <label for="establishment">Establishment Burned <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="establishment" name="establishment" class="form-control" placeholder="Name of the Establishment" required>
     </div>
 <hr class="section-separator full-bleed">
 <h4 style = "text-align: center;"> Fire Location </h4>
 <hr class="section-separator full-bleed">
 <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="street">Street</label>
+        <label for="street">Street <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="street" name="street" class="form-control" placeholder="street" required>
     </div>
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="purok">Purok</label>
+        <label for="purok">Purok <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="purok" name="purok" class="form-control" placeholder="purok" required>
     </div>
 <div class="form-group-container">
     <div class="form-group" style="width: 45%; display: inline-block;">
-                <label for="fire_location">Barangay</label>
+                <label for="fire_location">Barangay <span class="required">*</span><span class="required-text"> required</span></label>
                 <select id="fire_location" name="fire_location" class="form-control" required>
                     <option value="" disabled selected>Select Barangay</option>
                     <?php while ($row = mysqli_fetch_assoc($result_barangays)) { ?>
@@ -676,7 +694,7 @@ input[type="file"] {
         
     
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="municipality">Municipality</label>
+        <label for="municipality">Municipality <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="text" id="municipality" name="municipality" class="form-control" placeholder="municipality" required>
     </div>
 <hr class="section-separator full-bleed">
@@ -684,23 +702,23 @@ input[type="file"] {
 <hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
-        <label for="incident_date">Time and Date Reported</label>
+        <label for="incident_date">Time and Date Reported <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="datetime-local" id="incident_date" name="incident_date" class="form-control" placeholder="Date" required>
     </div>
 
     <div class="form-group" style="width: 30%; display: inline-block;">
-        <label for="arrival_time">Time of Arrival</label>
+        <label for="arrival_time">Time of Arrival <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="time" id="arrival_time" name="arrival_time" class="form-control" placeholder="Time of Arrival" required>
     </div>
 
     <div class="form-group" style="width: 30%; display: inline-block;">
-        <label for="fireout_time">Time of Fire Out</label>
+        <label for="fireout_time">Time of Fire Out <span class="required">*</span><span class="required-text"> required</span></label>
         <input type="time" id="fireout_time" name="fireout_time" class="form-control" placeholder="Time of Fire Out" required>
     </div>
   <hr class="section-separator full-bleed">
 <div class="form-group-container">
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="alarm_status">Alarm Status</label>
+        <label for="alarm_status">Alarm Status <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="alarm_status" name="alarm_status" class="form-control" required>
             <option value="" disabled selected>Select Alarm Status</option>
             <option value="1st Alarm">1st Alarm</option>
@@ -712,7 +730,7 @@ input[type="file"] {
     </div>
 
     <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="occupancy_type">Type of Occupancy</label>
+        <label for="occupancy_type">Type of Occupancy <span class="required">*</span><span class="required-text"> required</span></label>
         <select id="occupancy_type" name="occupancy_type" class="form-control" required>
             <option value="" disabled selected>Select Type of Occupancy</option>
             <option value="Residential">Residential</option>
@@ -728,7 +746,7 @@ input[type="file"] {
 
 <div class="form-group-container">
 <div class="form-group" style="width: 45%; display: inline-block;">
-        <label for="property_damage"> Estimated Damage to Property (₱)</label>
+        <label for="property_damage"> Estimated Damage to Property (₱) <span class="required">*</span><span class="required-text"> required</span></label>
         <input type = "text" id="property_damage" name="property_damage" class="form-control" placeholder= "Amount of Damage to Property" required></i>
     </div>
 
@@ -747,12 +765,12 @@ input[type="file"] {
     <h4 style="text-align: center;"> Injured/Casualties </h4>
     <hr class="section-separator full-bleed">
     <div class="form-group" style="width: 45%; display: inline-block;">
-    <label for="victims">Civilians</label><br>
+    <label for="victims">Civilians<br>
     <textarea id="victims" name="victims" rows="10" cols="30" placeholder="Enter each victim on a new line" onfocus="addFirstNumber()" oninput="autoNumber()" style="border-bottom: 1px solid #444;"></textarea><br><br>
 </div>
 
  <div class="form-group" style="width: 45%; display: inline-block;">
-    <label for="firefighters">Firefighters</label><br>
+    <label for="firefighters">Firefighters<br>
     <textarea id="victims" name="firefighters" rows="10" cols="30" placeholder="Enter each firefighter on a new line" onfocus="addFirstNumber()" oninput="autoNumber()" style="border-bottom: 1px solid #444;"></textarea><br><br>
 </div>
         </fieldset>
@@ -896,10 +914,55 @@ input[type="file"] {
 
 // Update nextStep/prevStep for 4 steps
 function nextStep(step) {
+    // Only validate required fields when moving from step 1 to step 2
+    if (step === 2) {
+        var step1Fields = document.querySelectorAll('#step-1 [required]');
+        let valid = true;
+        step1Fields.forEach(function(field) {
+            if (!field.value.trim()) {
+                valid = false;
+            }
+        });
+        if (!valid) {
+            // Show browser's native validation message for the first invalid field
+            for (let field of step1Fields) {
+                if (!field.value.trim()) {
+                    field.reportValidity();
+                    break;
+                }
+            }
+            return;
+        }
+    }
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';
     updateStepper(step);
 }
+
+// Hide 'required' text when field is filled
+function updateRequiredTextVisibility() {
+    document.querySelectorAll('#step-1 [required]').forEach(function(field) {
+        var label = field.closest('.form-group')?.querySelector('label') || field.closest('div')?.querySelector('label');
+        if (!label) return;
+        var reqText = label.querySelector('.required-text');
+        if (!reqText) return;
+        if (field.value.trim()) {
+            reqText.classList.add('filled');
+        } else {
+            reqText.classList.remove('filled');
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initial check
+    updateRequiredTextVisibility();
+    // Listen for input on all required fields in step 1
+    document.querySelectorAll('#step-1 [required]').forEach(function(field) {
+        field.addEventListener('input', updateRequiredTextVisibility);
+        field.addEventListener('change', updateRequiredTextVisibility);
+    });
+});
 function prevStep(step) {
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';
@@ -1125,12 +1188,7 @@ function updateStepper(step) {
     });
 }
 
-// Call updateStepper in your nextStep/prevStep functions:
-function nextStep(step) {
-    document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
-    document.getElementById('step-' + step).style.display = 'block';
-    updateStepper(step);
-}
+// ...existing code...
 function prevStep(step) {
     document.querySelectorAll('.form-step').forEach(div => div.style.display = 'none');
     document.getElementById('step-' + step).style.display = 'block';

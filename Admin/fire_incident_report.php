@@ -616,9 +616,9 @@ mysqli_close($conn);
                 <th>Casualties</th>
                 <th>Damage to Property</th>
                 <th>Cause of Fire</th>
-                <th>Status</th>
                 <th>Uploader</th>
                 <th>Department</th>
+                <th>Status</th>
                 <th>Action</th>
      
             </tr>
@@ -647,8 +647,10 @@ mysqli_close($conn);
                 ?>
             </td>
             <td><?php echo htmlspecialchars("₱" . $row['property_damage']); ?></td>
-            <td><?php echo htmlspecialchars($row['fire_types']); ?></td>
-             <td>
+            <td><?php echo empty($row['fire_types']) ? 'Under Investigation' : htmlspecialchars($row['fire_types']); ?>
+            <td><?php echo htmlspecialchars($row['uploader']); ?></td>
+            <td><?php echo !empty($row['department']) ? htmlspecialchars($row['department']) : 'N/A'; ?></td> 
+            <td>
         <?php
      // List all required fields from your create form
 $required_fields = [
@@ -680,8 +682,6 @@ foreach ($required_fields as $field) {
 }
 echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>';
 ?>
-<td><?php echo htmlspecialchars($row['uploader']); ?></td>
-<td><?php echo !empty($row['department']) ? htmlspecialchars($row['department']) : 'N/A'; ?></td>
     </td>
             <td class="action-button-container">
             <button class="view-btn" onclick="window.location.href='view_report.php?report_id=<?php echo $row['report_id']; ?>'">

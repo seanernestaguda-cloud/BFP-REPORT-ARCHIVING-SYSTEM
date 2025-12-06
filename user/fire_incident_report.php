@@ -642,7 +642,7 @@ mysqli_close($conn);
                 ?>
             </td>
             <td><?php echo htmlspecialchars("₱" . $row['property_damage']); ?></td>
-            <td><?php echo htmlspecialchars($row['fire_types']); ?></td>
+            <td><?php echo empty($row['fire_types']) ? 'Under Investigation' : htmlspecialchars($row['fire_types']); ?>
              <td>
         <?php
      // List all required fields from your create form

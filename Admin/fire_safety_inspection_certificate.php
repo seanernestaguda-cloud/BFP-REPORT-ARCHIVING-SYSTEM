@@ -416,8 +416,8 @@ if ($where_clauses) {
             <td><?php echo htmlspecialchars($row['inspection_purpose']); ?></td>
             <td><?php echo htmlspecialchars($row['inspection_address']); ?></td>
             <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($row['inspection_date']))) ?></td>
-            <td><?php echo htmlspecialchars($row['uploader']); ?></td>
-                <td><?php echo (isset($row['department']) && trim($row['department']) !== '') ? htmlspecialchars($row['department']) : 'N/A'; ?></td>
+                                   <td><?php echo htmlspecialchars($row['uploader']); ?></td>
+                                        <td><?php echo (isset($row['department']) && trim($row['department']) !== '') ? htmlspecialchars($row['department']) : 'N/A'; ?>
             <td>
             <?php
      // List all required fields from your create form

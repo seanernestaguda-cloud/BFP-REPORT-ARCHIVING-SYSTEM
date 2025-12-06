@@ -1,6 +1,6 @@
 <?php
 include('connection.php');
-session_start();
+include('auth_check.php');
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
@@ -13,15 +13,9 @@ $where_clauses[] = "uploader = '" . mysqli_real_escape_string($conn, $username) 
 $params = [];
 $param_types = '';
 
-if (!empty($search)) {
-    $search_param = '%' . $search . '%';
-    $where_clauses[] = "(report_id LIKE ? OR report_title LIKE ? OR fire_location LIKE ? OR incident_date LIKE ? OR establishment LIKE ? OR victims LIKE ? OR property_damage LIKE ? OR fire_types LIKE ? OR uploader LIKE ? OR department LIKE ?)";
-    $params = array_fill(0, 10, $search_param);
-    $param_types = 'ssssssssss';
-}
-$where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
+// ...existing code for preparing and executing the query...
 
-$query = "SELECT 
+$stmt = $conn->prepare("SELECT 
     report_id, 
     report_title, 
     CONCAT(street, ', ', purok, ', ', fire_location, ', ', municipality) AS fire_location_combined, 
@@ -40,11 +34,9 @@ $query = "SELECT
     alarm_status,
     occupancy_type, documentation_photos, narrative_report, progress_report, final_investigation_report
 FROM fire_incident_reports 
-$where_sql
+" . ($where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '') . "
 ORDER BY incident_date DESC
-LIMIT 50";
-
-$stmt = $conn->prepare($query);
+LIMIT 50");
 if ($param_types) {
     $stmt->bind_param($param_types, ...$params);
 }
@@ -54,17 +46,10 @@ $reports = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 mysqli_close($conn);
 
-if (count($reports) === 0) {
-    echo '<tr><td colspan="11" style="text-align:center;">No reports found.</td></tr>';
-    exit;
-}
-
 foreach ($reports as $row) {
     $victims_count = empty($row['victims']) ? 0 : substr_count($row['victims'], ',') + 1;
     $firefighters_count = empty($row['firefighters']) ? 0 : substr_count($row['firefighters'], ',') + 1;
     $casualties = $victims_count + $firefighters_count;
-
-    // Check completeness
     $required_fields = [
         $row['report_title'],
         $row['caller_name'],
@@ -90,32 +75,61 @@ foreach ($reports as $row) {
             break;
         }
     }
-    $status = $is_complete ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>';
+    $status = $is_complete ? 'Complete' : 'In Progress';
+    $fire_types_display = empty($row['fire_types']) ? 'Under Investigation' : $row['fire_types'];
 
-    echo '<tr id="report-row' . htmlspecialchars($row['report_id']) . '">';
-    echo '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['report_id']) . '"></td>';
-    echo '<td>' . htmlspecialchars($row['report_id']) . '</td>';
-    echo '<td>' . htmlspecialchars($row['report_title']) . '</td>';
-    echo '<td>' . htmlspecialchars($row['fire_location_combined']) . '</td>';
-    echo '<td>' . htmlspecialchars($row['incident_date']) . '</td>';
-    echo '<td>' . htmlspecialchars($row['establishment']) . '</td>';
-    echo '<td>' . $casualties . '</td>';
-    echo '<td>' . htmlspecialchars("₱" . $row['property_damage']) . '</td>';
-    echo '<td>' . htmlspecialchars($row['fire_types']) . '</td>';
-    echo '<td>' . $status . '</td>';
-    // echo '<td>' . htmlspecialchars($row['uploader']) . '</td>';
-    // echo '<td>' . htmlspecialchars($row['department']) . '</td>';
-    echo '<td class="action-button-container">
-        <button class="view-btn" onclick="window.location.href=\'view_report.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
-            <i class="fa-solid fa-eye"></i>
-        </button>
-        <button class="delete-btn" onclick="deleteReport(' . htmlspecialchars(json_encode($row['report_id'])) . ')">
-            <i class="fa-solid fa-trash"></i>
-        </button>
-        <button class="download-btn" onclick="window.location.href=\'generate_pdf.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
-            <i class="fa-solid fa-download"></i>
-        </button>
-    </td>';
-    echo '</tr>';
+    $show_row = true;
+    if (!empty($search)) {
+        $search_lower = strtolower($search);
+        $match = false;
+        $search_fields = array(
+            $row['report_id'],
+            $row['report_title'],
+            $row['fire_location_combined'],
+            $row['incident_date'],
+            $row['establishment'],
+            $row['victims'],
+            $row['property_damage'],
+            $row['fire_types'],
+            $row['uploader'],
+            $row['department'],
+            $status,
+            $fire_types_display
+        );
+        foreach ($search_fields as $field) {
+            if (strpos(strtolower((string) $field), $search_lower) !== false) {
+                $match = true;
+                break;
+            }
+        }
+        if (!$match) {
+            $show_row = false;
+        }
+    }
+    if ($show_row) {
+        echo '<tr id="report-row' . htmlspecialchars($row['report_id']) . '">';
+        echo '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['report_id']) . '"></td>';
+        echo '<td>' . htmlspecialchars($row['report_id']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['report_title']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['fire_location_combined']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['incident_date']) . '</td>';
+        echo '<td>' . htmlspecialchars($row['establishment']) . '</td>';
+        echo '<td>' . $casualties . '</td>';
+        echo '<td>' . htmlspecialchars("₱" . $row['property_damage']) . '</td>';
+        echo '<td>' . htmlspecialchars($fire_types_display) . '</td>';
+        echo '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
+        echo '<td class="action-button-container">
+            <button class="view-btn" onclick="window.location.href=\'view_report.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
+                <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="delete-btn" onclick="deleteReport(' . htmlspecialchars(json_encode($row['report_id'])) . ')">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+            <button class="download-btn" onclick="window.location.href=\'generate_pdf.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </td>';
+        echo '</tr>';
+    }
 }
 ?>

@@ -49,6 +49,8 @@ fputcsv($output, [
     'Purpose',
     'Address',
     'Date of Inspection',
+    'Uploaded By',
+    'Department',
     'Status'
 ]);
 
@@ -108,6 +110,8 @@ while ($row = mysqli_fetch_assoc($result)) {
         $row['inspection_purpose'],
         $row['inspection_address'],
         date("Y-m-d", strtotime($row['inspection_date'])),
+        $row['uploader'],
+        $row['department'],
         $status
     ]);
 }

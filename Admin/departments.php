@@ -639,27 +639,38 @@ function closeSuccessModal() {
     document.getElementById('successModal').style.display = 'none';
 }
 document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.querySelector('.search-input');
-  const departmentsTableBody = document.getElementById('departmentsTableBody');
+    const searchInput = document.querySelector('.search-input');
+    const departmentsTableBody = document.getElementById('departmentsTableBody');
+    const searchForm = document.getElementById('searchForm');
 
-  if (searchInput && departmentsTableBody) {
-    let searchTimeout;
-    searchInput.addEventListener('input', function() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(function() {
-        const query = searchInput.value;
+    function fetchDepartments(query) {
         if (query === '') {
-          window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
+            window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
         } else {
-          fetch(`departments_ajax.php?search=${encodeURIComponent(query)}`)
-            .then(response => response.text())
-          .then(html => {
-            departmentsTableBody.innerHTML = html;
-            });
+            fetch(`departments_ajax.php?search=${encodeURIComponent(query)}`)
+                .then(response => response.text())
+                .then(html => {
+                    departmentsTableBody.innerHTML = html;
+                });
         }
-      }, 0); // instant update
-    });
-  }
+    }
+
+    if (searchInput && departmentsTableBody) {
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                fetchDepartments(searchInput.value);
+            }, 0); // instant update
+        });
+    }
+
+    if (searchForm && searchInput && departmentsTableBody) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchDepartments(searchInput.value);
+        });
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {

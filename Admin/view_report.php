@@ -70,26 +70,26 @@ if (!$result_fire_types) {
 // Handle update if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     // Get updated form data
-    $report_title = $_POST['report_title'];
-    $caller_name = $_POST['caller_name'];
-    $responding_team = $_POST['responding_team'];
-    $fire_location = $_POST['fire_location'];
-    $street = $_POST['street'];
-    $purok = $_POST['purok'];
-    $municipality = $_POST['municipality'];
-    $incident_date = $_POST['incident_date'];
-    $arrival_time = $_POST['arrival_time'];
-    $fireout_time = $_POST['fireout_time'];
-    $establishment = $_POST['establishment'];
-    $occupancy_type = $_POST['occupancy_type'];
-    $alarm_status = $_POST['alarm_status'];
-    $victims = implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['victims'])));
-    $firefighters = implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['firefighters'])));
-    $property_damage = $_POST['property_damage'];
-    $fire_types = $_POST['fire_types'];
+    $report_title = isset($_POST['report_title']) ? $_POST['report_title'] : '';
+    $caller_name = isset($_POST['caller_name']) ? $_POST['caller_name'] : '';
+    $responding_team = isset($_POST['responding_team']) ? $_POST['responding_team'] : '';
+    $fire_location = isset($_POST['fire_location']) ? $_POST['fire_location'] : '';
+    $street = isset($_POST['street']) ? $_POST['street'] : '';
+    $purok = isset($_POST['purok']) ? $_POST['purok'] : '';
+    $municipality = isset($_POST['municipality']) ? $_POST['municipality'] : '';
+    $incident_date = isset($_POST['incident_date']) ? $_POST['incident_date'] : '';
+    $arrival_time = isset($_POST['arrival_time']) ? $_POST['arrival_time'] : '';
+    $fireout_time = isset($_POST['fireout_time']) ? $_POST['fireout_time'] : '';
+    $establishment = isset($_POST['establishment']) ? $_POST['establishment'] : '';
+    $occupancy_type = isset($_POST['occupancy_type']) ? $_POST['occupancy_type'] : '';
+    $alarm_status = isset($_POST['alarm_status']) ? $_POST['alarm_status'] : '';
+    $victims = isset($_POST['victims']) ? implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['victims']))) : '';
+    $firefighters = isset($_POST['firefighters']) ? implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['firefighters']))) : '';
+    $property_damage = isset($_POST['property_damage']) ? $_POST['property_damage'] : '';
+    $fire_types = isset($_POST['fire_types']) ? $_POST['fire_types'] : '';
     // Retrieve existing documentation photos
     $existing_photos = [];
-    if (isset($_POST['existing_photos_input'])) {
+    if (isset($_POST['existing_photos_input']) && $_POST['existing_photos_input'] !== '') {
         $existing_photos = array_filter(array_map('trim', explode(',', $_POST['existing_photos_input'])));
     }
 
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     }
 
     // Handling file uploads (documentation photos)
-    if (isset($_FILES['documentation_photos']) && !empty($_FILES['documentation_photos']['name'][0])) {
+    if (isset($_FILES['documentation_photos']) && isset($_FILES['documentation_photos']['name']) && !empty($_FILES['documentation_photos']['name'][0])) {
         foreach ($_FILES['documentation_photos']['tmp_name'] as $index => $tmp_name) {
             $file_name = $_FILES['documentation_photos']['name'][$index];
             $file_tmp = $_FILES['documentation_photos']['tmp_name'][$index];
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     }
 
     // Handle narrative report upload
-    if (isset($_FILES['narrative_report']) && $_FILES['narrative_report']['error'] === 0) {
+    if (isset($_FILES['narrative_report']) && isset($_FILES['narrative_report']['error']) && $_FILES['narrative_report']['error'] === 0) {
         $narrative_report_name = $_FILES['narrative_report']['name'];
         $narrative_report_tmp = $_FILES['narrative_report']['tmp_name'];
         $narrative_report_path = '../uploads/' . time() . "_" . basename($narrative_report_name);
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     }
 
     // Handle progress report upload
-    if (isset($_FILES['progress_report']) && $_FILES['progress_report']['error'] === 0) {
+    if (isset($_FILES['progress_report']) && isset($_FILES['progress_report']['error']) && $_FILES['progress_report']['error'] === 0) {
         $progress_report_name = $_FILES['progress_report']['name'];
         $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
         $progress_report_path = '../uploads/' . time() . "_" . basename($progress_report_name);
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     }
 
     // Handle final investigation report upload
-    if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation_report']['error'] === 0) {
+    if (isset($_FILES['final_investigation_report']) && isset($_FILES['final_investigation_report']['error']) && $_FILES['final_investigation_report']['error'] === 0) {
         $final_report_name = $_FILES['final_investigation_report']['name'];
         $final_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
         $final_report_path = '../uploads/' . time() . "_" . basename($final_report_name);

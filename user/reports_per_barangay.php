@@ -33,7 +33,7 @@ $result_barangays = $conn->query($sql_barangays);
 
 $sql_table_data = "SELECT fire_location AS barangay,
     COUNT(*) AS incident_count,
-    SUM(property_damage) AS total_damage,
+    SUM(CAST(REPLACE(property_damage, ',', '') AS UNSIGNED)) AS total_damage,
     
     -- Count victims
     SUM(

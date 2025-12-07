@@ -135,12 +135,21 @@ if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation
     mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssss", $report_title, $caller_name, $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $victims, $firefighters, $property_damage, $fire_types, $alarm_status, $occupancy_type, $uploader, $department, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report);
     if (mysqli_stmt_execute($stmt)) {
         $success_message = "Report created successfully!";
-        // Log activity
+        // Log activity with user_type
         $new_report_id = mysqli_insert_id($conn);
-        $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'create', ?, ?)";
+        $user_type = '';
+        $type_stmt = $conn->prepare("SELECT user_type FROM users WHERE username = ? LIMIT 1");
+        $type_stmt->bind_param('s', $uploader);
+        $type_stmt->execute();
+        $type_result = $type_stmt->get_result();
+        if ($type_result && $type_row = $type_result->fetch_assoc()) {
+            $user_type = $type_row['user_type'];
+        }
+        $type_stmt->close();
+        $log_query = "INSERT INTO activity_logs (username, user_type, action, report_id, details) VALUES (?, ?, 'create', ?, ?)";
         $log_stmt = $conn->prepare($log_query);
         $log_details = "Created report: " . $report_title;
-        $log_stmt->bind_param('sis', $uploader, $new_report_id, $log_details);
+        $log_stmt->bind_param('ssis', $uploader, $user_type, $new_report_id, $log_details);
         $log_stmt->execute();
         $log_stmt->close();
         // No immediate redirect; let JS handle modal and redirect

@@ -115,10 +115,10 @@ foreach ($reports as $row) {
         echo '<td>' . htmlspecialchars($row['establishment']) . '</td>';
         echo '<td>' . $casualties . '</td>';
         echo '<td>' . htmlspecialchars("₱" . $row['property_damage']) . '</td>';
-        echo '<td>' . htmlspecialchars($fire_types_display) . '</td>';
-        echo '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
+                echo '<td>' . htmlspecialchars($fire_types_display) . '</td>';
         echo '<td>' . htmlspecialchars($row['uploader']) . '</td>';
         echo '<td>' . htmlspecialchars($row['department']) . '</td>';
+        echo '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
         echo '<td class="action-button-container">
             <button class="view-btn" onclick="window.location.href=\'view_report.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
                 <i class="fa-solid fa-eye"></i>

@@ -46,6 +46,8 @@ $reports = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 mysqli_close($conn);
 
+// Track if any row is shown
+$any_row_shown = false;
 foreach ($reports as $row) {
     $victims_count = empty($row['victims']) ? 0 : substr_count($row['victims'], ',') + 1;
     $firefighters_count = empty($row['firefighters']) ? 0 : substr_count($row['firefighters'], ',') + 1;
@@ -107,6 +109,7 @@ foreach ($reports as $row) {
         }
     }
     if ($show_row) {
+        $any_row_shown = true;
         echo '<tr id="report-row' . htmlspecialchars($row['report_id']) . '">';
         echo '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['report_id']) . '"></td>';
         echo '<td>' . htmlspecialchars($row['report_id']) . '</td>';
@@ -132,4 +135,7 @@ foreach ($reports as $row) {
         echo '</tr>';
     }
 }
-?>
+// If no rows were shown, display 'No results found'
+if (!$any_row_shown) {
+    echo '<tr><td colspan="12" style="text-align:center; color:#888;">No results found.</td></tr>';
+}

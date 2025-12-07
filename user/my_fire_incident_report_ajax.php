@@ -46,6 +46,7 @@ $reports = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 mysqli_close($conn);
 
+$rows_shown = 0;
 foreach ($reports as $row) {
     $victims_count = empty($row['victims']) ? 0 : substr_count($row['victims'], ',') + 1;
     $firefighters_count = empty($row['firefighters']) ? 0 : substr_count($row['firefighters'], ',') + 1;
@@ -130,6 +131,9 @@ foreach ($reports as $row) {
             </button>
         </td>';
         echo '</tr>';
+        $rows_shown++;
     }
 }
-?>
+if ($rows_shown === 0) {
+    echo '<tr><td colspan="12" style="text-align:center; color:#888;">No results found.</td></tr>';
+}

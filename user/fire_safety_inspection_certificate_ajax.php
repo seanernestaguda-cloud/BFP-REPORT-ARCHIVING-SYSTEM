@@ -23,8 +23,11 @@ $offset = ($page - 1) * $per_page;
 
 $query = "SELECT * FROM fire_safety_inspection_certificate $where_sql ORDER BY id ASC LIMIT $per_page OFFSET $offset";
 $result = mysqli_query($conn, $query);
+
+// Fetch results into $permits array
 $permits = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
+$row_count = 0;
 foreach ($permits as $row) {
     $required_fields = [
         $row['permit_name'],
@@ -79,8 +82,6 @@ foreach ($permits as $row) {
         $row['inspection_purpose'],
         $row['inspection_address'],
         $row['inspection_date'],
-        // $row['uploader'],
-        // $row['department'],
         $status
     );
 
@@ -99,6 +100,7 @@ foreach ($permits as $row) {
         }
     }
     if ($show_row) {
+        $row_count++;
         echo '<tr id="permit-row' . htmlspecialchars($row['id']) . '">';
         echo '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['id']) . '"></td>';
         echo '<td>' . htmlspecialchars($row['id']) . '</td>';
@@ -106,6 +108,7 @@ foreach ($permits as $row) {
         echo '<td>' . htmlspecialchars($row['inspection_establishment']) . '</td>';
         echo '<td>' . htmlspecialchars($row['establishment_type']) . '</td>';
         echo '<td>' . htmlspecialchars($row['owner']) . '</td>';
+
         echo '<td>' . htmlspecialchars($row['inspection_purpose']) . '</td>';
         echo '<td>' . htmlspecialchars($row['inspection_address']) . '</td>';
         echo '<td>' . htmlspecialchars($row['inspection_date']) . '</td>';
@@ -114,15 +117,15 @@ foreach ($permits as $row) {
         echo '<button class="view-btn" onclick="window.location.href=\'view_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';
         echo '<i class="fa-solid fa-eye"></i>';
         echo '</button>';
-        echo '<button class="delete-btn" onclick="deletePermit(' . htmlspecialchars(json_encode($row['id'])) . ')">';
-        echo '<i class="fa-solid fa-trash"></i>';
-        echo '</button>';
         echo '<button class="download-btn" onclick="window.location.href=\'generate_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';
         echo '<i class="fa-solid fa-download"></i>';
         echo '</button>';
         echo '</td>';
         echo '</tr>';
     }
+}
+if ($row_count === 0) {
+    echo '<tr><td colspan="12" style="text-align:center;">No reports found.</td></tr>';
 }
 mysqli_close($conn);
 ?>

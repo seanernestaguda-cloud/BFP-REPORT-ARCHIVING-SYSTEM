@@ -9,14 +9,6 @@
 include('connection.php');
 include('auth_check.php');
 
-$sql_settings = "SELECT system_name FROM settings LIMIT 1";
-$result_settings = $conn->query($sql_settings);
-$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
-if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
-    $system_name = $row_settings['system_name'];
-}
-
-
 
 $username = $_SESSION['username'];
 $sql_user = "SELECT avatar, user_type FROM users WHERE username = ? LIMIT 1";
@@ -78,56 +70,89 @@ if (!$result_fire_types) {
 // Handle update if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     // Get updated form data
-    $report_title = $_POST['report_title'];
-    $caller_name = $_POST['caller_name'];
-    $responding_team = $_POST['responding_team'];
-    $fire_location = $_POST['fire_location'];
-    $street = $_POST['street'];
-    $purok = $_POST['purok'];
-    $municipality = $_POST['municipality'];
-    $incident_date = $_POST['incident_date'];
-    $arrival_time = $_POST['arrival_time'];
-    $fireout_time = $_POST['fireout_time'];
-    $establishment = $_POST['establishment'];
-    $occupancy_type = $_POST['occupancy_type'];
-    $alarm_status = $_POST['alarm_status'];
-    $victims = implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['victims'])));
-    $firefighters = implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['firefighters'])));
-    $property_damage = $_POST['property_damage'];
-    $fire_types = $_POST['fire_types'];
+    $report_title = isset($_POST['report_title']) ? $_POST['report_title'] : '';
+    $caller_name = isset($_POST['caller_name']) ? $_POST['caller_name'] : '';
+    $responding_team = isset($_POST['responding_team']) ? $_POST['responding_team'] : '';
+    $fire_location = isset($_POST['fire_location']) ? $_POST['fire_location'] : '';
+    $street = isset($_POST['street']) ? $_POST['street'] : '';
+    $purok = isset($_POST['purok']) ? $_POST['purok'] : '';
+    $municipality = isset($_POST['municipality']) ? $_POST['municipality'] : '';
+    $incident_date = isset($_POST['incident_date']) ? $_POST['incident_date'] : '';
+    $arrival_time = isset($_POST['arrival_time']) ? $_POST['arrival_time'] : '';
+    $fireout_time = isset($_POST['fireout_time']) ? $_POST['fireout_time'] : '';
+    $establishment = isset($_POST['establishment']) ? $_POST['establishment'] : '';
+    $occupancy_type = isset($_POST['occupancy_type']) ? $_POST['occupancy_type'] : '';
+    $alarm_status = isset($_POST['alarm_status']) ? $_POST['alarm_status'] : '';
+    $victims = isset($_POST['victims']) ? implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['victims']))) : '';
+    $firefighters = isset($_POST['firefighters']) ? implode(',', array_map('trim', preg_split('/\r\n|\r|\n/', $_POST['firefighters']))) : '';
+    $property_damage = isset($_POST['property_damage']) ? $_POST['property_damage'] : '';
+    $fire_types = isset($_POST['fire_types']) ? $_POST['fire_types'] : '';
     // Retrieve existing documentation photos
-        $existing_photos = [];
-            if (isset($_POST['existing_photos_input'])) {
-                $existing_photos = array_filter(array_map('trim', explode(',', $_POST['existing_photos_input'])));
+    $existing_photos = [];
+    if (isset($_POST['existing_photos_input']) && $_POST['existing_photos_input'] !== '') {
+        $existing_photos = array_filter(array_map('trim', explode(',', $_POST['existing_photos_input'])));
+    }
+
+    // Handle photos marked for deletion
+    if (isset($_POST['photos_to_delete']) && $_POST['photos_to_delete'] !== '') {
+        $photos_to_delete = array_filter(array_map('trim', explode(',', $_POST['photos_to_delete'])));
+        foreach ($photos_to_delete as $photo_path) {
+            // Remove from existing_photos array
+            $existing_photos = array_filter($existing_photos, function($p) use ($photo_path) { return $p !== $photo_path; });
+            // Delete file from disk
+            if (file_exists($photo_path)) {
+                @unlink($photo_path);
             }
+        }
+    }
 
-            // Handling file uploads (documentation photos)
-            if (isset($_FILES['documentation_photos']) && !empty($_FILES['documentation_photos']['name'][0])) {
-                foreach ($_FILES['documentation_photos']['tmp_name'] as $index => $tmp_name) {
-                    $file_name = $_FILES['documentation_photos']['name'][$index];
-                    $file_tmp = $_FILES['documentation_photos']['tmp_name'][$index];
-                    $file_error = $_FILES['documentation_photos']['error'][$index];
-
-                    if ($file_error === 0) {
-                        $upload_dir = '../uploads/';
-                        if (!is_dir($upload_dir)) {
-                            mkdir($upload_dir, 0777, true);
-                        }
-                        $unique_file_name = time() . "_" . basename($file_name);
-                        $upload_path = $upload_dir . $unique_file_name;
-                        if (move_uploaded_file($file_tmp, $upload_path)) {
-                            $existing_photos[] = $upload_path;
-                        }
-                    }
+    // Handling file uploads (documentation photos)
+    if (isset($_FILES['documentation_photos']) && isset($_FILES['documentation_photos']['name']) && !empty($_FILES['documentation_photos']['name'][0])) {
+        foreach ($_FILES['documentation_photos']['tmp_name'] as $index => $tmp_name) {
+            $file_name = $_FILES['documentation_photos']['name'][$index];
+            $file_tmp = $_FILES['documentation_photos']['tmp_name'][$index];
+            $file_error = $_FILES['documentation_photos']['error'][$index];
+            if ($file_error === 0) {
+                $upload_dir = '../uploads/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                $unique_file_name = time() . "_" . basename($file_name);
+                $upload_path = $upload_dir . $unique_file_name;
+                if (move_uploaded_file($file_tmp, $upload_path)) {
+                    $existing_photos[] = $upload_path;
                 }
             }
+        }
+    }
+
+    // Handle report files marked for deletion
+    if (isset($_POST['reports_to_delete']) && $_POST['reports_to_delete'] !== '') {
+        $reports_to_delete = array_filter(array_map('trim', explode(',', $_POST['reports_to_delete'])));
+        foreach ($reports_to_delete as $type) {
+            if ($type === 'narrative_report' && !empty($report['narrative_report']) && file_exists($report['narrative_report'])) {
+                @unlink($report['narrative_report']);
+                $narrative_report = '';
+            }
+            if ($type === 'progress_report' && !empty($report['progress_report']) && file_exists($report['progress_report'])) {
+                @unlink($report['progress_report']);
+                $progress_report = '';
+            }
+            if ($type === 'final_investigation_report' && !empty($report['final_investigation_report']) && file_exists($report['final_investigation_report'])) {
+                @unlink($report['final_investigation_report']);
+                $final_investigation_report = '';
+            }
+        }
+    } else {
+        $narrative_report = $report['narrative_report'];
+        $progress_report = $report['progress_report'];
+        $final_investigation_report = $report['final_investigation_report'];
+    }
 
     // Handle narrative report upload
-    $narrative_report = $report['narrative_report']; // Keep the original file if not updated
-    if (isset($_FILES['narrative_report']) && $_FILES['narrative_report']['error'] === 0) {
+    if (isset($_FILES['narrative_report']) && isset($_FILES['narrative_report']['error']) && $_FILES['narrative_report']['error'] === 0) {
         $narrative_report_name = $_FILES['narrative_report']['name'];
         $narrative_report_tmp = $_FILES['narrative_report']['tmp_name'];
-
         $narrative_report_path = '../uploads/' . time() . "_" . basename($narrative_report_name);
         if (move_uploaded_file($narrative_report_tmp, $narrative_report_path)) {
             $narrative_report = $narrative_report_path;
@@ -135,54 +160,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $can_edit) {
     }
 
     // Handle progress report upload
-$progress_report = $report['progress_report']; // Keep the original file if not updated
-if (isset($_FILES['progress_report']) && $_FILES['progress_report']['error'] === 0) {
-    $progress_report_name = $_FILES['progress_report']['name'];
-    $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
-
-    $progress_report_path = '../uploads/' . time() . "_" . basename($progress_report_name);
-    if (move_uploaded_file($progress_report_tmp, $progress_report_path)) {
-        $progress_report = $progress_report_path;
+    if (isset($_FILES['progress_report']) && isset($_FILES['progress_report']['error']) && $_FILES['progress_report']['error'] === 0) {
+        $progress_report_name = $_FILES['progress_report']['name'];
+        $progress_report_tmp = $_FILES['progress_report']['tmp_name'];
+        $progress_report_path = '../uploads/' . time() . "_" . basename($progress_report_name);
+        if (move_uploaded_file($progress_report_tmp, $progress_report_path)) {
+            $progress_report = $progress_report_path;
+        }
     }
-}
 
-// Handle final investigation report upload
-$final_investigation_report = $report['final_investigation_report']; // Keep the original file if not updated
-if (isset($_FILES['final_investigation_report']) && $_FILES['final_investigation_report']['error'] === 0) {
-    $final_report_name = $_FILES['final_investigation_report']['name'];
-    $final_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
-
-    $final_report_path = '../uploads/' . time() . "_" . basename($final_report_name);
-    if (move_uploaded_file($final_report_tmp, $final_report_path)) {
-        $final_investigation_report = $final_report_path;
+    // Handle final investigation report upload
+    if (isset($_FILES['final_investigation_report']) && isset($_FILES['final_investigation_report']['error']) && $_FILES['final_investigation_report']['error'] === 0) {
+        $final_report_name = $_FILES['final_investigation_report']['name'];
+        $final_report_tmp = $_FILES['final_investigation_report']['tmp_name'];
+        $final_report_path = '../uploads/' . time() . "_" . basename($final_report_name);
+        if (move_uploaded_file($final_report_tmp, $final_report_path)) {
+            $final_investigation_report = $final_report_path;
+        }
     }
-}
-
 
     // Update report data in the database
     $query = "UPDATE fire_incident_reports 
     SET report_title = ?, caller_name = ?, responding_team = ?, fire_location = ?, street = ?, purok = ?, municipality = ?, incident_date = ?, arrival_time = ?, fireout_time = ?, establishment = ?, occupancy_type = ?, victims = ?, firefighters = ?, alarm_status = ?, property_damage = ?, fire_types = ?, documentation_photos = ?, narrative_report = ?, progress_report = ?, final_investigation_report = ? 
     WHERE report_id = ?";   
     $stmt = mysqli_prepare($conn, $query);
-    $documentation_photos = implode(',', $existing_photos);    mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssi", $report_title, $caller_name,  $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $occupancy_type, $victims, $firefighters, $alarm_status, $property_damage, $fire_types, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report, $report_id);
-if (mysqli_stmt_execute($stmt)) {
-    $success_message = "Report updated successfully!";
-    // Log activity
-    $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'update', ?, ?)";
-    $log_stmt = $conn->prepare($log_query);
-    $log_details = "Updated Fire Incident Report: " . $report_title;
-    $log_stmt->bind_param('sis', $username, $report_id, $log_details);
-    $log_stmt->execute();
-    $log_stmt->close();
-    // Set redirect target for JS
-    if (strtolower($user_type) === 'admin' && $report['uploader'] === $_SESSION['username']) {
-        $redirect_target = 'my_fire_incident_reports.php';
+    $documentation_photos = implode(',', $existing_photos);
+    mysqli_stmt_bind_param($stmt, "sssssssssssssssssssssi", $report_title, $caller_name,  $responding_team, $fire_location, $street, $purok, $municipality, $incident_date, $arrival_time, $fireout_time, $establishment, $occupancy_type, $victims, $firefighters, $alarm_status, $property_damage, $fire_types, $documentation_photos, $narrative_report, $progress_report, $final_investigation_report, $report_id);
+    if (mysqli_stmt_execute($stmt)) {
+        $success_message = "Report updated successfully!";
+        // Log activity
+        $log_query = "INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'update', ?, ?)";
+        $log_stmt = $conn->prepare($log_query);
+        $log_details = "Updated Fire Incident Report: " . $report_title;
+        $log_stmt->bind_param('sis', $username, $report_id, $log_details);
+        $log_stmt->execute();
+        $log_stmt->close();
+        // Set redirect target for JS
+        if (strtolower($user_type) === 'admin' && $report['uploader'] === $_SESSION['username']) {
+            $redirect_target = 'my_fire_incident_reports.php';
+        } else {
+            $redirect_target = 'fire_incident_report.php';
+        }
     } else {
-        $redirect_target = 'fire_incident_report.php';
+        $error_message = "There was an error updating the report.";
     }
-} else {
-    $error_message = "There was an error updating the report.";
 }
+
+$sql_settings = "SELECT system_name FROM settings LIMIT 1";
+$result_settings = $conn->query($sql_settings);
+$system_name = 'BUREAU OF FIRE PROTECTION ARCHIVING SYSTEM';
+if ($result_settings && $row_settings = $result_settings->fetch_assoc()) {
+    $system_name = $row_settings['system_name'];
 }
 
 mysqli_close($conn);
@@ -353,20 +381,20 @@ mysqli_close($conn);
 </head>
 <body>
 <div class = "dashboard">
-      <aside class="sidebar">
+ <aside class="sidebar">
         <nav>
             <ul>
                 <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
                 <li><a href="userdashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
                 <li class = "archive-text"><p>Archives</p></li>
                 <!-- <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-building"></i><span> Barangay List </span></a></li> -->
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li> -->
+                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
             
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                        <i class="fa-solid fa-chart-column"></i>
+                       <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
@@ -385,13 +413,13 @@ mysqli_close($conn);
             </ul>
         </nav>
     </aside>
-    <div class="main-content">
-   <header class="header">
+
+<div class="main-content">
+<header class="header">
     <button id="toggleSidebar" class="toggle-sidebar-btn">
         <i class="fa-solid fa-bars"></i>
     </button>
-        <h2><?php echo htmlspecialchars($system_name); ?></h2>
-    <div class="header-right">
+        <h2><?php echo htmlspecialchars($system_name); ?></h2>    <div class="header-right">
         <div class="dropdown">
             <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
                 <!-- Add avatar image here -->
@@ -422,7 +450,7 @@ mysqli_close($conn);
 <fieldset>
     <legend> Incident Details </legend>
         <!-- Fire Incident Report Form -->
-        <form method="POST" action="view_report.php?report_id=<?php echo $report_id; ?>" enctype="multipart/form-data">
+        <form method="POST" action="view_my_report.php?report_id=<?php echo $report_id; ?>" enctype="multipart/form-data">
             <div class="form-group-container">
             <div class="form-group" style="width: 45%; display: inline-block;">
                 <label for="report_title">Report Title:</label>
@@ -442,9 +470,11 @@ mysqli_close($conn);
                 <label for="establishment">Establishment Name:</label>
                 <input type="text" id="establishment" name="establishment" value="<?php echo htmlspecialchars($report['establishment']); ?>" class="form-control" required <?php echo !$can_edit ? 'disabled' : ''; ?>>
             </div>
+    <br>
 <hr class="section-separator full-bleed">
-<h4 style = "text-align: center;"> Fire Location </h4>
+<h4 style = "text-align:center"> Fire Location </h4>
 <hr class="section-separator full-bleed">
+
 <div class = "form-group-container">
             <div class="form-group" style="width: 45%; display: inline-block;">
     <label for="street">Street:</label>
@@ -474,8 +504,9 @@ mysqli_close($conn);
                 </select>
             </div>
             </div>
+            <br>
 <hr class="section-separator full-bleed">
-<h4 style = "text-align:center;"> Date and Time </h4>
+<h4 style = "text-align:center"> Date and Time </h4>
 <hr class="section-separator full-bleed">
 <div class="form-group-container">
 <div class="form-group" style="width: 30%; display: inline-block;">
@@ -536,8 +567,10 @@ mysqli_close($conn);
                     <?php } ?>
                 </select>
             </div>
+       </div>
+       <br>
 <hr class="section-separator full-bleed">
-<h4 style = "text-align:center;"> Injured/Casualties </h4>
+<h4 style = "text-align: center;"> Injured/Casualties </h4>
 <hr class="section-separator full-bleed">
 <br>
 <div class="form-group-container">
@@ -551,7 +584,7 @@ mysqli_close($conn);
                 <textarea id="victims" name="firefighters" rows="10" class="form-control" <?php echo !$can_edit ? 'disabled' : ''; ?>><?php echo htmlspecialchars($report['firefighters']); ?></textarea>
             </div>
             </div>
-
+<br>
 
 </fieldset>
 <br>
@@ -734,7 +767,7 @@ mysqli_close($conn);
     </div>
 </div>
 
-    <div id="logoutModal" class = "confirm-delete-modal">
+<div id="logoutModal" class = "confirm-delete-modal">
 <div class = "modal-content">   
 <h3 style="margin-bottom:10px;">Confirm Logout?</h3>
 <hr>
@@ -743,7 +776,17 @@ mysqli_close($conn);
     <button id="cancelLogout" class = "cancel-btn">Cancel</button>
   </div>
 </div>
+        <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <i class="fa-regular fa-circle-check"></i> <h2>Success!</h2>
+        <p id="successMessage"></p>
+    </div>
+</div>
 
+</body>
+
+</html>
+<script src = "../js/archivescript.js"></script>
 
 
 <script>
@@ -815,7 +858,7 @@ function showModal(redirectUrl) {
 
 // --- Enable Save Button on Any Change ---
 const saveBtn = document.getElementById('saveBtn');
-const mainForm = document.querySelector('form[action^="view_report.php"]');
+const mainForm = document.querySelector('form[action^="view_my_report.php"]');
 let formChanged = false;
 function enableSave() {
     if (!formChanged) {
@@ -902,7 +945,7 @@ document.getElementById('confirmDeleteBtn').onclick = function() {
 
 // Add hidden input to form for report files to delete
 document.addEventListener('DOMContentLoaded', function() {
-    const mainForm = document.querySelector('form[action^="view_report.php"]');
+    const mainForm = document.querySelector('form[action^="view_my_report.php"]');
     if (mainForm && !document.getElementById('reports_to_delete')) {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -912,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // On form submit, update hidden input value
-document.querySelector('form[action^="view_report.php"]').addEventListener('submit', function() {
+document.querySelector('form[action^="view_my_report.php"]').addEventListener('submit', function() {
     document.getElementById('reports_to_delete').value = reportsToDelete.join(',');
 });
 
@@ -1010,7 +1053,7 @@ document.getElementById('confirmPhotoDeleteBtn').onclick = function() {
 
 // Add hidden input to form for photos to delete
 document.addEventListener('DOMContentLoaded', function() {
-    const mainForm = document.querySelector('form[action^="view_report.php"]');
+    const mainForm = document.querySelector('form[action^="view_my_report.php"]');
     if (mainForm && !document.getElementById('photos_to_delete')) {
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -1020,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 // On form submit, update hidden input value
-document.querySelector('form[action^="view_report.php"]').addEventListener('submit', function() {
+document.querySelector('form[action^="view_my_report.php"]').addEventListener('submit', function() {
     document.getElementById('photos_to_delete').value = photosToDelete.join(',');
 });
 
@@ -1059,6 +1102,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-</body>
-</html>
-<script src = "../js/archivescript.js"></script>

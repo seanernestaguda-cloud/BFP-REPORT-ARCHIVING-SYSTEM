@@ -29,7 +29,7 @@ $stmt_user->close();
 $sql_table_data = "SELECT 
     CONCAT(YEAR(incident_date), ' ', MONTHNAME(incident_date)) AS month,
     COUNT(*) AS incident_count,
-    SUM(property_damage) AS total_damage,
+    SUM(CAST(REPLACE(property_damage, ',', '') AS UNSIGNED)) AS total_damage,
     SUM(
         CASE 
             WHEN victims IS NULL OR victims = '' THEN 0
@@ -67,6 +67,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -81,10 +82,11 @@ $conn->close();
         .card {
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
             margin-bottom: 32px;
             padding: 32px 28px 28px 28px;
         }
+
         .card h3 {
             margin-top: 0;
             margin-bottom: 18px;
@@ -93,46 +95,55 @@ $conn->close();
             padding-bottom: 10px;
             letter-spacing: 1px;
         }
+
         .charts-container {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 10px;
         }
+
         #monthlyChart {
             max-width: 800px;
             width: 100%;
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
             padding: 12px;
             border: 1px solid;
         }
+
         .archive-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 18px;
             background: #fff;
         }
-        .archive-table th, .archive-table td {
+
+        .archive-table th,
+        .archive-table td {
             border: 1px solid #e0e0e0;
             padding: 12px 10px;
             text-align: center;
         }
+
         .archive-table th {
             background: #003D73;
             color: #fff;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
+
         .archive-table tr:nth-child(even) {
             background: #f7fafd;
         }
+
         .top-controls {
             display: flex;
             justify-content: flex-start;
             margin-bottom: 10px;
         }
+
         .create-new-button {
             background: #003D73;
             color: #fff;
@@ -143,77 +154,96 @@ $conn->close();
             cursor: pointer;
             transition: background 0.2s;
         }
+
         .create-new-button:hover {
             background: #00509e;
         }
+
         @media print {
-            body, .main-content, .card {
+
+            body,
+            .main-content,
+            .card {
                 background: #fff !important;
                 box-shadow: none !important;
             }
-            .sidebar, .header, .top-controls, .create-new-button {
+
+            .sidebar,
+            .header,
+            .top-controls,
+            .create-new-button {
                 display: none !important;
             }
+
             .card {
                 padding: 0;
                 margin: 0;
             }
-            .archive-table th, .archive-table td {
+
+            .archive-table th,
+            .archive-table td {
                 font-size: 12pt;
             }
         }
 
         .section-separator.full-bleed {
-    height: 1px;
-    background: linear-gradient(90deg, rgba(0,0,0,0.08), rgba(0,0,0,0.18), rgba(0,0,0,0.08));
-    border: none;
-    margin: 12px 0 20px;
-    width: calc(100% + 40px); /* expand across left+right padding (2 * 20px) */
-    margin-left: -20px;        /* shift left by container padding */
-    box-sizing: border-box;
-}
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.08));
+            border: none;
+            margin: 12px 0 20px;
+            width: calc(100% + 40px);
+            /* expand across left+right padding (2 * 20px) */
+            margin-left: -20px;
+            /* shift left by container padding */
+            box-sizing: border-box;
+        }
     </style>
 </head>
+
 <body>
     <div class="dashboard">
-       <aside class="sidebar">
-        <nav>
-            <ul>
-                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
-                <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
-                <li class = "archive-text"><p>Archives</p></li>
-                <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
-                <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
-                <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
-            
-                <li class="report-dropdown">
-                    <a href="#" class="report-dropdown-toggle">
-                       <i class="fa-solid fa-chart-column"></i>
-                        <span>Reports</span>
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </a>
-                    <ul class="report-dropdown-content">
-                        <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
-                        <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
-                        <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
-                    </ul>
-                </li>
-                
-                <li class="archive-text"><span>Maintenance</span></li>
-                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
-                <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
-                <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
-                <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
-            </ul>
-        </nav>
-    </aside>
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li class="archive-text">
+                        <h4><?php echo htmlspecialchars($system_name); ?></h4>
+                    </li>
+                    <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
+                    <li class="archive-text">
+                        <p>Archives</p>
+                    </li>
+                    <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
+                    <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                    <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
+                    <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
+
+                    <li class="report-dropdown">
+                        <a href="#" class="report-dropdown-toggle">
+                            <i class="fa-solid fa-chart-column"></i>
+                            <span>Reports</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        <ul class="report-dropdown-content">
+                            <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
+                            <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
+                            <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
+                        </ul>
+                    </li>
+
+                    <li class="archive-text"><span>Maintenance</span></li>
+                    <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                    <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
+                    <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
+                    <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+        </aside>
         <div class="main-content">
             <header class="header">
                 <button id="toggleSidebar" class="toggle-sidebar-btn">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-<h2><?php echo htmlspecialchars($system_name); ?></h2>
+                <h2><?php echo htmlspecialchars($system_name); ?></h2>
                 <div class="header-right">
                     <div class="dropdown">
                         <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
@@ -235,8 +265,8 @@ $conn->close();
                 </div>
             </div>
             <div class="card">
-             <h3>Monthly Incident Reports</h3>
-             <p> List of Incidents per Month </p>
+                <h3>Monthly Incident Reports</h3>
+                <p> List of Incidents per Month </p>
                 <hr class="section-separator full-bleed">
                 <div class="top-controls">
                     <button onclick="printTable()" class="create-new-button"><i class="fa-solid fa-print"></i>Print Report</button>
@@ -251,7 +281,7 @@ $conn->close();
                             <th>Total Casualties</th>
                         </tr>
                     </thead>
-                   <tbody>
+                    <tbody>
                         <?php if (empty($chart_data)): ?>
                             <tr>
                                 <td colspan="4">No data available</td>
@@ -271,80 +301,89 @@ $conn->close();
             </div>
         </div>
     </div>
-    <div id="logoutModal" class = "confirm-delete-modal">
-<div class = "modal-content">   
-<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
-<hr>
-    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
-    <button id="confirmLogout" class = "confirm-btn">Logout</button>
-    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
-  </div>
-</div>
-<script>
+    <div id="logoutModal" class="confirm-delete-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+            <hr>
+            <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+            <button id="confirmLogout" class="confirm-btn">Logout</button>
+            <button id="cancelLogout" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+    <script>
         const chartData = <?php echo json_encode($chart_data); ?>;
         const labels = chartData.map(item => item.month);
-    const data = {
-    labels: labels,
-    datasets: [{
-        label: 'Incident Count',
-        data: chartData.map(item => item.incident_count),
-        borderColor: '#00509e',      // Pinkish line color
-        backgroundColor: '#00509e',  // Point color
-        fill: false,                 // No area fill
-        tension: 0.3,                // Smooth curve
-        pointRadius: 5,              // Size of points
-        pointHoverRadius: 7,         // Point size on hover
-        pointBackgroundColor: '#00509e',
-        pointBorderColor: '#00509e',
-        borderWidth: 3
-    }]
-};
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Incident Count',
+                data: chartData.map(item => item.incident_count),
+                borderColor: '#00509e', // Pinkish line color
+                backgroundColor: '#00509e', // Point color
+                fill: false, // No area fill
+                tension: 0.3, // Smooth curve
+                pointRadius: 5, // Size of points
+                pointHoverRadius: 7, // Point size on hover
+                pointBackgroundColor: '#00509e',
+                pointBorderColor: '#00509e',
+                borderWidth: 3
+            }]
+        };
 
-const config = {
-    type: 'line',
-    data: data,
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: true, position: 'top' },
-            title: { display: false }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    stepSize: 1,
-                    callback: function(value) {
-                        if (Number.isInteger(value)) {
-                            return value;
-                        }
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    title: {
+                        display: false
                     }
                 },
-                title: {
-                    display: true,
-                    text: 'Number of Incidents',
-                    color: '#003D73',
-                    font: { weight: 'bold' }
-                }
-            },
-            x: {
-                title: {
-                    display: true,
-                    text: 'Month',
-                    color: '#003D73',
-                    font: { weight: 'bold' }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            callback: function(value) {
+                                if (Number.isInteger(value)) {
+                                    return value;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Incidents',
+                            color: '#003D73',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month',
+                            color: '#003D73',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
                 }
             }
-        }
-    }
-};
+        };
         const ctx = document.getElementById('monthlyChart').getContext('2d');
         const monthlyChart = new Chart(ctx, config);
 
         document.addEventListener('DOMContentLoaded', () => {
             const toggles = document.querySelectorAll('.report-dropdown-toggle');
             toggles.forEach(toggle => {
-                toggle.addEventListener('click', function (event) {
+                toggle.addEventListener('click', function(event) {
                     event.preventDefault();
                     const dropdown = this.closest('.report-dropdown');
                     dropdown.classList.toggle('show');
@@ -381,34 +420,35 @@ const config = {
             printWindow.print();
         }
 
-        
-document.addEventListener('DOMContentLoaded', function() {
-    // Show Confirm Logout Modal
-   document.getElementById('logoutLink').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('logoutModal').style.display = 'flex';
-    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
-});
 
-    // Handle Confirm Logout
-    document.getElementById('confirmLogout').addEventListener('click', function() {
-        window.location.href = 'logout.php';
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show Confirm Logout Modal
+            document.getElementById('logoutLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('logoutModal').style.display = 'flex';
+                document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+            });
 
-    // Handle Cancel Logout
-    document.getElementById('cancelLogout').addEventListener('click', function() {
-        document.getElementById('logoutModal').style.display = 'none';
-    });
-});
+            // Handle Confirm Logout
+            document.getElementById('confirmLogout').addEventListener('click', function() {
+                window.location.href = 'logout.php';
+            });
 
-window.onclick = function(event) {
-    // ...existing code...
-    const logoutModal = document.getElementById('logoutModal');
-    if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-    }
-};
+            // Handle Cancel Logout
+            document.getElementById('cancelLogout').addEventListener('click', function() {
+                document.getElementById('logoutModal').style.display = 'none';
+            });
+        });
+
+        window.onclick = function(event) {
+            // ...existing code...
+            const logoutModal = document.getElementById('logoutModal');
+            if (event.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        };
     </script>
 </body>
+
 </html>
-<script src = "../js/archivescript.js"></script>
+<script src="../js/archivescript.js"></script>

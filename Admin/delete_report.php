@@ -33,4 +33,3 @@ if ($report_id > 0) {
     echo json_encode(['success' => false, 'error' => 'Invalid report ID']);
 }
 $conn->close();
-?>

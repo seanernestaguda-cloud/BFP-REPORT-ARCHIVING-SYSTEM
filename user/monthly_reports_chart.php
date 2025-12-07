@@ -33,7 +33,7 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
 $sql_table_data = "SELECT 
     CONCAT(YEAR(incident_date), ' ', MONTHNAME(incident_date)) AS month,
     COUNT(*) AS incident_count,
-    SUM(property_damage) AS total_damage,
+    SUM(CAST(REPLACE(property_damage, ',', '') AS UNSIGNED)) AS total_damage,
     SUM(
         CASE 
             WHEN victims IS NULL OR victims = '' THEN 0

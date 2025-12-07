@@ -608,25 +608,25 @@ mysqli_close($conn);
                         <div class="pagination" style="margin: 20px 0; text-align: center;">
                             <?php if ($page > 1): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page - 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">&laquo; Prev</a>
+                                            $params = $_GET;
+                                            $params['page'] = $page - 1;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn">&laquo; Prev</a>
                             <?php endif; ?>
                             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $i;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn<?php if ($i == $page)
-                                    echo ' active'; ?>"><?php echo $i; ?></a>
+                                            $params = $_GET;
+                                            $params['page'] = $i;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn<?php if ($i == $page)
+                                                                            echo ' active'; ?>"><?php echo $i; ?></a>
                             <?php endfor; ?>
                             <?php if ($page < $total_pages): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page + 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">Next &raquo;</a>
+                                            $params = $_GET;
+                                            $params['page'] = $page + 1;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn">Next &raquo;</a>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -688,7 +688,7 @@ mysqli_close($conn);
                 const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                 toggles.forEach(toggle => {
-                    toggle.addEventListener('click', function (event) {
+                    toggle.addEventListener('click', function(event) {
                         event.preventDefault();
                         const dropdown = this.closest('.report-dropdown');
                         dropdown.classList.toggle('show');
@@ -712,26 +712,26 @@ mysqli_close($conn);
                 });
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 // Show Confirm Logout Modal
-                document.getElementById('logoutLink').addEventListener('click', function (e) {
+                document.getElementById('logoutLink').addEventListener('click', function(e) {
                     e.preventDefault();
                     document.getElementById('logoutModal').style.display = 'flex';
                     document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                 });
 
                 // Handle Confirm Logout
-                document.getElementById('confirmLogout').addEventListener('click', function () {
+                document.getElementById('confirmLogout').addEventListener('click', function() {
                     window.location.href = 'logout.php';
                 });
 
                 // Handle Cancel Logout
-                document.getElementById('cancelLogout').addEventListener('click', function () {
+                document.getElementById('cancelLogout').addEventListener('click', function() {
                     document.getElementById('logoutModal').style.display = 'none';
                 });
             });
 
-            window.onclick = function (event) {
+            window.onclick = function(event) {
                 // ...existing code...
                 const logoutModal = document.getElementById('logoutModal');
                 if (event.target === logoutModal) {
@@ -808,52 +808,97 @@ mysqli_close($conn);
                 selectedToDelete = []; // Make sure multi-delete is not set
                 singleDeleteId = report_id; // Set single delete ID
                 document.getElementById('confirmDeleteModal').style.display = 'flex';
+                // Attach confirm handler for single delete
+                var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                confirmDeleteBtn.onclick = function() {
+                    // Send AJAX request to delete_selected_reports.php
+                    fetch('delete_selected_reports.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                report_ids: [singleDeleteId]
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                refreshReportsTable();
+                                openSuccessModal();
+                            } else {
+                                alert('Delete failed: ' + (data.error || 'Unknown error'));
+                            }
+                            closeDeleteModal();
+                        })
+                        .catch(err => {
+                            alert('AJAX error: ' + err);
+                            closeDeleteModal();
+                        });
+                };
             }
 
             // Confirm delete handler for both single and multi delete
-            document.getElementById('confirmDeleteBtn').onclick = function () {
-                if (singleDeleteId) {
-                    // Single delete
-                    fetch('delete_report.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'report_id=' + encodeURIComponent(singleDeleteId)
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const row = document.getElementById('report-row' + singleDeleteId);
-                                if (row) row.remove();
-                                openSuccessModal();
-                            } else {
-                                alert('Error deleting report: ' + (data.error || 'Unknown error'));
-                            }
-                            singleDeleteId = null;
-                            closeDeleteModal();
-                        });
-                } else if (selectedToDelete.length > 0) {
-                    // Multi delete
-                    fetch('delete_selected_reports.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ report_ids: selectedToDelete })
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                selectedToDelete.forEach(id => {
-                                    const row = document.getElementById('report-row' + id);
-                                    if (row) row.remove();
+            document.addEventListener('DOMContentLoaded', function() {
+                var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+                if (confirmDeleteBtn) {
+                    confirmDeleteBtn.onclick = function() {
+                        if (singleDeleteId) {
+                            // Single delete
+                            fetch('delete_report.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    },
+                                    body: 'report_id=' + encodeURIComponent(singleDeleteId)
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        refreshReportsTable();
+                                        openSuccessModal();
+                                    } else {
+                                        alert('Error deleting report: ' + (data.error || 'Unknown error'));
+                                    }
+                                    singleDeleteId = null;
+                                    closeDeleteModal();
                                 });
-                                openSuccessModal();
-                            } else {
-                                alert('Error deleting reports.');
-                            }
-                            selectedToDelete = [];
-                            closeDeleteModal();
-                        });
+                        } else if (selectedToDelete.length > 0) {
+                            // Multi delete
+                            fetch('delete_selected_reports.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        report_ids: selectedToDelete
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        refreshReportsTable();
+                                        openSuccessModal();
+                                    } else {
+                                        alert('Error deleting reports.');
+                                    }
+                                    selectedToDelete = [];
+                                    closeDeleteModal();
+                                });
+                        }
+                    };
                 }
-            };
+            });
+            // Refresh the reports table via AJAX
+            function refreshReportsTable() {
+                // Preserve current search, sort, filter, and page params
+                const params = new URLSearchParams(window.location.search);
+                fetch('my_fire_incident_report_ajax.php?' + params.toString())
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('reportsTableBody').innerHTML = html;
+                    });
+            }
 
             function closeDeleteModal() {
                 document.getElementById('confirmDeleteModal').style.display = 'none';
@@ -892,22 +937,22 @@ mysqli_close($conn);
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('start_month') || urlParams.get('end_month')) {
                     document.getElementById('monthFilterContainer').style.display = 'block';
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.querySelector('.search-input');
                 const reportsTableBody = document.getElementById('reportsTableBody');
 
                 if (searchInput && reportsTableBody) {
                     let searchTimeout;
-                    searchInput.addEventListener('input', function () {
+                    searchInput.addEventListener('input', function() {
                         clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(function () {
+                        searchTimeout = setTimeout(function() {
                             const query = searchInput.value;
                             if (query === '') {
                                 window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
@@ -919,6 +964,12 @@ mysqli_close($conn);
                                     });
                             }
                         }, 0);
+                    });
+                    // Prevent Enter key from submitting the form
+                    searchInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                        }
                     });
                 }
             });

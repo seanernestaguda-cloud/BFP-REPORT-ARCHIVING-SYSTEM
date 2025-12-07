@@ -36,13 +36,13 @@ $params = [];
 $types = '';
 
 if ($search !== '') {
-    $search_sql = "WHERE activity_logs.username LIKE ? OR action LIKE ? OR details LIKE ? OR id LIKE ? OR report_id LIKE ?";
+    $search_sql = "WHERE activity_logs.username LIKE ? OR activity_logs.action LIKE ? OR activity_logs.details LIKE ? OR activity_logs.id LIKE ? OR activity_logs.report_id LIKE ? OR users.user_type LIKE ? OR users.department LIKE ?";
     $search_param = '%' . $search . '%';
-    $params = [$search_param, $search_param, $search_param, $search_param, $search_param];
-    $types = 'sssss';
+    $params = [$search_param, $search_param, $search_param, $search_param, $search_param, $search_param, $search_param];
+    $types = 'sssssss';
 
     // Get total logs count with search
-    $total_reports_query = "SELECT COUNT(*) AS total FROM activity_logs $search_sql";
+    $total_reports_query = "SELECT COUNT(*) AS total FROM activity_logs LEFT JOIN users ON activity_logs.username = users.username $search_sql";
     $stmt_count = $conn->prepare($total_reports_query);
     $stmt_count->bind_param($types, ...$params);
     $stmt_count->execute();
@@ -51,12 +51,12 @@ if ($search !== '') {
     $total_reports = $total_reports_row['total'];
     $stmt_count->close();
 
-    // Fetch logs for current page with search (JOIN users for department)
-    $query = "SELECT activity_logs.*, users.department FROM activity_logs LEFT JOIN users ON activity_logs.username = users.username $search_sql ORDER BY activity_logs.timestamp DESC LIMIT ? OFFSET ?";
-    $stmt_logs = $conn->prepare($query);
+    // Fetch logs for current page with search (JOIN users for department and user_type)
+    $query = "SELECT activity_logs.*, users.department, users.user_type AS user_type FROM activity_logs LEFT JOIN users ON activity_logs.username = users.username $search_sql ORDER BY activity_logs.timestamp ASC LIMIT ? OFFSET ?";
     $params[] = $per_page;
     $params[] = $offset;
     $types .= 'ii';
+    $stmt_logs = $conn->prepare($query);
     $stmt_logs->bind_param($types, ...$params);
     $stmt_logs->execute();
     $result = $stmt_logs->get_result();
@@ -68,11 +68,11 @@ if ($search !== '') {
     $total_reports_row = mysqli_fetch_assoc($total_reports_result);
     $total_reports = $total_reports_row['total'];
 
-    // Fetch logs for current page
-    $query = "SELECT activity_logs.*, users.department 
+    // Fetch logs for current page (JOIN users for department and user_type)
+    $query = "SELECT activity_logs.*, users.department, users.user_type AS user_type 
 FROM activity_logs 
 LEFT JOIN users ON activity_logs.username = users.username
-ORDER BY activity_logs.timestamp DESC
+ORDER BY activity_logs.timestamp ASC
 LIMIT ? OFFSET ?";
     $stmt_logs = $conn->prepare($query);
     $stmt_logs->bind_param('ii', $per_page, $offset);
@@ -217,6 +217,9 @@ $stmt->close();
             /* shift left by container padding */
             box-sizing: border-box;
         }
+.archive-table th, .archive-table td {
+    padding: 17px 10px;
+}
     </style>
 </head>
 
@@ -304,11 +307,12 @@ $stmt->close();
                             </div>
                         </div>
                     </div>
-                    <table class="archive-table" border="1" cellpadding="8">
+                    <table class="archive-table">
                         <thead>
                             <tr>
                                 <th>Timestamp</th>
                                 <th>Username</th>
+                                <th>User Type</th>
                                 <th>Department</th>
                                 <th>Action</th>
                                 <th>Report ID</th> <!-- Unified ID column -->
@@ -321,21 +325,22 @@ $stmt->close();
                                     <tr>
                                         <td><?php echo htmlspecialchars($row['timestamp']); ?></td>
                                         <td><?php echo htmlspecialchars($row['username']); ?></td>
+                                        <td><?php echo isset($row['user_type']) && $row['user_type'] !== '' ? htmlspecialchars($row['user_type']) : '<span style="color:#888;">N/A</span>'; ?></td>
                                         <td><?php echo isset($row['department']) && $row['department'] !== '' ? htmlspecialchars($row['department']) : '<span style="color:#888;">N/A</span>'; ?>
                                         </td>
                                         <td class="<?php
-                                        $action = strtolower($row['action']);
-                                        if ($action === 'delete')
-                                            echo 'action-delete';
-                                        elseif ($action === 'update')
-                                            echo 'action-update';
-                                        elseif ($action === 'create')
-                                            echo 'action-create';
-                                        elseif ($action === 'download')
-                                            echo 'action-download';
-                                        elseif ($action === 'restore')
-                                            echo 'action-restore';
-                                        ?>"><?php echo htmlspecialchars($row['action']); ?></td>
+                                                    $action = strtolower($row['action']);
+                                                    if ($action === 'delete')
+                                                        echo 'action-delete';
+                                                    elseif ($action === 'update')
+                                                        echo 'action-update';
+                                                    elseif ($action === 'create')
+                                                        echo 'action-create';
+                                                    elseif ($action === 'download')
+                                                        echo 'action-download';
+                                                    elseif ($action === 'restore')
+                                                        echo 'action-restore';
+                                                    ?>"><?php echo htmlspecialchars($row['action']); ?></td>
                                         <td>
                                             <?php
                                             if (!empty($row['id'])) {
@@ -364,36 +369,35 @@ $stmt->close();
                     <div class="pagination" style="margin: 20px 0; text-align: center;">
                         <?php if ($page > 1): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page - 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">&laquo; Prev</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page - 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">&laquo; Prev</a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $i;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn<?php if ($i == $page)
-                                echo ' active'; ?>"><?php echo $i; ?></a>
+                                        $params = $_GET;
+                                        $params['page'] = $i;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn<?php if ($i == $page)
+                                                                        echo ' active'; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         <?php if ($page < $total_pages): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page + 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">Next &raquo;</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page + 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
 
                 <script>
-
                     document.addEventListener('DOMContentLoaded', () => {
                         const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                         toggles.forEach(toggle => {
-                            toggle.addEventListener('click', function (event) {
+                            toggle.addEventListener('click', function(event) {
                                 event.preventDefault();
                                 const dropdown = this.closest('.report-dropdown');
                                 dropdown.classList.toggle('show');
@@ -416,15 +420,16 @@ $stmt->close();
                             }
                         });
                     });
-                    document.addEventListener('DOMContentLoaded', function () {
+                    document.addEventListener('DOMContentLoaded', function() {
                         const searchInput = document.querySelector('.search-input');
                         const logsTableBody = document.getElementById('logsTableBody');
+                        const searchForm = document.getElementById('searchForm');
                         let debounceTimer;
 
                         function fetchLogs(searchValue) {
                             const xhr = new XMLHttpRequest();
                             xhr.open('GET', 'activity_logs_search.php?search=' + encodeURIComponent(searchValue), true);
-                            xhr.onload = function () {
+                            xhr.onload = function() {
                                 if (xhr.status === 200) {
                                     logsTableBody.innerHTML = xhr.responseText;
                                 }
@@ -435,35 +440,42 @@ $stmt->close();
                         if (searchInput && logsTableBody) {
                             // Fetch logs on initial page load
                             fetchLogs(searchInput.value);
-                            searchInput.addEventListener('input', function () {
+                            searchInput.addEventListener('input', function() {
                                 clearTimeout(debounceTimer);
-                                debounceTimer = setTimeout(function () {
+                                debounceTimer = setTimeout(function() {
                                     fetchLogs(searchInput.value);
                                 }, 0); // 500ms debounce
                             });
                         }
+
+                        if (searchForm) {
+                            searchForm.addEventListener('submit', function(e) {
+                                e.preventDefault();
+                                fetchLogs(searchInput.value);
+                            });
+                        }
                     });
 
-                    document.addEventListener('DOMContentLoaded', function () {
+                    document.addEventListener('DOMContentLoaded', function() {
                         // Show Confirm Logout Modal
-                        document.getElementById('logoutLink').addEventListener('click', function (e) {
+                        document.getElementById('logoutLink').addEventListener('click', function(e) {
                             e.preventDefault();
                             document.getElementById('logoutModal').style.display = 'flex';
                             document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                         });
 
                         // Handle Confirm Logout
-                        document.getElementById('confirmLogout').addEventListener('click', function () {
+                        document.getElementById('confirmLogout').addEventListener('click', function() {
                             window.location.href = 'logout.php';
                         });
 
                         // Handle Cancel Logout
-                        document.getElementById('cancelLogout').addEventListener('click', function () {
+                        document.getElementById('cancelLogout').addEventListener('click', function() {
                             document.getElementById('logoutModal').style.display = 'none';
                         });
                     });
 
-                    window.onclick = function (event) {
+                    window.onclick = function(event) {
                         // ...existing code...
                         const logoutModal = document.getElementById('logoutModal');
                         if (event.target === logoutModal) {

@@ -605,25 +605,25 @@ mysqli_close($conn);
                         <div class="pagination" style="margin: 20px 0; text-align: center;">
                             <?php if ($page > 1): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page - 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">&laquo; Prev</a>
+                                            $params = $_GET;
+                                            $params['page'] = $page - 1;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn">&laquo; Prev</a>
                             <?php endif; ?>
                             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $i;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn<?php if ($i == $page)
-                                    echo ' active'; ?>"><?php echo $i; ?></a>
+                                            $params = $_GET;
+                                            $params['page'] = $i;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn<?php if ($i == $page)
+                                                                            echo ' active'; ?>"><?php echo $i; ?></a>
                             <?php endfor; ?>
                             <?php if ($page < $total_pages): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page + 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">Next &raquo;</a>
+                                            $params = $_GET;
+                                            $params['page'] = $page + 1;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn">Next &raquo;</a>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -666,12 +666,11 @@ mysqli_close($conn);
 
 
         <script>
-
             document.addEventListener('DOMContentLoaded', () => {
                 const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                 toggles.forEach(toggle => {
-                    toggle.addEventListener('click', function (event) {
+                    toggle.addEventListener('click', function(event) {
                         event.preventDefault();
                         const dropdown = this.closest('.report-dropdown');
                         dropdown.classList.toggle('show');
@@ -767,20 +766,23 @@ mysqli_close($conn);
             }
 
             // Confirm delete handler for both single and multi delete
-            document.getElementById('confirmDeleteBtn').onclick = function () {
+            document.getElementById('confirmDeleteBtn').onclick = function() {
                 if (singleDeleteId) {
                     // Single delete
                     fetch('delete_report.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: 'report_id=' + encodeURIComponent(singleDeleteId)
-                    })
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'report_id=' + encodeURIComponent(singleDeleteId)
+                        })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                const row = document.getElementById('report-row' + singleDeleteId);
-                                if (row) row.remove();
                                 openSuccessModal();
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1200); // Wait for success modal before reload
                             } else {
                                 alert('Error deleting report: ' + (data.error || 'Unknown error'));
                             }
@@ -790,18 +792,21 @@ mysqli_close($conn);
                 } else if (selectedToDelete.length > 0) {
                     // Multi delete
                     fetch('delete_selected_reports.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ report_ids: selectedToDelete })
-                    })
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                report_ids: selectedToDelete
+                            })
+                        })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                selectedToDelete.forEach(id => {
-                                    const row = document.getElementById('report-row' + id);
-                                    if (row) row.remove();
-                                });
                                 openSuccessModal();
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 1200); // Wait for success modal before reload
                             } else {
                                 alert('Error deleting reports.');
                             }
@@ -848,22 +853,22 @@ mysqli_close($conn);
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('start_month') || urlParams.get('end_month')) {
                     document.getElementById('monthFilterContainer').style.display = 'block';
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.querySelector('.search-input');
                 const reportsTableBody = document.getElementById('reportsTableBody');
 
                 if (searchInput && reportsTableBody) {
                     let searchTimeout;
-                    searchInput.addEventListener('input', function () {
+                    searchInput.addEventListener('input', function() {
                         clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(function () {
+                        searchTimeout = setTimeout(function() {
                             const query = searchInput.value;
                             if (query === '') {
                                 window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
@@ -876,29 +881,35 @@ mysqli_close($conn);
                             }
                         }, 0);
                     });
+                    // Prevent Enter key from submitting the form
+                    searchInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                        }
+                    });
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 // Show Confirm Logout Modal
-                document.getElementById('logoutLink').addEventListener('click', function (e) {
+                document.getElementById('logoutLink').addEventListener('click', function(e) {
                     e.preventDefault();
                     document.getElementById('logoutModal').style.display = 'flex';
                     document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                 });
 
                 // Handle Confirm Logout
-                document.getElementById('confirmLogout').addEventListener('click', function () {
+                document.getElementById('confirmLogout').addEventListener('click', function() {
                     window.location.href = 'logout.php';
                 });
 
                 // Handle Cancel Logout
-                document.getElementById('cancelLogout').addEventListener('click', function () {
+                document.getElementById('cancelLogout').addEventListener('click', function() {
                     document.getElementById('logoutModal').style.display = 'none';
                 });
             });
 
-            window.onclick = function (event) {
+            window.onclick = function(event) {
                 // ...existing code...
                 const logoutModal = document.getElementById('logoutModal');
                 if (event.target === logoutModal) {

@@ -34,9 +34,13 @@ if ($result && $result->num_rows > 0) {
             <td>$fullName</td>
             <td>$username</td>
             <td>$user_type</td>
-            <td>$department</td>
-            <td>$status</td>
-            <td>
+            <td>$department</td>";
+        if (strtolower($status) === 'verified') {
+            echo "<td><span style='color: #fff; font-weight: bold; background-color: green; padding: 5px 10px; border-radius: 20px;'>$status</span></td>";
+        } else {
+            echo "<td><span style='color: #fff; font-weight: bold; background-color: red; padding: 5px 10px; border-radius: 20px;'>$status</span></td>";
+        }
+        echo "<td>
                 <div class='action-dropdown'>
                     <button class='dropdown-btn' onclick=\"toggleDropdown(event, 'actionDropdown$userId')\">
                         Action <i class='fa-solid fa-caret-down'></i>

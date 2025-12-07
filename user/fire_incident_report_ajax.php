@@ -93,13 +93,19 @@ foreach ($reports as $row) {
             $row['fire_types'],
             $row['uploader'],
             $row['department'],
-            $status,
             $fire_types_display
         );
-        foreach ($search_fields as $field) {
-            if (strpos(strtolower((string) $field), $search_lower) !== false) {
-                $match = true;
-                break;
+        // Check status field explicitly and case-insensitively
+        if (strpos('complete', $search_lower) !== false && $is_complete) {
+            $match = true;
+        } elseif (strpos('in progress', $search_lower) !== false && !$is_complete) {
+            $match = true;
+        } else {
+            foreach ($search_fields as $field) {
+                if (strpos(strtolower((string) $field), $search_lower) !== false) {
+                    $match = true;
+                    break;
+                }
             }
         }
         if (!$match) {

@@ -144,6 +144,7 @@ if (isset($_SESSION['show_error_modal']) && $_SESSION['show_error_modal']) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -153,23 +154,25 @@ if (isset($_SESSION['show_error_modal']) && $_SESSION['show_error_modal']) {
     <link rel="stylesheet" href="../css/fontawesome.min.css">
     <link rel="icon" type="image/png" href="../REPORT.png">
     <title>Edit User</title>
-     <style>
+    <style>
         .profile-card {
             background: #fff;
-            max-width: 700px;
+            max-width: 800px;
             margin: 40px auto 0 auto;
             border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
             padding: 40px 32px 32px 32px;
             display: flex;
             gap: 40px;
             align-items: flex-start;
             border-top: solid 5px #003D73;
         }
+
         .profile-info {
             flex: 1 1 220px;
             text-align: center;
         }
+
         .profile-info img.avatar {
             width: 140px;
             height: 140px;
@@ -178,46 +181,55 @@ if (isset($_SESSION['show_error_modal']) && $_SESSION['show_error_modal']) {
             object-fit: cover;
             margin-bottom: 18px;
         }
+
         .profile-info h3 {
             margin: 0 0 6px 0;
             font-size: 1.4rem;
             color: #222;
             font-weight: 600;
         }
+
         .profile-info p {
             color: #888;
             margin: 0 0 18px 0;
             font-size: 1rem;
         }
+
         .profile-info .profile-meta {
             font-size: 0.98rem;
             color: #555;
             margin-bottom: 8px;
         }
+
         .edit-form {
             flex: 2 1 350px;
         }
+
         .edit-form h2 {
             font-size: 1.2rem;
             color: #003D73;
             margin-bottom: 18px;
             font-weight: 600;
         }
+
         .form-group-container {
             display: flex;
             gap: 16px;
             margin-bottom: 12px;
         }
+
         .form-group {
             flex: 1 1 0;
             display: flex;
             flex-direction: column;
         }
+
         .form-group label {
             font-size: 0.97rem;
             color: #555;
             margin-bottom: 4px;
         }
+
         .form-group input,
         .form-group select {
             padding: 9px 12px;
@@ -227,12 +239,14 @@ if (isset($_SESSION['show_error_modal']) && $_SESSION['show_error_modal']) {
             background: #f9fafb;
             margin-bottom: 0;
         }
+
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: #003D73;
             background: #fff;
         }
+
         .edit-form button[type="submit"] {
             background: #003D73;
             color: #fff;
@@ -245,9 +259,11 @@ if (isset($_SESSION['show_error_modal']) && $_SESSION['show_error_modal']) {
             cursor: pointer;
             transition: background 0.2s;
         }
+
         .edit-form button[type="submit"]:hover {
             background: #002D57;
         }
+
         .edit-form button[type="button"] {
             background: #e3e6ea;
             color: #222;
@@ -259,333 +275,437 @@ if (isset($_SESSION['show_error_modal']) && $_SESSION['show_error_modal']) {
             cursor: pointer;
             transition: background 0.2s;
         }
+
         .edit-form button[type="button"]:hover {
             background: #d1d5db;
         }
+
+        /* Status badge styles */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            background: #1ca21c;
+            text-transform: lowercase;
+            margin-top: 2px;
+        }
+
+        .status-badge.verified {
+            background: #1ca21c;
+        }
+
+        .status-badge.not-verified {
+            background: #bd000a;
+        }
+
+        /* Status dropdown color styles */
+        #status.verified {
+            color: #1ca21c;
+        }
+
+        #status.not-verified {
+            color: #bd000a;
+        }
+
+        /* Color the dropdown options (Webkit/Blink/Edge/Chrome) */
+        #status option[value="verified"] {
+            color: #1ca21c;
+        }
+
+        #status option[value="not verified"] {
+            color: #bd000a;
+        }
+
         @media (max-width: 900px) {
-            .profile-card {
-                flex-direction: column;
-                align-items: center;
-                padding: 24px 10px;
-            }
-            .edit-form, .profile-info {
+
+            .edit-form,
+            .profile-info {
                 width: 100%;
             }
         }
 
-        .change-avatar{
-            background:#003D73; 
-            color: #fff; 
-            border: none; 
-            border-radius: 20px; 
-            padding: 5px 16px; 
-            font-size: 0.95rem; 
-            cursor: pointer; 
-            position: absolute; 
-            bottom: 10px; 
-            left: 50%; 
+        .change-avatar {
+            background: #003D73;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 5px 16px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
             transform: translateX(-50%);
         }
-.change-avatar:hover{
-background-color: #002D57;
-}
+
+        .change-avatar:hover {
+            background-color: #002D57;
+        }
     </style>
 </head>
+
 <body>
-  <aside class="sidebar">
+    <aside class="sidebar">
         <nav>
             <ul>
-                <li class = "archive-text"><h4><?php echo htmlspecialchars($system_name); ?></h4></li>
+                <li class="archive-text">
+                    <h4><?php echo htmlspecialchars($system_name); ?></h4>
+                </li>
                 <li><a href="admindashboard.php"><i class="fa-solid fa-gauge"></i> <span>Dashboard</span></a></li>
-                <li class = "archive-text"><p>Archives</p></li>
-                <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                <li class="archive-text">
+                    <p>Archives</p>
+                </li>
+                <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire
+                        </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List
+                        </span></a></li>
                 <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
-            
+
                 <li class="report-dropdown">
                     <a href="#" class="report-dropdown-toggle">
-                       <i class="fa-solid fa-chart-column"></i>
+                        <i class="fa-solid fa-chart-column"></i>
                         <span>Reports</span>
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <ul class="report-dropdown-content">
-                        <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
-                        <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
-                        <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
+                        <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                Barangay</a></li>
+                        <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                Month </a></li>
+                        <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to
+                                Year Comparison </a></li>
                     </ul>
                 </li>
-                
+
                 <li class="archive-text"><span>Maintenance</span></li>
-                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a>
+                </li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
                 <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
             </ul>
         </nav>
     </aside>
-<div class="main-content">
-     <header class="header">
-    <button id="toggleSidebar" class="toggle-sidebar-btn">
-        <i class="fa-solid fa-bars"></i>
-    </button>
-<h2><?php echo htmlspecialchars($system_name); ?></h2>
-    <div class="header-right">
-        <div class="dropdown">
-            <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
-                <!-- Add avatar image here -->
-                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
-            </a>
-            <div id="profileDropdown" class="dropdown-content">
-                <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    <div class="main-content">
+        <header class="header">
+            <button id="toggleSidebar" class="toggle-sidebar-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <h2><?php echo htmlspecialchars($system_name); ?></h2>
+            <div class="header-right">
+                <div class="dropdown">
+                    <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
+                        <!-- Add avatar image here -->
+                        <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar"
+                            style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                        <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i>
+                        </p>
+                    </a>
+                    <div id="profileDropdown" class="dropdown-content">
+                        <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
+                        <a href="#" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</header>
-<br>
+        </header>
+        <br>
 
-    <div class="profile-card">
-     <div class="profile-info">
-    <?php
-    if (isset($user['avatar']) && !empty($user['avatar'])) {
-        $avatarPath = '../avatars/' . $user['avatar'];
-    } else {
-        $avatarPath = '../avatars/default_avatar.png';
-    }
-    ?>
-    
- <div style="position: relative; display: inline-block;">
-    <img src="<?php echo $avatarPath; ?>" alt="User Avatar" class="avatar" id="profileAvatar">
-    <label for="avatarInput" class = "change-avatar">Change</label>
-    <!-- <input type="file" name="avatar" id="avatarInput" style="display:none;" accept="image/*"> -->
-</div>
-    <h3><?= htmlspecialchars($user['first_name']) ?> <?= htmlspecialchars($user['middle_name']) ?> <?= htmlspecialchars($user['last_name']) ?></h3>
-    <p>@<?= htmlspecialchars($user['username']) ?></p>
-    <div class="profile-meta">
-        <div><strong>Department:</strong> <?= htmlspecialchars($user['department']) ?></div><br>
-        <div><strong>User Type:</strong> <?= htmlspecialchars($user['user_type']) ?></div><br>
-        <div><strong>Status:</strong> <?= htmlspecialchars($user['status']) ?></div><br>
-    </div>
-</div>
-<form class="edit-form" method="POST" action="edit_user.php?id=<?php echo $userId; ?>" enctype="multipart/form-data">
-    <input type="hidden" name="id" value="<?php echo $userId; ?>">
-    <input type="file" name="avatar" id="avatarInput" style="display:none;" accept="image/*">
-            <h2>Edit Profile</h2>
-            <div class="form-group-container">
-                <div class="form-group">
-                    <label for="first_name">First Name:</label>
-                    <input type="text" name="first_name" id="first_name" value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+        <div class="profile-card">
+            <div class="profile-info">
+                <?php
+                if (isset($user['avatar']) && !empty($user['avatar'])) {
+                    $avatarPath = '../avatars/' . $user['avatar'];
+                } else {
+                    $avatarPath = '../avatars/default_avatar.png';
+                }
+                ?>
+
+                <div style="position: relative; display: inline-block;">
+                    <img src="<?php echo $avatarPath; ?>" alt="User Avatar" class="avatar" id="profileAvatar">
+                    <label for="avatarInput" class="change-avatar">Change</label>
+                    <!-- <input type="file" name="avatar" id="avatarInput" style="display:none;" accept="image/*"> -->
                 </div>
-                <div class="form-group">
-                    <label for="middle_name">Middle Name:</label>
-                    <input type="text" name="middle_name" id="middle_name" value="<?php echo htmlspecialchars($user['middle_name']); ?>">
+                <h3><?= htmlspecialchars($user['first_name']) ?> <?= htmlspecialchars($user['middle_name']) ?>
+                    <?= htmlspecialchars($user['last_name']) ?>
+                </h3>
+                <p>@<?= htmlspecialchars($user['username']) ?></p>
+                <div class="profile-meta">
+                    <div><strong>Department:</strong> <?= htmlspecialchars($user['department']) ?></div><br>
+                    <div><strong>User Type:</strong> <?= htmlspecialchars($user['user_type']) ?></div><br>
+                    <div><strong>Status:</strong>
+                        <?php if (strtolower($user['status']) === 'verified'): ?>
+                            <span class="status-badge verified">verified</span>
+                        <?php else: ?>
+                            <span class="status-badge not-verified">not verified</span>
+                        <?php endif; ?>
+                    </div><br>
                 </div>
             </div>
-            <div class="form-group-container">
-                <div class="form-group">
-                    <label for="last_name">Last Name:</label>
-                    <input type="text" name="last_name" id="last_name" value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+            <form class="edit-form" method="POST" action="edit_user.php?id=<?php echo $userId; ?>"
+                enctype="multipart/form-data">
+                <input type="hidden" name="id" value="<?php echo $userId; ?>">
+                <input type="file" name="avatar" id="avatarInput" style="display:none;" accept="image/*">
+                <h2>Edit Profile</h2>
+                <div class="form-group-container">
+                    <div class="form-group">
+                        <label for="first_name">First Name:</label>
+                        <input type="text" name="first_name" id="first_name"
+                            value="<?php echo htmlspecialchars($user['first_name']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="middle_name">Middle Name:</label>
+                        <input type="text" name="middle_name" id="middle_name"
+                            value="<?php echo htmlspecialchars($user['middle_name']); ?>">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="birthday">Birthday:</label>
-                    <input type="date" name="birthday" id="birthday" value="<?php echo htmlspecialchars($user['birthday']); ?>" required>
+                <div class="form-group-container">
+                    <div class="form-group">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" name="last_name" id="last_name"
+                            value="<?php echo htmlspecialchars($user['last_name']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthday">Birthday:</label>
+                        <input type="date" name="birthday" id="birthday"
+                            value="<?php echo htmlspecialchars($user['birthday']); ?>" required>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group-container">
-                <div class="form-group">
-                    <label for="address">Address:</label>
-                    <input type="text" name="address" id="address" value="<?php echo htmlspecialchars($user['address']); ?>" required>
+                <div class="form-group-container">
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <input type="text" name="address" id="address"
+                            value="<?php echo htmlspecialchars($user['address']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" id="username"
+                            value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" name="username" id="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
-                </div>
-            </div>
-            <div class="form-group-container">
-                <div class="form-group">
-                    <label for="department">Department:</label>
-                    <select name="department" required>
-                        <option value=''>Department</option>
-                        <?php
-                        if ($departmentResult->num_rows > 0) {
-                            while ($row = $departmentResult->fetch_assoc()) {
-                                $selected = ($row['departments'] == $user['department']) ? 'selected' : '';
-                                echo "<option value='" . $row['departments'] . "' $selected>" . $row['departments'] . "</option>";
+                <div class="form-group-container">
+                    <div class="form-group">
+                        <label for="department">Department:</label>
+                        <select name="department" required>
+                            <option value=''>Department</option>
+                            <?php
+                            if ($departmentResult->num_rows > 0) {
+                                while ($row = $departmentResult->fetch_assoc()) {
+                                    $selected = ($row['departments'] == $user['department']) ? 'selected' : '';
+                                    echo "<option value='" . $row['departments'] . "' $selected>" . $row['departments'] . "</option>";
+                                }
+                            } else {
+                                echo "<option value=''>No departments available</option>";
                             }
-                        } else {
-                            echo "<option value=''>No departments available</option>";
-                        }
-                        ?>
-                    </select>
+                            ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact:</label>
+                        <input type="text" name="contact" id="contact"
+                            value="<?php echo htmlspecialchars($user['contact']); ?>" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="contact" value="<?php echo htmlspecialchars($user['contact']); ?>" required>
+                <div class="form-group-container">
+                    <div class="form-group">
+                        <label for="user_type">User Type:</label>
+                        <input type="text" name="user_type" id="user_type"
+                            value="<?php echo htmlspecialchars($user['user_type']); ?>" readonly>
+                        <input type="hidden" name="user_type"
+                            value="<?php echo htmlspecialchars($user['user_type']); ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select name="status" id="status" required>
+                            <option value="verified" style="color:#1ca21c;" <?php echo $user['status'] === 'verified' ? 'selected' : ''; ?>>Verified</option>
+                            <option value="not verified" style="color:#bd000a;" <?php echo $user['status'] === 'not verified' ? 'selected' : ''; ?>>Not Verified</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group-container">
-                <div class="form-group">
-                    <label for="user_type">User Type:</label>
-                    <input type="text" name="user_type" id="user_type" value="<?php echo htmlspecialchars($user['user_type']); ?>" readonly>
-                    <input type="hidden" name="user_type" value="<?php echo htmlspecialchars($user['user_type']); ?>">
-                </div>
-                <div class="form-group">
-                    <label for="status">Status:</label>
-                    <select name="status" id="status" required>
-                        <option value="verified" <?php echo $user['status'] === 'verified' ? 'selected' : ''; ?>>Verified</option>
-                        <option value="not verified" <?php echo $user['status'] === 'not verified' ? 'selected' : ''; ?>>Not Verified</option>
-                    </select>
-                </div>
-            </div>
-            <button type="submit">Save Changes</button>
+                <button type="submit">Save Changes</button>
                 <button type="button" onclick="window.location.href='manageuser.php'">Cancel</button>
             </form>
+        </div>
     </div>
-</div>
-<!-- Success Modal -->
-<div id="successModal" class="success-modal" style="display: none;">
-    <div class="success-modal-content">
-        <i class="fa-regular fa-circle-check"></i><h2>Success!</h2>
-        <p id="successMessage"></p>
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal" style="display: none;">
+        <div class="success-modal-content">
+            <i class="fa-regular fa-circle-check"></i>
+            <h2>Success!</h2>
+            <p id="successMessage"></p>
+        </div>
     </div>
-</div>
 
-<div id="errorModal" class="success-modal">
-    <div class="success-modal-content" style="color: #bd000a;">
-        <i class="fa-regular fa-circle-xmark" style="color: #bd000a;"></i>
-        <h2>Error!</h2>
-        <p id="errorMessage"></p>
+    <div id="errorModal" class="success-modal">
+        <div class="success-modal-content" style="color: #bd000a;">
+            <i class="fa-regular fa-circle-xmark" style="color: #bd000a;"></i>
+            <h2>Error!</h2>
+            <p id="errorMessage"></p>
+        </div>
     </div>
-</div>
 
-<div id="logoutModal" class = "confirm-delete-modal">
-<div class = "modal-content">   
-<h3 style="margin-bottom:10px;">Confirm Logout?</h3>
-<hr>
-    <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
-    <button id="confirmLogout" class = "confirm-btn">Logout</button>
-    <button id="cancelLogout" class = "cancel-btn">Cancel</button>
-  </div>
-</div>
+    <div id="logoutModal" class="confirm-delete-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:10px;">Confirm Logout?</h3>
+            <hr>
+            <p style="margin-bottom:24px;">Are you sure you want to logout?</p>
+            <button id="confirmLogout" class="confirm-btn">Logout</button>
+            <button id="cancelLogout" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
 
-<?php if ($showSuccessModal): ?>
-<script>
-<?php if ($showSuccessModal): ?>
-    document.addEventListener('DOMContentLoaded', function() {
-        var modal = document.getElementById('successModal');
-        var msg = document.getElementById('successMessage');
-        modal.style.display = 'block';
-        msg.textContent = <?php echo json_encode($successMessage); ?>;
-        setTimeout(function() {
-            modal.style.display = 'none';
-            <?php if ($redirectAfterModal): ?>
-            window.location.href = 'manageuser.php';
+    <?php if ($showSuccessModal): ?>
+        <script>
+            <?php if ($showSuccessModal): ?>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var modal = document.getElementById('successModal');
+                    var msg = document.getElementById('successMessage');
+                    modal.style.display = 'block';
+                    msg.textContent = <?php echo json_encode($successMessage); ?>;
+                    setTimeout(function () {
+                        modal.style.display = 'none';
+                        <?php if ($redirectAfterModal): ?>
+                            window.location.href = 'manageuser.php';
+                        <?php endif; ?>
+                    }, 2000); // 2 seconds before redirect
+                });
             <?php endif; ?>
-        }, 2000); // 2 seconds before redirect
-    });
-<?php endif; ?>
-</script>
-<?php endif; ?>
+        </script>
+    <?php endif; ?>
 
-<?php if ($showErrorModal): ?>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var modal = document.getElementById('errorModal');
-        var msg = document.getElementById('errorMessage');
-        modal.style.display = 'block';
-        msg.textContent = <?php echo json_encode($errorMessage); ?>;
-        setTimeout(function() {
-            modal.style.display = 'none';
-        }, 2500);
-    });
-</script>
-<?php endif; ?>
+    <?php if ($showErrorModal): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var modal = document.getElementById('errorModal');
+                var msg = document.getElementById('errorMessage');
+                modal.style.display = 'block';
+                msg.textContent = <?php echo json_encode($errorMessage); ?>;
+                setTimeout(function () {
+                    modal.style.display = 'none';
+                }, 2500);
+            });
+        </script>
+    <?php endif; ?>
 
-<script>
-     document.addEventListener('DOMContentLoaded', () => {
-    const toggles = document.querySelectorAll('.report-dropdown-toggle');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
-    toggles.forEach(toggle => {
-        toggle.addEventListener('click', function (event) {
-            event.preventDefault();
-            const dropdown = this.closest('.report-dropdown');
-            dropdown.classList.toggle('show');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const dropdown = this.closest('.report-dropdown');
+                    dropdown.classList.toggle('show');
 
-            // Close other dropdowns
-            document.querySelectorAll('.report-dropdown').forEach(item => {
-                if (item !== dropdown) {
-                    item.classList.remove('show');
+                    // Close other dropdowns
+                    document.querySelectorAll('.report-dropdown').forEach(item => {
+                        if (item !== dropdown) {
+                            item.classList.remove('show');
+                        }
+                    });
+                });
+            });
+
+            // Close dropdown when clicking outside
+            window.addEventListener('click', event => {
+                if (!event.target.closest('.report-dropdown')) {
+                    document.querySelectorAll('.report-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
                 }
             });
         });
-    });
 
-    // Close dropdown when clicking outside
-    window.addEventListener('click', event => {
-        if (!event.target.closest('.report-dropdown')) {
-            document.querySelectorAll('.report-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('show');
-            });
-        }
-    });
-}); 
+        document.addEventListener('DOMContentLoaded', () => {
+            // Display modal if it exists
+            const successModal = document.getElementById('successModal');
+            if (successModal.style.display === "block") {
+                const closeModal = document.getElementById('closeModal');
+                closeModal.hidden = false; // Make the close button visible
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Display modal if it exists
-    const successModal = document.getElementById('successModal');
-    if (successModal.style.display === "block") {
-        const closeModal = document.getElementById('closeModal');
-        closeModal.hidden = false; // Make the close button visible
+                // Close the modal when the close button is clicked
+                closeModal.addEventListener('click', () => {
+                    successModal.style.display = "none";
+                });
 
-        // Close the modal when the close button is clicked
-        closeModal.addEventListener('click', () => {
-            successModal.style.display = "none";
-        });
-
-        // Close the modal if the user clicks outside the modal content
-        window.addEventListener('click', event => {
-            if (event.target === successModal) {
-                successModal.style.display = "none";
+                // Close the modal if the user clicks outside the modal content
+                window.addEventListener('click', event => {
+                    if (event.target === successModal) {
+                        successModal.style.display = "none";
+                    }
+                });
             }
         });
-    }
-});
-document.getElementById('avatarInput').addEventListener('change', function(event) {
-    const [file] = event.target.files;
-    if (file) {
-        document.getElementById('profileAvatar').src = URL.createObjectURL(file);
-    }
-});
+        document.getElementById('avatarInput').addEventListener('change', function (event) {
+            const [file] = event.target.files;
+            if (file) {
+                document.getElementById('profileAvatar').src = URL.createObjectURL(file);
+            }
+        });
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Show Confirm Logout Modal
-   document.getElementById('logoutLink').addEventListener('click', function(e) {
-    e.preventDefault();
-    document.getElementById('logoutModal').style.display = 'flex';
-    document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
-});
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show Confirm Logout Modal
+            document.getElementById('logoutLink').addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('logoutModal').style.display = 'flex';
+                document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
+            });
 
-    // Handle Confirm Logout
-    document.getElementById('confirmLogout').addEventListener('click', function() {
-        window.location.href = 'logout.php';
-    });
+            // Handle Confirm Logout
+            document.getElementById('confirmLogout').addEventListener('click', function () {
+                window.location.href = 'logout.php';
+            });
 
-    // Handle Cancel Logout
-    document.getElementById('cancelLogout').addEventListener('click', function() {
-        document.getElementById('logoutModal').style.display = 'none';
-    });
-});
+            // Handle Cancel Logout
+            document.getElementById('cancelLogout').addEventListener('click', function () {
+                document.getElementById('logoutModal').style.display = 'none';
+            });
+        });
 
-window.onclick = function(event) {
-    // ...existing code...
-    const logoutModal = document.getElementById('logoutModal');
-    if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-    }
-};
-</script>
+        window.onclick = function (event) {
+            // ...existing code...
+            const logoutModal = document.getElementById('logoutModal');
+            if (event.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        };
+    </script>
+    <script>
+        // Status dropdown color logic
+        function updateStatusColor() {
+            const statusSelect = document.getElementById('status');
+            if (!statusSelect) return;
+            // Remove both classes first
+            statusSelect.classList.remove('verified', 'not-verified');
+            // Set color for the select element
+            if (statusSelect.value === 'verified') {
+                statusSelect.classList.add('verified');
+                statusSelect.style.color = '#1ca21c';
+            } else {
+                statusSelect.classList.add('not-verified');
+                statusSelect.style.color = '#bd000a';
+            }
+            // Set color for each option (for browsers that support it)
+            Array.from(statusSelect.options).forEach(option => {
+                if (option.value === 'verified') {
+                    option.style.color = '#1ca21c';
+                } else if (option.value === 'not verified') {
+                    option.style.color = '#bd000a';
+                } else {
+                    option.style.color = '';
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            updateStatusColor();
+            const statusSelect = document.getElementById('status');
+            statusSelect.addEventListener('change', updateStatusColor);
+        });
+    </script>
 </body>
+
 </html>
-<script src = "../js/archivescript.js"></script>
+<script src="../js/archivescript.js"></script>

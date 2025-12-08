@@ -7,12 +7,11 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
+$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 $where_clauses[] = "deleted_at IS NULL";
 $query_search = $search;
 $where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
-
 
 // Pagination for AJAX search
 $per_page = 10;
@@ -21,13 +20,20 @@ if ($page < 1)
     $page = 1;
 $offset = ($page - 1) * $per_page;
 
-$query = "SELECT * FROM fire_safety_inspection_certificate $where_sql ORDER BY id ASC LIMIT $per_page OFFSET $offset";
-$result = mysqli_query($conn, $query);
+// If searching, ignore pagination and get all records
+if ($search !== '') {
+    $query = "SELECT * FROM fire_safety_inspection_certificate $where_sql ORDER BY id ASC";
+    $result = mysqli_query($conn, $query);
+    $permits = mysqli_fetch_all($result, MYSQLI_ASSOC);
+} else {
+    $query = "SELECT * FROM fire_safety_inspection_certificate $where_sql ORDER BY id ASC LIMIT $per_page OFFSET $offset";
+    $result = mysqli_query($conn, $query);
+    $permits = mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
 
-// Fetch results into $permits array
-$permits = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-$row_count = 0;
+$rows_html = '';
+$filtered_count = 0;
 foreach ($permits as $row) {
     $required_fields = [
         $row['permit_name'],
@@ -100,32 +106,41 @@ foreach ($permits as $row) {
         }
     }
     if ($show_row) {
-        $row_count++;
-        echo '<tr id="permit-row' . htmlspecialchars($row['id']) . '">';
-        echo '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['id']) . '"></td>';
-        echo '<td>' . htmlspecialchars($row['id']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['permit_name']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['inspection_establishment']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['establishment_type']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['owner']) . '</td>';
-
-        echo '<td>' . htmlspecialchars($row['inspection_purpose']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['inspection_address']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['inspection_date']) . '</td>';
-        echo '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
-        echo '<td class="action-button-container">';
-        echo '<button class="view-btn" onclick="window.location.href=\'view_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';
-        echo '<i class="fa-solid fa-eye"></i>';
-        echo '</button>';
-        echo '<button class="download-btn" onclick="window.location.href=\'generate_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';
-        echo '<i class="fa-solid fa-download"></i>';
-        echo '</button>';
-        echo '</td>';
-        echo '</tr>';
+        $filtered_count++;
+        $rows_html .= '<tr id="permit-row' . htmlspecialchars($row['id']) . '">';
+        $rows_html .= '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['id']) . '"></td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['id']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['permit_name']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['inspection_establishment']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['establishment_type']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['owner']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['inspection_purpose']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['inspection_address']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['inspection_date']) . '</td>';
+        $rows_html .= '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
+        $rows_html .= '<td class="action-button-container">';
+        $rows_html .= '<button class="view-btn" onclick="window.location.href=\'view_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';
+        $rows_html .= '<i class="fa-solid fa-eye"></i>';
+        $rows_html .= '</button>';
+        $rows_html .= '<button class="delete-btn" onclick="deletePermit(' . htmlspecialchars(json_encode($row['id'])) . ')">';
+        $rows_html .= '<i class="fa-solid fa-trash"></i>';
+        $rows_html .= '</button>';
+        $rows_html .= '<button class="download-btn" onclick="window.location.href=\'generate_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';
+        $rows_html .= '<i class="fa-solid fa-download"></i>';
+        $rows_html .= '</button>';
+        $rows_html .= '</td>';
+        $rows_html .= '</tr>';
     }
 }
-if ($row_count === 0) {
-    echo '<tr><td colspan="12" style="text-align:center;">No reports found.</td></tr>';
-}
 mysqli_close($conn);
-?>
+
+if (isset($_GET['count']) && $_GET['count'] == '1') {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'html' => $rows_html,
+        'count' => $filtered_count
+    ]);
+    exit;
+} else {
+    echo $rows_html;
+}

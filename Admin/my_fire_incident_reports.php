@@ -97,6 +97,7 @@ $query = "SELECT
     firefighters,
     property_damage, 
     fire_types, 
+    created_at,
     uploader, 
     department,
     caller_name,
@@ -410,7 +411,10 @@ mysqli_close($conn);
             <div class="card">
                 <section class="archive-section">
                     <h3><?php echo htmlspecialchars($_SESSION['username']); ?>'s Fire Incident Reports</h3>
-                    <p> List of Fire Incident Reports</p>
+                    <p>List of Fire Incident Reports</p>
+                    <br>
+                    <p id="totalReportsCount" style="font-weight:bold; color:#003D73; margin-bottom:10px;">Total
+                        Reports: <?php echo number_format($total_reports); ?></p>
                     <hr class="section-separator full-bleed">
                     <div class="top-controls">
                         <button onclick="window.location.href='create_fire_incident_report.php'"
@@ -517,6 +521,7 @@ mysqli_close($conn);
                                 <th>Casualties</th>
                                 <th>Damage to Property</th>
                                 <th>Cause of Fire</th>
+                                <th>Date Created</th>
                                 <th>Status</th>
                                 <th>Action</th>
 
@@ -548,6 +553,8 @@ mysqli_close($conn);
                                         </td>
                                         <td><?php echo htmlspecialchars("₱" . $row['property_damage']); ?></td>
                                         <td><?php echo empty($row['fire_types']) ? 'Under Investigation' : htmlspecialchars($row['fire_types']); ?>
+                                        </td>
+                                        <td><?php echo !empty($row['created_at']) ? htmlspecialchars($row['created_at']) : 'N/A'; ?>
                                         </td>
                                         <td>
                                             <?php
@@ -605,28 +612,28 @@ mysqli_close($conn);
                     <?php
                     $total_pages = ceil($total_reports / $per_page);
                     if ($total_pages > 1): ?>
-                        <div class="pagination" style="margin: 20px 0; text-align: center;">
+                        <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                             <?php if ($page > 1): ?>
                                 <a href="?<?php
-                                            $params = $_GET;
-                                            $params['page'] = $page - 1;
-                                            echo http_build_query($params);
-                                            ?>" class="pagination-btn">&laquo; Prev</a>
+                                $params = $_GET;
+                                $params['page'] = $page - 1;
+                                echo http_build_query($params);
+                                ?>" class="pagination-btn">&laquo; Prev</a>
                             <?php endif; ?>
                             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                                 <a href="?<?php
-                                            $params = $_GET;
-                                            $params['page'] = $i;
-                                            echo http_build_query($params);
-                                            ?>" class="pagination-btn<?php if ($i == $page)
-                                                                            echo ' active'; ?>"><?php echo $i; ?></a>
+                                $params = $_GET;
+                                $params['page'] = $i;
+                                echo http_build_query($params);
+                                ?>" class="pagination-btn<?php if ($i == $page)
+                                    echo ' active'; ?>"><?php echo $i; ?></a>
                             <?php endfor; ?>
                             <?php if ($page < $total_pages): ?>
                                 <a href="?<?php
-                                            $params = $_GET;
-                                            $params['page'] = $page + 1;
-                                            echo http_build_query($params);
-                                            ?>" class="pagination-btn">Next &raquo;</a>
+                                $params = $_GET;
+                                $params['page'] = $page + 1;
+                                echo http_build_query($params);
+                                ?>" class="pagination-btn">Next &raquo;</a>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -688,7 +695,7 @@ mysqli_close($conn);
                 const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                 toggles.forEach(toggle => {
-                    toggle.addEventListener('click', function(event) {
+                    toggle.addEventListener('click', function (event) {
                         event.preventDefault();
                         const dropdown = this.closest('.report-dropdown');
                         dropdown.classList.toggle('show');
@@ -712,26 +719,26 @@ mysqli_close($conn);
                 });
             });
 
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // Show Confirm Logout Modal
-                document.getElementById('logoutLink').addEventListener('click', function(e) {
+                document.getElementById('logoutLink').addEventListener('click', function (e) {
                     e.preventDefault();
                     document.getElementById('logoutModal').style.display = 'flex';
                     document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                 });
 
                 // Handle Confirm Logout
-                document.getElementById('confirmLogout').addEventListener('click', function() {
+                document.getElementById('confirmLogout').addEventListener('click', function () {
                     window.location.href = 'logout.php';
                 });
 
                 // Handle Cancel Logout
-                document.getElementById('cancelLogout').addEventListener('click', function() {
+                document.getElementById('cancelLogout').addEventListener('click', function () {
                     document.getElementById('logoutModal').style.display = 'none';
                 });
             });
 
-            window.onclick = function(event) {
+            window.onclick = function (event) {
                 // ...existing code...
                 const logoutModal = document.getElementById('logoutModal');
                 if (event.target === logoutModal) {
@@ -810,17 +817,17 @@ mysqli_close($conn);
                 document.getElementById('confirmDeleteModal').style.display = 'flex';
                 // Attach confirm handler for single delete
                 var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-                confirmDeleteBtn.onclick = function() {
+                confirmDeleteBtn.onclick = function () {
                     // Send AJAX request to delete_selected_reports.php
                     fetch('delete_selected_reports.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                report_ids: [singleDeleteId]
-                            })
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            report_ids: [singleDeleteId]
                         })
+                    })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -839,19 +846,19 @@ mysqli_close($conn);
             }
 
             // Confirm delete handler for both single and multi delete
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 var confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
                 if (confirmDeleteBtn) {
-                    confirmDeleteBtn.onclick = function() {
+                    confirmDeleteBtn.onclick = function () {
                         if (singleDeleteId) {
                             // Single delete
                             fetch('delete_report.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded'
-                                    },
-                                    body: 'report_id=' + encodeURIComponent(singleDeleteId)
-                                })
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: 'report_id=' + encodeURIComponent(singleDeleteId)
+                            })
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success) {
@@ -866,14 +873,14 @@ mysqli_close($conn);
                         } else if (selectedToDelete.length > 0) {
                             // Multi delete
                             fetch('delete_selected_reports.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        report_ids: selectedToDelete
-                                    })
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    report_ids: selectedToDelete
                                 })
+                            })
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success) {
@@ -937,36 +944,45 @@ mysqli_close($conn);
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('start_month') || urlParams.get('end_month')) {
                     document.getElementById('monthFilterContainer').style.display = 'block';
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const searchInput = document.querySelector('.search-input');
                 const reportsTableBody = document.getElementById('reportsTableBody');
+                const totalReportsCount = document.getElementById('totalReportsCount');
+                const paginationContainer = document.getElementById('paginationContainer');
 
-                if (searchInput && reportsTableBody) {
+                if (searchInput && reportsTableBody && totalReportsCount) {
                     let searchTimeout;
-                    searchInput.addEventListener('input', function() {
+                    searchInput.addEventListener('input', function () {
                         clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(function() {
+                        searchTimeout = setTimeout(function () {
                             const query = searchInput.value;
                             if (query === '') {
                                 window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
+                                if (paginationContainer) {
+                                    paginationContainer.style.display = '';
+                                }
                             } else {
-                                fetch(`my_fire_incident_report_ajax.php?search=${encodeURIComponent(query)}`)
-                                    .then(response => response.text())
-                                    .then(html => {
-                                        reportsTableBody.innerHTML = html;
+                                fetch(`my_fire_incident_report_ajax.php?search=${encodeURIComponent(query)}&count=1`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        reportsTableBody.innerHTML = data.html;
+                                        totalReportsCount.textContent = 'Total Reports: ' + data.count;
+                                        if (paginationContainer) {
+                                            paginationContainer.style.display = 'none';
+                                        }
                                     });
                             }
                         }, 0);
                     });
                     // Prevent Enter key from submitting the form
-                    searchInput.addEventListener('keydown', function(e) {
+                    searchInput.addEventListener('keydown', function (e) {
                         if (e.key === 'Enter') {
                             e.preventDefault();
                         }

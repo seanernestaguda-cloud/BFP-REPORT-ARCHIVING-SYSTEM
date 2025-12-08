@@ -37,41 +37,68 @@ $log_stmt->execute();
 $log_stmt->close();
 
 
-// Create PDF
-$pdf = new PdfWithFpdi('P', 'mm', 'Legal', true, 'UTF-8', false);
+
+// Custom Header and Footer class
+class CustomPDF extends PdfWithFpdi
+{
+    public function Header()
+    {
+        // Only show header on the first page
+        if ($this->PageNo() == 1) {
+            $logoPath = '../images/logo.png'; // Update path if you have a logo
+            if (file_exists($logoPath)) {
+                $this->Image($logoPath, 15, 10, 20, 20);
+            }
+            $this->SetFont('helvetica', 'B', 16);
+            $this->Cell(0, 10, 'BUREAU OF FIRE PROTECTION', 0, 1, 'C');
+            $this->SetFont('helvetica', '', 12);
+            $this->Cell(0, 8, 'Fire Safety Inspection Certificate', 0, 1, 'C');
+            $this->Ln(2);
+        }
+    }
+    public function Footer()
+    {
+        $this->SetY(-15);
+        $this->SetFont('helvetica', 'I', 9);
+        $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 0, 'C');
+    }
+}
+
+$pdf = new CustomPDF('P', 'mm', 'LEGAL', true, 'UTF-8', false);
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('Bureau of Fire Protection');
 $pdf->SetTitle($row['permit_name']);
-$pdf->SetMargins(15, 15, 15);
+$pdf->SetMargins(15, 35, 15); // Top margin for header
 $pdf->AddPage();
 
-// Header
-$pdf->SetFont('helvetica', 'B', 20);
-$pdf->Cell(0, 10, 'Fire Safety Inspection Certificate', 0, 1, 'C');
+// Section: Permit Title
+$pdf->SetFont('helvetica', 'B', 15);
+$pdf->Cell(0, 12, strtoupper($row['permit_name']), 0, 1, 'C');
+$pdf->Ln(2);
 
-// Main info
+// Section: Main Info Table
 $pdf->SetFont('helvetica', '', 12);
-$html = <<<EOD
-<h3>{$row['permit_name']}</h3>
-<p><strong>Establishment Name:</strong> {$row['inspection_establishment']}</p>
-<p><strong>Owner:</strong> {$row['owner']}</p>
-<p><strong>Contact Person:</strong> {$row['contact_person']}</p>
-<p><strong>Contact Number:</strong> {$row['contact_number']}</p>
-<p><strong>Address:</strong> {$row['inspection_address']}</p>
-<p><strong>Date of Inspection:</strong> {$row['inspection_date']}</p>
-<p><strong>Establishment Type:</strong> {$row['establishment_type']}</p>
-<p><strong>Purpose of Inspection:</strong> {$row['inspection_purpose']}</p>
-<p><strong>Number of Occupants:</strong> {$row['number_of_occupants']}</p>
-<p><strong>Nature of Business:</strong> {$row['nature_of_business']}</p>
-<p><strong>Number of Floors:</strong> {$row['number_of_floors']}</p>
-<p><strong>Floor Area:</strong> {$row['floor_area']}</p>
-<p><strong>Classification of Hazards:</strong> {$row['classification_of_hazards']}</p>
-<p><strong>Building Construction:</strong> {$row['building_construction']}</p>
-<p><strong>Possible Problems during Fire:</strong> {$row['possible_problems']}</p>
-<p><strong>Hazardous/Flammable Materials:</strong> {$row['hazardous_materials']}</p>
-<p><strong>Inspected By:</strong> {$row['inspected_by']}</p>
-EOD;
-$pdf->writeHTML($html, true, false, true, false, '');
+$tbl = '<table border="1" cellpadding="4">
+<tr><td width="40%"><b>Establishment Name</b></td><td width="60%">' . htmlspecialchars($row['inspection_establishment']) . '</td></tr>
+<tr><td><b>Owner</b></td><td>' . htmlspecialchars($row['owner']) . '</td></tr>
+<tr><td><b>Contact Person</b></td><td>' . htmlspecialchars($row['contact_person']) . '</td></tr>
+<tr><td><b>Contact Number</b></td><td>' . htmlspecialchars($row['contact_number']) . '</td></tr>
+<tr><td><b>Address</b></td><td>' . htmlspecialchars($row['inspection_address']) . '</td></tr>
+<tr><td><b>Date of Inspection</b></td><td>' . htmlspecialchars($row['inspection_date']) . '</td></tr>
+<tr><td><b>Establishment Type</b></td><td>' . htmlspecialchars($row['establishment_type']) . '</td></tr>
+<tr><td><b>Purpose of Inspection</b></td><td>' . htmlspecialchars($row['inspection_purpose']) . '</td></tr>
+<tr><td><b>Number of Occupants</b></td><td>' . htmlspecialchars($row['number_of_occupants']) . '</td></tr>
+<tr><td><b>Nature of Business</b></td><td>' . htmlspecialchars($row['nature_of_business']) . '</td></tr>
+<tr><td><b>Number of Floors</b></td><td>' . htmlspecialchars($row['number_of_floors']) . '</td></tr>
+<tr><td><b>Floor Area</b></td><td>' . htmlspecialchars($row['floor_area']) . '</td></tr>
+<tr><td><b>Classification of Hazards</b></td><td>' . htmlspecialchars($row['classification_of_hazards']) . '</td></tr>
+<tr><td><b>Building Construction</b></td><td>' . htmlspecialchars($row['building_construction']) . '</td></tr>
+<tr><td><b>Possible Problems during Fire</b></td><td>' . htmlspecialchars($row['possible_problems']) . '</td></tr>
+<tr><td><b>Hazardous/Flammable Materials</b></td><td>' . htmlspecialchars($row['hazardous_materials']) . '</td></tr>
+<tr><td><b>Inspected By</b></td><td>' . htmlspecialchars($row['inspected_by']) . '</td></tr>
+</table>';
+$pdf->writeHTML($tbl, true, false, false, false, '');
+$pdf->Ln(4);
 
 $attachments = [
     'Application Form' => $row['application_form'],
@@ -82,17 +109,13 @@ $attachments = [
     'Occupancy Permit' => $row['occupancy_permit'],
     'Business Permit' => $row['business_permit'],
 ];
-function importAllPdfPages($pdf, $filePath, $title) {
+function importAllPdfPages($pdf, $filePath)
+{
     try {
         if (file_exists($filePath) && strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'pdf') {
             $pageCount = $pdf->setSourceFile($filePath);
             for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
                 $pdf->AddPage();
-                $pdf->SetFont('helvetica', 'B', 14);
-                // Only show the title on the first page
-                if ($pageNo === 1) {
-                    $pdf->Cell(0, 10, $title, 0, 1, 'L');
-                }
                 $templateId = $pdf->importPage($pageNo);
                 $pdf->useTemplate($templateId);
             }
@@ -115,7 +138,7 @@ foreach ($attachments as $title => $filePath) {
             $pdf->Image($filePath, '', '', 120, 90, '', '', 'T', true);
             $pdf->Ln(95);
         } elseif ($ext === 'pdf') {
-            if (!importAllPdfPages($pdf, $filePath, $title)) {
+            if (!importAllPdfPages($pdf, $filePath)) {
                 $pdf->AddPage();
                 $pdf->SetFont('helvetica', 'B', 14);
                 $pdf->Cell(0, 10, $title, 0, 1, 'L');

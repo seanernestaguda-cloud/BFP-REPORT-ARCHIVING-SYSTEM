@@ -7,7 +7,7 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-require_once('../vendor/tecnickcom/tcpdf/tcpdf.php'); 
+require_once('../vendor/tecnickcom/tcpdf/tcpdf.php');
 require_once('../FPDF/vendor/autoload.php'); // Ensure FPDI autoload is also included
 
 
@@ -40,52 +40,96 @@ $log_stmt->execute();
 $log_stmt->close();
 
 
-// Create a new PDF document using TCPDF with FPDI extension
-$pdf = new PdfWithFpdi();
+
+// Custom Header and Footer class
+class CustomPDF extends PdfWithFpdi
+{
+    public function Header()
+    {
+        // Logo (optional, update path if you have a logo)
+        $logoPath = '../images/logo.png'; // Change path if needed
+        if (file_exists($logoPath)) {
+            $this->Image($logoPath, 15, 10, 20, 20);
+        }
+        $this->SetFont('helvetica', 'B', 16);
+        $this->Cell(0, 10, 'BUREAU OF FIRE PROTECTION', 0, 1, 'C');
+        $this->SetFont('helvetica', '', 12);
+        $this->Cell(0, 8, 'Fire Incident Report', 0, 1, 'C');
+        $this->Ln(2);
+    }
+    public function Footer()
+    {
+        $this->SetY(-15);
+        $this->SetFont('helvetica', 'I', 9);
+        $this->Cell(0, 10, 'Page ' . $this->getAliasNumPage() . ' of ' . $this->getAliasNbPages(), 0, 0, 'C');
+    }
+}
+
+$pdf = new CustomPDF('P', 'mm', 'LEGAL');
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('Bureau of Fire Protection');
 $pdf->SetTitle($report['report_title']);
-$pdf->SetMargins(15, 15, 15);
+$pdf->SetMargins(15, 35, 15); // Top margin increased for header
 $pdf->AddPage();
 
-// Set header
-$pdf->SetFont('helvetica', 'B', 20);
-$pdf->Cell(0, 10, 'Fire Incident Report', 0, 1, 'C');
+// Section: Report Title
+$pdf->SetFont('helvetica', 'B', 15);
+$pdf->Cell(0, 12, strtoupper($report['report_title']), 0, 1, 'C');
+$pdf->Ln(2);
 
-// Add basic information
+// Section: Basic Information Table
 $pdf->SetFont('helvetica', '', 12);
-$html = <<<EOD
-<h3>{$report['report_title']}</h3>
-<p><strong>Reported By:</strong> {$report['caller_name']}</p>
-<p><strong>Responding Team:</strong> {$report['responding_team']}</p>
-<h4> Fire Location </h4>
-<hr>
-<p><strong>Establishment Name:</strong> {$report['establishment']}</p>
-<p><strong>Location:</strong> {$report['street']}, {$report['purok']}, {$report['fire_location']}</p>
-<h4> Time and Date </h4>
-<hr>
-<p><strong>Date and Time Reported:</strong> {$report['incident_date']}</p>
-<p><strong>Time of Arrival:</strong> {$report['arrival_time']}</p>
-<p><strong>Time of Fireout:</strong> {$report['fireout_time']}</p>
-<h4> Injured/Casualties </h4>
-<hr>
-<p><strong>Casualties (Civilians):</strong><br> {$report['victims']}</p>
-<p><strong>Casualties (Firefighters):</strong><br> {$report['firefighters']}</p>
+$tbl = '<table border="1" cellpadding="4">
+<tr><td width="35%"><b>Reported By</b></td><td width="65%">' . htmlspecialchars($report['caller_name']) . '</td></tr>
+<tr><td><b>Responding Team</b></td><td>' . htmlspecialchars($report['responding_team']) . '</td></tr>
+<tr><td><b>Establishment Name</b></td><td>' . htmlspecialchars($report['establishment']) . '</td></tr>
+<tr><td><b>Location</b></td><td>' . htmlspecialchars($report['street']) . ', ' . htmlspecialchars($report['purok']) . ', ' . htmlspecialchars($report['fire_location']) . '</td></tr>
+</table>';
+$pdf->writeHTML($tbl, true, false, false, false, '');
+$pdf->Ln(4);
 
-<p><strong>Estimated Damage to Property:</strong> PHP {$report['property_damage']}</p>
-<p><strong>Alarm Status:</strong> {$report['alarm_status']}</p>
-<p><strong>Type of Occupancy:</strong> {$report['occupancy_type']}</p>
-<p><strong>Cause of Fire:</strong> {$report['fire_types']}</p>
+// Section: Time and Date Table
+$pdf->SetFont('helvetica', 'B', 13);
+$pdf->Cell(0, 8, 'Time and Date', 0, 1, 'L');
+$pdf->SetFont('helvetica', '', 12);
+$tbl2 = '<table border="1" cellpadding="4">
+<tr><td width="35%"><b>Date and Time Reported</b></td><td width="65%">' . htmlspecialchars($report['incident_date']) . '</td></tr>
+<tr><td><b>Time of Arrival</b></td><td>' . htmlspecialchars($report['arrival_time']) . '</td></tr>
+<tr><td><b>Time of Fireout</b></td><td>' . htmlspecialchars($report['fireout_time']) . '</td></tr>
+</table>';
+$pdf->writeHTML($tbl2, true, false, false, false, '');
+$pdf->Ln(4);
 
-EOD;
-$pdf->writeHTML($html, true, false, true, false, '');
+// Section: Injured/Casualties Table
+$pdf->SetFont('helvetica', 'B', 13);
+$pdf->Cell(0, 8, 'Injured / Casualties', 0, 1, 'L');
+$pdf->SetFont('helvetica', '', 12);
+$tbl3 = '<table border="1" cellpadding="4">
+<tr><td width="35%"><b>Casualties (Civilians)</b></td><td width="65%">' . htmlspecialchars($report['victims']) . '</td></tr>
+<tr><td><b>Casualties (Firefighters)</b></td><td>' . htmlspecialchars($report['firefighters']) . '</td></tr>
+</table>';
+$pdf->writeHTML($tbl3, true, false, false, false, '');
+$pdf->Ln(4);
 
+// Section: Other Details Table
+$pdf->SetFont('helvetica', 'B', 13);
+$pdf->Cell(0, 8, 'Other Details', 0, 1, 'L');
+$pdf->SetFont('helvetica', '', 12);
+$tbl4 = '<table border="1" cellpadding="4">
+<tr><td width="35%"><b>Estimated Damage to Property</b></td><td width="65%">PHP ' . htmlspecialchars($report['property_damage']) . '</td></tr>
+<tr><td><b>Alarm Status</b></td><td>' . htmlspecialchars($report['alarm_status']) . '</td></tr>
+<tr><td><b>Type of Occupancy</b></td><td>' . htmlspecialchars($report['occupancy_type']) . '</td></tr>
+<tr><td><b>Cause of Fire</b></td><td>' . htmlspecialchars($report['fire_types']) . '</td></tr>
+</table>';
+$pdf->writeHTML($tbl4, true, false, false, false, '');
+$pdf->Ln(4);
+
+// Section: Documentation Photos
 if (!empty($report['documentation_photos'])) {
     $pdf->AddPage();
     $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 10, 'Documentation Photos', 0, 1, 'L');
+    $pdf->Cell(0, 10, 'Photos of the Scene', 0, 1, 'L');
     $pdf->SetFont('helvetica', '', 12);
-
     $photos = explode(',', $report['documentation_photos']);
     foreach ($photos as $photo) {
         if (file_exists($photo)) {
@@ -95,8 +139,10 @@ if (!empty($report['documentation_photos'])) {
     }
 }
 
+
 // Function to import PDF pages using FPDI
-function importPdfPages($pdf, $filePath, $useCurrentPageForFirst = false) {
+function importPdfPages($pdf, $filePath, $useCurrentPageForFirst = false)
+{
     if (file_exists($filePath) && strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'pdf') {
         $pageCount = $pdf->setSourceFile($filePath);
         for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
@@ -122,20 +168,19 @@ $reports = [
 foreach ($reports as $title => $filePath) {
     if (!empty($filePath) && file_exists($filePath)) {
         $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-  if ($ext === 'pdf') {
-    $pdf->AddPage();
-    $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 10, $title, 0, 1, 'L');
-    $pdf->SetFont('helvetica', '', 12);
-    importPdfPages($pdf, $filePath, true); // Use current page for first imported page
-} else {
-    $pdf->AddPage();
-    $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 10, $title, 0, 1, 'L');
-    $pdf->SetFont('helvetica', '', 12);
+        // Disable header/footer for these pages
+        $pdf->setPrintHeader(false);
+        $pdf->setPrintFooter(false);
+        if ($ext === 'pdf') {
+            $pdf->AddPage();
+            $pdf->SetFont('helvetica', '', 12);
+            importPdfPages($pdf, $filePath, true); // Use current page for first imported page
+        } else {
+            $pdf->AddPage();
+            $pdf->SetFont('helvetica', '', 12);
 
             if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                $pdf->Image($filePath, '', '', 120, 90, '', '', 'T', true);
+                $pdf->Image($filePath, 15, 40, 120, 90, '', '', 'T', true);
                 $pdf->Ln(95);
             } elseif (in_array($ext, ['txt', 'csv'])) {
                 $content = file_get_contents($filePath);
@@ -144,6 +189,9 @@ foreach ($reports as $title => $filePath) {
                 $pdf->Write(0, "Attached file: " . basename($filePath) . " (Cannot display this file type in PDF)", '', 0, '', false);
             }
         }
+        // Re-enable header/footer for next pages
+        $pdf->setPrintHeader(true);
+        $pdf->setPrintFooter(true);
     } else {
         $pdf->AddPage();
         $pdf->Write(0, "No $title available or file not found.", '', 0, '', false);

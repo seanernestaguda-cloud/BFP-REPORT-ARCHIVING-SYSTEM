@@ -537,60 +537,67 @@ $conn->close();
                         <?php
                         if ($result && $result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
-                                $fireType = strtolower($row['fire_types']);
+                                $fireTypeRaw = $row['fire_types'];
+                                $fireType = strtolower($fireTypeRaw);
                                 $icon = 'fa-fire';
-                                switch (true) {
-                                    case strpos($fireType, 'electrical connection') !== false:
-                                    case strpos($fireType, 'electrical appliances') !== false:
-                                    case strpos($fireType, 'electrical machineries') !== false:
-                                        $icon = 'fa-bolt'; // electrical
-                                        break;
-                                    case strpos($fireType, 'spontaneous combustion') !== false:
-                                        $icon = 'fa-flask'; // chemical/combustion
-                                        break;
-                                    case strpos($fireType, 'open flame') !== false:
-                                        $icon = 'fa-fire-flame-curved';
-                                        break;
-                                    case strpos($fireType, 'lpg explosion') !== false:
-                                    case strpos($fireType, 'chemicals/lpg leaking') !== false:
-                                        $icon = 'fa-gas-pump';
-                                        break;
-                                    case strpos($fireType, 'lighted cigarette') !== false:
-                                        $icon = 'fa-smoking';
-                                        break;
-                                    case strpos($fireType, 'pyrotechnics') !== false:
-                                        $icon = 'fa-firecracker'; // not in FA, fallback
-                                        break;
-                                    case strpos($fireType, 'matchstick') !== false:
-                                    case strpos($fireType, 'lighter') !== false:
-                                        $icon = 'fa-fire';
-                                        break;
-                                    case strpos($fireType, 'incendiary device') !== false:
-                                    case strpos($fireType, 'ignited flammable liquids') !== false:
-                                        $icon = 'fa-bomb';
-                                        break;
-                                    case strpos($fireType, 'lightning') !== false:
-                                        $icon = 'fa-cloud-bolt';
-                                        break;
-                                    case strpos($fireType, 'mechanical collision') !== false:
-                                        $icon = 'fa-gears';
-                                        break;
-                                    case strpos($fireType, 'airplane crash') !== false:
-                                        $icon = 'fa-plane';
-                                        break;
-                                    case strpos($fireType, 'bomb explosion') !== false:
-                                        $icon = 'fa-bomb';
-                                        break;
-                                    case strpos($fireType, 'others') !== false:
-                                        $icon = 'fa-ellipsis-h';
-                                        break;
-                                    default:
-                                        $icon = 'fa-fire';
+                                $displayType = htmlspecialchars($fireTypeRaw);
+                                if (is_null($fireTypeRaw) || trim($fireTypeRaw) === '') {
+                                    $icon = 'fa-search';
+                                    $displayType = 'Under Investigation';
+                                } else {
+                                    switch (true) {
+                                        case strpos($fireType, 'electrical connection') !== false:
+                                        case strpos($fireType, 'electrical appliances') !== false:
+                                        case strpos($fireType, 'electrical machineries') !== false:
+                                            $icon = 'fa-bolt'; // electrical
+                                            break;
+                                        case strpos($fireType, 'spontaneous combustion') !== false:
+                                            $icon = 'fa-flask'; // chemical/combustion
+                                            break;
+                                        case strpos($fireType, 'open flame') !== false:
+                                            $icon = 'fa-fire-flame-curved';
+                                            break;
+                                        case strpos($fireType, 'lpg explosion') !== false:
+                                        case strpos($fireType, 'chemicals/lpg leaking') !== false:
+                                            $icon = 'fa-gas-pump';
+                                            break;
+                                        case strpos($fireType, 'lighted cigarette') !== false:
+                                            $icon = 'fa-smoking';
+                                            break;
+                                        case strpos($fireType, 'pyrotechnics') !== false:
+                                            $icon = 'fa-firecracker'; // not in FA, fallback
+                                            break;
+                                        case strpos($fireType, 'matchstick') !== false:
+                                        case strpos($fireType, 'lighter') !== false:
+                                            $icon = 'fa-fire';
+                                            break;
+                                        case strpos($fireType, 'incendiary device') !== false:
+                                        case strpos($fireType, 'ignited flammable liquids') !== false:
+                                            $icon = 'fa-bomb';
+                                            break;
+                                        case strpos($fireType, 'lightning') !== false:
+                                            $icon = 'fa-cloud-bolt';
+                                            break;
+                                        case strpos($fireType, 'mechanical collision') !== false:
+                                            $icon = 'fa-gears';
+                                            break;
+                                        case strpos($fireType, 'airplane crash') !== false:
+                                            $icon = 'fa-plane';
+                                            break;
+                                        case strpos($fireType, 'bomb explosion') !== false:
+                                            $icon = 'fa-bomb';
+                                            break;
+                                        case strpos($fireType, 'others') !== false:
+                                            $icon = 'fa-ellipsis-h';
+                                            break;
+                                        default:
+                                            $icon = 'fa-fire';
+                                    }
                                 }
                         ?>
                                 <div class="dashboard-card">
                                     <i class="fa-solid <?php echo $icon; ?>"></i>
-                                    <h2><?php echo htmlspecialchars($row['fire_types']); ?></h2>
+                                    <h2><?php echo $displayType; ?></h2>
                                     <p class="card-number"><?php echo $row['fire_count']; ?> incident(s)</p>
                                 </div>
                         <?php

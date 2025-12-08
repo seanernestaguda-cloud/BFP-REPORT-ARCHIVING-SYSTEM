@@ -21,19 +21,28 @@ if ($where) {
 
 $stmt->execute();
 $result = $stmt->get_result();
+$rows = [];
+while ($barangay = $result->fetch_assoc()) {
+    $rows[] = $barangay;
+}
 
-while ($barangay = $result->fetch_assoc()): ?>
-    <tr>
-        <td><?php echo htmlspecialchars($barangay['barangay_name']); ?></td>
-        <td class="action-button-container">
-            <form action="barangay_list.php" method="POST" style="display:flex;">
-                <input type="hidden" name="barangay_id" value="<?php echo $barangay['barangay_id']; ?>">
-                <button type="button" onclick="confirmDelete(<?php echo $barangay['barangay_id']; ?>)" class="delete-btn"><i class="fa-solid fa-trash"></i></button>
-                <button type="button" onclick="openEditModal(<?php echo $barangay['barangay_id']; ?>, '<?php echo htmlspecialchars($barangay['barangay_name'], ENT_QUOTES); ?>')" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>
-            </form>
-        </td>
-    </tr>
-<?php endwhile;
+if (count($rows) === 0) {
+    echo '<tr><td colspan="2" style="text-align:center;">No records found.</td></tr>';
+} else {
+    foreach ($rows as $barangay) {
+        $js_barangay_name = htmlspecialchars($barangay['barangay_name'], ENT_QUOTES);
+        echo '<tr>';
+        echo '<td>' . htmlspecialchars($barangay['barangay_name']) . '</td>';
+        echo '<td class="action-button-container">';
+        echo '<form action="barangay_list.php" method="POST" style="display:flex;">';
+        echo '<input type="hidden" name="barangay_id" value="' . $barangay['barangay_id'] . '">';
+        echo '<button type="button" onclick="confirmDelete(' . $barangay['barangay_id'] . ')" class="delete-btn"><i class="fa-solid fa-trash"></i></button>';
+        echo '<button type="button" onclick="openEditModal(' . $barangay['barangay_id'] . ', \'" . $js_barangay_name . "\')" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>';
+        echo '</form>';
+        echo '</td>';
+        echo '</tr>';
+    }
+}
 $stmt->close();
 $conn->close();
 ?>

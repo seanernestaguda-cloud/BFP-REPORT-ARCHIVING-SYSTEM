@@ -22,20 +22,30 @@ if ($where) {
 
 $stmt->execute();
 $result = $stmt->get_result();
+$rows = [];
+while ($fire_type = $result->fetch_assoc()) {
+    $rows[] = $fire_type;
+}
 
-while ($fire_type = $result->fetch_assoc()): ?>
-<tr>
-    <td><?php echo htmlspecialchars($fire_type['fire_types']); ?></td>
-    <td><?php echo htmlspecialchars($fire_type['description']); ?></td>
-    <td class="action-button-container">
-        <form action="fire_types.php" method="POST" style="display:flex;">
-            <input type="hidden" name="fire_types_id" value="<?php echo $fire_type['fire_types_id']; ?>">
-            <button type="button" onclick="confirmDelete(<?php echo $fire_type['fire_types_id']; ?>)" class="delete-btn"><i class="fa-solid fa-trash"></i></button>
-            <button type="button" onclick="openEditModal(<?php echo $fire_type['fire_types_id']; ?>, '<?php echo htmlspecialchars($fire_type['fire_types'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($fire_type['description'], ENT_QUOTES); ?>')" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>
-        </form>
-    </td>
-</tr>
-<?php endwhile;
+if (count($rows) === 0) {
+    echo '<tr><td colspan="3" style="text-align:center;">No records found.</td></tr>';
+} else {
+    foreach ($rows as $fire_type) {
+        echo '<tr>';
+        echo '<td>' . htmlspecialchars($fire_type['fire_types']) . '</td>';
+        echo '<td>' . htmlspecialchars($fire_type['description']) . '</td>';
+        echo '<td class="action-button-container">';
+        echo '<form action="fire_types.php" method="POST" style="display:flex;">';
+        echo '<input type="hidden" name="fire_types_id" value="' . $fire_type['fire_types_id'] . '">';
+        echo '<button type="button" onclick="confirmDelete(' . $fire_type['fire_types_id'] . ')" class="delete-btn"><i class="fa-solid fa-trash"></i></button>';
+        $js_fire_types = htmlspecialchars($fire_type['fire_types'], ENT_QUOTES);
+        $js_description = htmlspecialchars($fire_type['description'], ENT_QUOTES);
+        echo '<button type="button" onclick="openEditModal(' . $fire_type['fire_types_id'] . ', \'" . $js_fire_types . "\', \'" . $js_description . "\')" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>';
+        echo '</form>';
+        echo '</td>';
+        echo '</tr>';
+    }
+}
 $stmt->close();
 $conn->close();
 ?>

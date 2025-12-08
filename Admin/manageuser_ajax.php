@@ -2,27 +2,49 @@
 session_start();
 include 'connection.php';
 
+// Pagination variables
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $search = trim($search);
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$limit = 10; // Number of records per page
+$offset = ($page - 1) * $limit;
 
+// Count total records for pagination
+$count_sql = "SELECT COUNT(*) as total FROM users WHERE 
+    CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ? OR
+    username LIKE ? OR
+    user_type LIKE ? OR
+    department LIKE ? OR
+    status LIKE ?";
+$param = '%' . $search . '%';
+$count_stmt = $conn->prepare($count_sql);
+$count_stmt->bind_param('sssss', $param, $param, $param, $param, $param);
+$count_stmt->execute();
+$count_result = $count_stmt->get_result();
+$total_records = 0;
+if ($count_result && $row = $count_result->fetch_assoc()) {
+    $total_records = $row['total'];
+}
+$count_stmt->close();
+
+// Fetch paginated records
 $sql = "SELECT * FROM users WHERE 
     CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ? OR
     username LIKE ? OR
     user_type LIKE ? OR
     department LIKE ? OR
     status LIKE ?
-    ORDER BY id DESC";
-
-$param = '%' . $search . '%';
+    ORDER BY id DESC
+    LIMIT ? OFFSET ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param('sssss', $param, $param, $param, $param, $param);
+$stmt->bind_param('ssssssi', $param, $param, $param, $param, $param, $limit, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $avatar = $row['avatar'] ?: '../avatars/default_avatar.png';
-        $fullName = htmlspecialchars($row['first_name'] . ' ' . $row['middle_name'] .' '. $row['last_name']);
+        $fullName = htmlspecialchars($row['first_name'] . ' ' . $row['middle_name'] . ' ' . $row['last_name']);
         $username = htmlspecialchars($row['username']);
         $user_type = htmlspecialchars($row['user_type']);
         $department = htmlspecialchars($row['department']);
@@ -58,6 +80,19 @@ if ($result && $result->num_rows > 0) {
     }
 } else {
     echo "<tr><td colspan='7'>No users found.</td></tr>";
+}
+
+// Output pagination if not searching
+if ($search === '') {
+    $total_pages = ceil($total_records / $limit);
+    if ($total_pages > 1) {
+        echo "<tr><td colspan='7'><div class='pagination'>";
+        for ($i = 1; $i <= $total_pages; $i++) {
+            $active = ($i == $page) ? 'active' : '';
+            echo "<a href='#' class='page-link $active' data-page='$i'>$i</a> ";
+        }
+        echo "</div></td></tr>";
+    }
 }
 
 $stmt->close();

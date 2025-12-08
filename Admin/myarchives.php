@@ -116,7 +116,7 @@ $stmt->close();
                         <div style="border-radius: 14px; padding: 36px 48px; box-shadow: 0 2px 12px rgba(211,84,0,0.10); display: flex; flex-direction: column; align-items: center; background: #fff7f0; transition: transform 0.2s, box-shadow 0.2s;">
                             <i class="fa-solid fa-fire-flame-curved" style="font-size: 2.7rem; color: #d35400; margin-bottom: 14px;"></i>
                             <span style="font-size: 1.15rem; color: #d35400; font-weight: 600; margin-bottom: 6px;">Fire Incident Reports</span>
-                            <span style="font-size: 0.95rem; color: #555; text-align: center;">View and manage all fire incident reports.</span>
+                            <span style="font-size: 0.95rem; color: #555; text-align: center;">View and manage your fire incident reports.</span>
                         </div>
                     </a>
                     <a href="my_fire_safety_reports.php" style="text-decoration: none;">

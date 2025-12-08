@@ -195,9 +195,12 @@ mysqli_close($conn);
                     <li class="archive-text">
                         <p>Archives</p>
                     </li>
-                    <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                    <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
-                    <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
+                    <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire
+                            </span></a></li>
+                    <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List
+                            </span></a></li>
+                    <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a>
+                    </li>
                     <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
 
                     <li class="report-dropdown">
@@ -207,14 +210,18 @@ mysqli_close($conn);
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                         <ul class="report-dropdown-content">
-                            <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
-                            <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
-                            <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
+                            <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                    Barangay</a></li>
+                            <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                    Month </a></li>
+                            <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year
+                                    to Year Comparison </a></li>
                         </ul>
                     </li>
 
                     <li class="archive-text"><span>Maintenance</span></li>
-                    <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                    <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs
+                            </span></a></li>
                     <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                     <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
                     <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
@@ -231,8 +238,10 @@ mysqli_close($conn);
                     <div class="dropdown">
                         <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
                             <!-- Add avatar image here -->
-                            <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                            <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+                            <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar"
+                                style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                            <p><?php echo htmlspecialchars($_SESSION['username']); ?><i
+                                    class="fa-solid fa-caret-down"></i></p>
                         </a>
                         <div id="profileDropdown" class="dropdown-content">
                             <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
@@ -257,7 +266,8 @@ mysqli_close($conn);
                     <div class="entries-right">
                         <div class="search-input-container">
                             <form method="GET" style="display:inline;" id="searchForm" onsubmit="return false;">
-                                <input type="search" name="search" class="search-input" placeholder="Search..." autocomplete="off">
+                                <input type="search" name="search" class="search-input" placeholder="Search..."
+                                    autocomplete="off">
                                 <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
                             </form>
                         </div>
@@ -278,9 +288,14 @@ mysqli_close($conn);
                                     <td><?php echo htmlspecialchars($fire_type['description']); ?></td>
                                     <td class="action-button-container">
                                         <form action="fire_types.php" method="POST" style="display:flex;">
-                                            <input type="hidden" name="fire_types_id" value="<?php echo $fire_type['fire_types_id']; ?>">
-                                            <button type="button" onclick="confirmDelete(<?php echo $fire_type['fire_types_id']; ?>)" class="delete-btn"><i class="fa-solid fa-trash"></i></button>
-                                            <button type="button" onclick="openEditModal(<?php echo $fire_type['fire_types_id']; ?>, '<?php echo htmlspecialchars($fire_type['fire_types']); ?>', '<?php echo htmlspecialchars($fire_type['description']); ?>')" class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+                                            <input type="hidden" name="fire_types_id"
+                                                value="<?php echo $fire_type['fire_types_id']; ?>">
+                                            <button type="button"
+                                                onclick="confirmDelete(<?php echo $fire_type['fire_types_id']; ?>)"
+                                                class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+                                            <button type="button"
+                                                onclick="openEditModal(<?php echo $fire_type['fire_types_id']; ?>, '<?php echo htmlspecialchars($fire_type['fire_types']); ?>', '<?php echo htmlspecialchars($fire_type['description']); ?>')"
+                                                class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>
                                         </form>
                                     </td>
                                 </tr>
@@ -288,27 +303,28 @@ mysqli_close($conn);
                         </tbody>
                     </table>
                     <?php if ($total_pages > 1): ?>
-                        <div class="pagination" style="margin: 20px 0; text-align: center;">
+                        <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                             <?php if ($page > 1): ?>
                                 <a href="?<?php
-                                            $params = $_GET;
-                                            $params['page'] = $page - 1;
-                                            echo http_build_query($params);
-                                            ?>" class="pagination-btn">&laquo; Prev</a>
+                                $params = $_GET;
+                                $params['page'] = $page - 1;
+                                echo http_build_query($params);
+                                ?>" class="pagination-btn">&laquo; Prev</a>
                             <?php endif; ?>
-                            <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                                 <a href="?<?php
-                                            $params = $_GET;
-                                            $params['page'] = $i;
-                                            echo http_build_query($params);
-                                            ?>" class="pagination-btn<?php if ($i == $page) echo ' active'; ?>"><?php echo $i; ?></a>
+                                $params = $_GET;
+                                $params['page'] = $i;
+                                echo http_build_query($params);
+                                ?>" class="pagination-btn<?php if ($i == $page)
+                                    echo ' active'; ?>"><?php echo $i; ?></a>
                             <?php endfor; ?>
                             <?php if ($page < $total_pages): ?>
                                 <a href="?<?php
-                                            $params = $_GET;
-                                            $params['page'] = $page + 1;
-                                            echo http_build_query($params);
-                                            ?>" class="pagination-btn">Next &raquo;</a>
+                                $params = $_GET;
+                                $params['page'] = $page + 1;
+                                echo http_build_query($params);
+                                ?>" class="pagination-btn">Next &raquo;</a>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -319,10 +335,12 @@ mysqli_close($conn);
                             <h3>Add New Fire Cause</h3>
                             <form id="addFireTypes" method="POST" action="fire_types.php">
                                 <label for="fire_types">Cause of fire:</label>
-                                <input type="text" id="fire_types" name="fire_types" placeholder="Enter Fire Type" required>
+                                <input type="text" id="fire_types" name="fire_types" placeholder="Enter Fire Type"
+                                    required>
 
                                 <label for="description">Description:</label>
-                                <textarea id="description" name="description" placeholder="Enter Description" required></textarea>
+                                <textarea id="description" name="description" placeholder="Enter Description"
+                                    required></textarea>
 
                                 <button type="submit" class="action-button">Save</button>
                             </form>
@@ -340,7 +358,8 @@ mysqli_close($conn);
                                 <input type="text" id="edit_fire_types" name="fire_types" required>
 
                                 <label for="edit_description">Description:</label>
-                                <textarea id="edit_description" name="description" required rows="10" cols="30"></textarea>
+                                <textarea id="edit_description" name="description" required rows="10"
+                                    cols="30"></textarea>
 
                                 <button type="submit" class="action-btn">Save Changes</button>
                             </form>
@@ -379,34 +398,34 @@ mysqli_close($conn);
                     </div>
 
                     <script>
-                        document.addEventListener('DOMContentLoaded', function() {
+                        document.addEventListener('DOMContentLoaded', function () {
                             // Show Confirm Logout Modal
-                            document.getElementById('logoutLink').addEventListener('click', function(e) {
+                            document.getElementById('logoutLink').addEventListener('click', function (e) {
                                 e.preventDefault();
                                 document.getElementById('logoutModal').style.display = 'flex';
                                 document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
-                            } );
+                            });
 
                             // Handle Confirm Logout
-                            document.getElementById('confirmLogout').addEventListener('click', function() {
+                            document.getElementById('confirmLogout').addEventListener('click', function () {
                                 window.location.href = 'logout.php';
-                            } );
+                            });
 
                             // Handle Cancel Logout
-                            document.getElementById('cancelLogout').addEventListener('click', function() {
+                            document.getElementById('cancelLogout').addEventListener('click', function () {
                                 document.getElementById('logoutModal').style.display = 'none';
-                            } );
-                        } );
+                            });
+                        });
 
-                        window.onclick = function(event) {
+                        window.onclick = function (event) {
                             // ...existing code...
                             const logoutModal = document.getElementById('logoutModal');
                             if (event.target === logoutModal) {
                                 logoutModal.style.display = 'none';
                             }
-                        } ;
+                        };
                         // Close modal when clicking outside of it
-                        window.onclick = function(event) {
+                        window.onclick = function (event) {
                             const modal = document.getElementById('addFireTypesModal');
                             const editModal = document.getElementById('editFireTypesModal');
                             const deleteModal = document.getElementById('confirmDeleteModal');
@@ -414,7 +433,7 @@ mysqli_close($conn);
                             if (event.target === modal || event.target === editModal || event.target === deleteModal) {
                                 closeModal();
                             }
-                        } ;
+                        };
 
                         function openEditModal(fireTypesId, fireTypesName, fireTypesDescription) {
                             document.getElementById('edit_fire_types_id').value = fireTypesId;
@@ -451,7 +470,7 @@ mysqli_close($conn);
                             const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                             toggles.forEach(toggle => {
-                                toggle.addEventListener('click', function(event) {
+                                toggle.addEventListener('click', function (event) {
                                     event.preventDefault();
                                     const dropdown = this.closest('.report-dropdown');
                                     dropdown.classList.toggle('show');
@@ -461,19 +480,19 @@ mysqli_close($conn);
                                         if (item !== dropdown) {
                                             item.classList.remove('show');
                                         }
-                                    } );
-                                } );
-                            } );
+                                    });
+                                });
+                            });
 
                             // Close dropdown when clicking outside
                             window.addEventListener('click', event => {
                                 if (!event.target.closest('.report-dropdown')) {
                                     document.querySelectorAll('.report-dropdown').forEach(dropdown => {
                                         dropdown.classList.remove('show');
-                                    } );
+                                    });
                                 }
-                            } );
-                        } );
+                            });
+                        });
 
                         document.addEventListener('DOMContentLoaded', () => {
                             // Check if there's a session message and show modal if it's a success
@@ -487,7 +506,7 @@ mysqli_close($conn);
                                 <?php unset($_SESSION['message']); ?>
                                 <?php unset($_SESSION['message_type']); ?>
                             }
-                        } );
+                        });
 
                         // Open success message modal
                         function openSuccessModal() {
@@ -496,7 +515,7 @@ mysqli_close($conn);
                             // Automatically close the modal after 2 seconds
                             setTimeout(() => {
                                 closeSuccessModal();
-                            } , 2000); // 2000 milliseconds = 2 seconds
+                            }, 2000); // 2000 milliseconds = 2 seconds
                         }
 
                         // Close success message modal
@@ -504,25 +523,34 @@ mysqli_close($conn);
                             document.getElementById('successModal').style.display = 'none';
                         }
 
-                        document.addEventListener('DOMContentLoaded', function() {
+                        document.addEventListener('DOMContentLoaded', function () {
                             const searchInput = document.querySelector('.search-input');
                             const tableBody = document.getElementById('fireTypesTableBody');
+                            const paginationContainer = document.getElementById('paginationContainer');
 
                             if (searchInput && tableBody) {
                                 let searchTimeout;
-                                searchInput.addEventListener('input', function() {
+                                searchInput.addEventListener('input', function () {
                                     clearTimeout(searchTimeout);
-                                    searchTimeout = setTimeout(function() {
+                                    searchTimeout = setTimeout(function () {
                                         const query = searchInput.value;
-                                        fetch('fire_types_ajax.php?search=' + encodeURIComponent(query))
-                                            .then(response => response.text())
-                                            .then(html => {
-                                                tableBody.innerHTML = html;
-                                            } );
-                                    } , 200); // Debounce for 200ms
-                                } );
+                                        if (query.trim() === '') {
+                                            // If search is cleared, reload the page to restore pagination
+                                            window.location.href = 'fire_types.php';
+                                        } else {
+                                            fetch('fire_types_ajax.php?search=' + encodeURIComponent(query))
+                                                .then(response => response.text())
+                                                .then(html => {
+                                                    tableBody.innerHTML = html;
+                                                    if (paginationContainer) {
+                                                        paginationContainer.style.display = 'none';
+                                                    }
+                                                });
+                                        }
+                                    }, 200); // Debounce for 200ms
+                                });
                             }
-                        } );
+                        });
                     </script>
 
 </body>

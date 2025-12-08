@@ -558,7 +558,10 @@ mysqli_close($conn);
 
                 <section class="archive-section">
                     <h3>Fire Incident Reports</h3>
-                    <p> List of Fire Incident Reports</p>
+                    <p>List of Fire Incident Reports</p>
+                    <br>
+                    <p id="totalReportsCount" style="font-weight:bold; color:#003D73; margin-bottom:10px;">Total
+                        Reports: <?php echo number_format($total_reports); ?></p>
                     <!-- <hr class="section-separator full-bleed">
             <div class="top-controls">
             <button onclick="window.location.href='create_fire_incident_report.php'" class="create-new-button">
@@ -747,7 +750,7 @@ mysqli_close($conn);
                     <?php
                     $total_pages = ceil($total_reports / $per_page);
                     if ($total_pages > 1): ?>
-                        <div class="pagination" style="margin: 20px 0; text-align: center;">
+                        <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                             <?php if ($page > 1): ?>
                                 <a href="?<?php
                                 $params = $_GET;
@@ -971,20 +974,25 @@ mysqli_close($conn);
             document.addEventListener('DOMContentLoaded', function () {
                 const searchInput = document.querySelector('.search-input');
                 const reportsTableBody = document.getElementById('reportsTableBody');
+                const totalReportsCount = document.getElementById('totalReportsCount');
+                const paginationContainer = document.getElementById('paginationContainer');
 
-                if (searchInput && reportsTableBody) {
+                if (searchInput && reportsTableBody && totalReportsCount) {
                     let searchTimeout;
                     searchInput.addEventListener('input', function () {
                         clearTimeout(searchTimeout);
                         searchTimeout = setTimeout(function () {
                             const query = searchInput.value;
                             if (query === '') {
+                                if (paginationContainer) paginationContainer.style.display = '';
                                 window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
                             } else {
-                                fetch(`fire_incident_report_ajax.php?search=${encodeURIComponent(query)}`)
-                                    .then(response => response.text())
-                                    .then(html => {
-                                        reportsTableBody.innerHTML = html;
+                                if (paginationContainer) paginationContainer.style.display = 'none';
+                                fetch(`fire_incident_report_ajax.php?search=${encodeURIComponent(query)}&count=1`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        reportsTableBody.innerHTML = data.html;
+                                        totalReportsCount.textContent = `Total Reports: ${data.count}`;
                                         // If no <tr> elements are present, show 'No reports found.'
                                         if (!reportsTableBody.querySelector('tr')) {
                                             const noReportsRow = document.createElement('tr');
@@ -995,12 +1003,12 @@ mysqli_close($conn);
                             }
                         }, 0);
                     });
-                        // Prevent Enter key from submitting the form
-                        searchInput.addEventListener('keydown', function (e) {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                            }
-                        });
+                    // Prevent Enter key from submitting the form
+                    searchInput.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                        }
+                    });
                 }
             });
 

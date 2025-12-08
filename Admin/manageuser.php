@@ -319,8 +319,10 @@ $result = $stmt->get_result();
                 <p> List of Users </p>
                 <hr class="section-separator full-bleed">
                 <div class="top-controls" style="display: flex; gap: 10px;">
-                    <button onclick="window.location.href='create_manager.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i>Create New</button>
-                    <button onclick="window.location.href='export_users_excel.php'" class="create-new-button export-excel">
+                    <button onclick="window.location.href='create_manager.php'" class="create-new-button"><i
+                            class="fa-solid fa-circle-plus"></i>Create New</button>
+                    <button onclick="window.location.href='export_users_excel.php'"
+                        class="create-new-button export-excel">
                         <i class="fa-solid fa-file-excel"></i> .csv
                     </button>
                 </div>
@@ -350,6 +352,28 @@ $result = $stmt->get_result();
                     </thead>
                     <tbody id="usersTableBody">
                         <?php
+                        // Pagination logic
+                        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+                        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+                        $limit = 10;
+                        $offset = ($page - 1) * $limit;
+                        $param = '%' . $search . '%';
+                        $where = "CONCAT(first_name, ' ', middle_name, ' ', last_name) LIKE ? OR username LIKE ? OR user_type LIKE ? OR department LIKE ? OR status LIKE ?";
+                        $count_stmt = $conn->prepare("SELECT COUNT(*) as total FROM users WHERE $where");
+                        $count_stmt->bind_param('sssss', $param, $param, $param, $param, $param);
+                        $count_stmt->execute();
+                        $count_result = $count_stmt->get_result();
+                        $total_records = 0;
+                        if ($count_result && $row = $count_result->fetch_assoc()) {
+                            $total_records = $row['total'];
+                        }
+                        $count_stmt->close();
+
+                        $stmt = $conn->prepare("SELECT * FROM users WHERE $where ORDER BY id DESC LIMIT ? OFFSET ?");
+                        $stmt->bind_param('ssssssi', $param, $param, $param, $param, $param, $limit, $offset);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
+
                         if ($result && mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $avatar = $row['avatar'] ?: '../avatars/default_avatar.png';
@@ -361,7 +385,6 @@ $result = $stmt->get_result();
                                 $status = htmlspecialchars($row['status']);
                                 $userId = htmlspecialchars($row['id']);
 
-                                // (Removed raw HTML output, only using PHP echo for table rows)
                                 echo '<tr>';
                                 echo '<td>' . $id . '</td>';
                                 echo '<td><img src="../avatars/' . $avatar . '" alt="Avatar" width="40" height="40" style="border-radius:100%;"></td>';
@@ -393,9 +416,25 @@ $result = $stmt->get_result();
                                 echo '</tr>';
                             }
                         } else {
-                            echo "<tr><td colspan='7'>No users found.</td></tr>";
+                            echo "<tr><td colspan='8'>No users found.</td></tr>";
                         }
+                        $stmt->close();
                         ?>
+                    </tbody>
+                    <?php
+                    // Pagination controls (hide if searching)
+                    if ($search === '') {
+                        $total_pages = ceil($total_records / $limit);
+                        if ($total_pages > 1) {
+                            echo '<tr><td colspan="8"><div class="pagination">';
+                            for ($i = 1; $i <= $total_pages; $i++) {
+                                $active = ($i == $page) ? 'active' : '';
+                                echo "<a href='?page=$i' class='page-link $active' data-page='$i'>$i</a> ";
+                            }
+                            echo '</div></td></tr>';
+                        }
+                    }
+                    ?>
                     </tbody>
 
                 </table>
@@ -430,7 +469,7 @@ $result = $stmt->get_result();
         function toggleDropdown(event, dropdownId) {
             event.stopPropagation();
             // Close all other action dropdowns
-            document.querySelectorAll('.action-dropdown-content.show').forEach(function(openDropdown) {
+            document.querySelectorAll('.action-dropdown-content.show').forEach(function (openDropdown) {
                 if (openDropdown.id !== dropdownId) {
                     openDropdown.classList.remove('show');
                 }
@@ -444,9 +483,9 @@ $result = $stmt->get_result();
             }
         }
         // Close all action dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (!event.target.closest('.action-dropdown')) {
-                document.querySelectorAll('.action-dropdown-content.show').forEach(function(openDropdown) {
+                document.querySelectorAll('.action-dropdown-content.show').forEach(function (openDropdown) {
                     openDropdown.classList.remove('show');
                 });
             }
@@ -466,7 +505,7 @@ $result = $stmt->get_result();
         }
 
         // Function to confirm deletion
-        document.getElementById('confirmDelete').addEventListener('click', function() {
+        document.getElementById('confirmDelete').addEventListener('click', function () {
             if (userIdToDelete !== null) {
                 // Perform the deletion (redirect or AJAX request)
                 window.location.href = 'delete_user.php?id=' + userIdToDelete; // Redirect to the delete action
@@ -478,7 +517,7 @@ $result = $stmt->get_result();
             const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
             toggles.forEach(toggle => {
-                toggle.addEventListener('click', function(event) {
+                toggle.addEventListener('click', function (event) {
                     event.preventDefault();
                     const dropdown = this.closest('.report-dropdown');
                     dropdown.classList.toggle('show');
@@ -506,7 +545,7 @@ $result = $stmt->get_result();
             document.getElementById('successMessageModal').style.display = 'none'; // Hide the modal
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
 
@@ -533,23 +572,26 @@ $result = $stmt->get_result();
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.querySelector('.search-input');
             const usersTableBody = document.getElementById('usersTableBody');
+            const paginationDiv = document.querySelector('.pagination');
 
             if (searchInput && usersTableBody) {
                 let searchTimeout;
-                searchInput.addEventListener('input', function() {
+                searchInput.addEventListener('input', function () {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(function() {
+                    searchTimeout = setTimeout(function () {
                         const query = searchInput.value;
                         if (query === '') {
                             window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
+                            if (paginationDiv) paginationDiv.style.display = '';
                         } else {
                             fetch(`manageuser_ajax.php?search=${encodeURIComponent(query)}`)
                                 .then(response => response.text())
                                 .then(html => {
                                     usersTableBody.innerHTML = html;
+                                    if (paginationDiv) paginationDiv.style.display = 'none';
                                 });
                         }
                     }, 0); // instant update
@@ -557,26 +599,26 @@ $result = $stmt->get_result();
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Show Confirm Logout Modal
-            document.getElementById('logoutLink').addEventListener('click', function(e) {
+            document.getElementById('logoutLink').addEventListener('click', function (e) {
                 e.preventDefault();
                 document.getElementById('logoutModal').style.display = 'flex';
                 document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
             });
 
             // Handle Confirm Logout
-            document.getElementById('confirmLogout').addEventListener('click', function() {
+            document.getElementById('confirmLogout').addEventListener('click', function () {
                 window.location.href = 'logout.php';
             });
 
             // Handle Cancel Logout
-            document.getElementById('cancelLogout').addEventListener('click', function() {
+            document.getElementById('cancelLogout').addEventListener('click', function () {
                 document.getElementById('logoutModal').style.display = 'none';
             });
         });
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             // ...existing code...
             const logoutModal = document.getElementById('logoutModal');
             if (event.target === logoutModal) {

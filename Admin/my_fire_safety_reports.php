@@ -66,8 +66,9 @@ if (!empty($_GET['search'])) {
 $where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
 
 $per_page = 10;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) $page = 1;
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+if ($page < 1)
+    $page = 1;
 $offset = ($page - 1) * $per_page;
 
 $count_query = "SELECT COUNT(*) FROM fire_safety_inspection_certificate $where_sql";
@@ -285,8 +286,10 @@ $stmt->close();
                 <li class="archive-text">
                     <p>Archives</p>
                 </li>
-                <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
+                <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire
+                        </span></a></li>
+                <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List
+                        </span></a></li>
                 <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
                 <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
 
@@ -297,14 +300,18 @@ $stmt->close();
                         <i class="fa-solid fa-chevron-right"></i>
                     </a>
                     <ul class="report-dropdown-content">
-                        <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
-                        <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
-                        <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
+                        <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                Barangay</a></li>
+                        <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                Month </a></li>
+                        <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to
+                                Year Comparison </a></li>
                     </ul>
                 </li>
 
                 <li class="archive-text"><span>Maintenance</span></li>
-                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a>
+                </li>
                 <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                 <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
                 <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
@@ -320,8 +327,10 @@ $stmt->close();
             <div class="header-right">
                 <div class="dropdown">
                     <a href="#" class="user-icon" onclick="toggleProfileDropdown(event)">
-                        <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                        <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+                        <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar"
+                            style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                        <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i>
+                        </p>
                     </a>
                     <div id="profileDropdown" class="dropdown-content">
                         <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
@@ -335,10 +344,15 @@ $stmt->close();
 
             <section class="archive-section">
                 <h3><?php echo htmlspecialchars($_SESSION['username']); ?>'s Fire Safety Inspection Reports</h3>
-                <p> List of Fire Safety Inspection Reports </p>
+                <p>List of Fire Safety Inspection Reports</p>
+                <br>
+                <p id="totalPermitsCount" style="font-weight:bold; color:#003D73; margin-bottom:10px;">Total Reports:
+                    <?php echo number_format($total_permits); ?>
+                </p>
                 <hr class="section-separator full-bleed">
                 <div class="top-controls">
-                    <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'" class="create-new-button"><i class="fa-solid fa-circle-plus"></i> Create New</button>
+                    <button onclick="window.location.href='create_fire_safety_inspection_certificate.php'"
+                        class="create-new-button"><i class="fa-solid fa-circle-plus"></i> Create New</button>
                 </div>
                 <hr class="section-separator full-bleed">
 
@@ -348,46 +362,64 @@ $stmt->close();
                         <button id="toggleSelectBtn" class="select-multi-btn" onclick="toggleSelectMode()">
                             <i class="fa-solid fa-check-square"></i> Select
                         </button>
-                        <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;" onclick="deleteSelectedPermits()">
+                        <button id="deleteSelectedBtn" class="select-multi-btn" style="display:none;"
+                            onclick="deleteSelectedPermits()">
                             <i class="fa-solid fa-trash"></i>
                             <label for="">Delete Selected</label>
                         </button>
-                        <button id="downloadSelectedBtn" class="select-multi-btn" style="display:none;" onclick="downloadSelectedPermits()">
+                        <button id="downloadSelectedBtn" class="select-multi-btn" style="display:none;"
+                            onclick="downloadSelectedPermits()">
                             <i class="fa-solid fa-download"></i>
                             <label for="">Download Selected</label>
                         </button>
                         <div style="position: relative;">
-                            <button type="button" id="sortIconBtn" class="select-multi-btn" onclick="toggleSortMenu()" style="padding: 8px;">
+                            <button type="button" id="sortIconBtn" class="select-multi-btn" onclick="toggleSortMenu()"
+                                style="padding: 8px;">
                                 <i class="fa-solid fa-arrow-up-wide-short"></i>
                                 <i class="fa-solid fa-caret-down"></i>
                             </button>
-                            <div id="sortMenu" style="display:none; position:absolute; left:0; top:110%; background:white; border:1px solid #ccc; border-radius:6px; z-index:10; min-width:120px;">
-                                <a href="?sort_by=permit_id" class="select-multi-btn" style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">ID</a>
-                                <a href="?sort_by=permit_name" class="select-multi-btn" style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Title</a>
-                                <a href="?sort_by=inspection_date" class="select-multi-btn" style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Time & Date</a>
-                                <a href="?sort_by=inspection_establishment" class="select-multi-btn" style="width:100%; text-align:left; border-radius:0; text-decoration: none;">Establishment</a>
+                            <div id="sortMenu"
+                                style="display:none; position:absolute; left:0; top:110%; background:white; border:1px solid #ccc; border-radius:6px; z-index:10; min-width:120px;">
+                                <a href="?sort_by=permit_id" class="select-multi-btn"
+                                    style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">ID</a>
+                                <a href="?sort_by=permit_name" class="select-multi-btn"
+                                    style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Title</a>
+                                <a href="?sort_by=inspection_date" class="select-multi-btn"
+                                    style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Time
+                                    & Date</a>
+                                <a href="?sort_by=inspection_establishment" class="select-multi-btn"
+                                    style="width:100%; text-align:left; border-radius:0; text-decoration: none;">Establishment</a>
                             </div>
                         </div>
-                        <button id="toggleMonthFilterBtn" class="select-multi-btn" type="button" onclick="toggleMonthFilter()">
+                        <button id="toggleMonthFilterBtn" class="select-multi-btn" type="button"
+                            onclick="toggleMonthFilter()">
                             <i style="color:#0096FF;" class="fa-solid fa-calendar"></i>
                         </button>
                         <div id="monthFilterContainer" style="display:none;">
-                            <form action="fire_safety_inspection_certificate.php" method="GET" style="display: flex; gap: 8px; align-items: center;">
+                            <form action="fire_safety_inspection_certificate.php" method="GET"
+                                style="display: flex; gap: 8px; align-items: center;">
                                 <label>
-                                    <input type="month" name="start_month" value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
+                                    <input type="month" name="start_month"
+                                        value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
                                 </label>
                                 <span>to</span>
                                 <label>
-                                    <input type="month" name="end_month" value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
+                                    <input type="month" name="end_month"
+                                        value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
                                 </label>
                                 <button type="submit" class="filter-multi-btn">Filter</button>
-                                <a href="fire_safety_inspection_certificate.php" class="clear-filter-multi-btn">Clear Filter</a>
+                                <a href="fire_safety_inspection_certificate.php" class="clear-filter-multi-btn">Clear
+                                    Filter</a>
                             </form>
                         </div>
-                        <form action="export_fire_safety_inspection_certificate.php" method="GET" style="display:inline;">
-                            <input type="hidden" name="start_month" value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
-                            <input type="hidden" name="end_month" value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
-                            <input type="hidden" name="sort_by" value="<?php echo isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by']) : ''; ?>">
+                        <form action="export_fire_safety_inspection_certificate.php" method="GET"
+                            style="display:inline;">
+                            <input type="hidden" name="start_month"
+                                value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
+                            <input type="hidden" name="end_month"
+                                value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
+                            <input type="hidden" name="sort_by"
+                                value="<?php echo isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by']) : ''; ?>">
                             <button type="submit" class="select-multi-btn">
                                 <i class="fa-solid fa-file-excel" style="color: green;"></i>
                                 <label for="">.csv</label>
@@ -431,7 +463,8 @@ $stmt->close();
                             <?php foreach ($permits as $row): ?>
                                 <tr id="report-row<?php echo $row['id']; ?>">
                                     <td class="select-checkbox-cell" style="display:none;">
-                                        <input type="checkbox" class="select-item" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                        <input type="checkbox" class="select-item"
+                                            value="<?php echo htmlspecialchars($row['id']); ?>">
                                     </td>
                                     <td><?php echo htmlspecialchars($row['id']); ?></td>
                                     <td><?php echo htmlspecialchars($row['permit_name']); ?></td>
@@ -495,13 +528,15 @@ $stmt->close();
                                     </td>
 
                                     <td class="action-button-container">
-                                        <button class="view-btn" onclick="window.location.href='view_permit.php?id=<?php echo $row['id']; ?>'">
+                                        <button class="view-btn"
+                                            onclick="window.location.href='view_permit.php?id=<?php echo $row['id']; ?>'">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
                                         <button class="delete-btn" onclick="deletePermit(<?php echo $row['id']; ?>)">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
-                                        <button class="download-btn" onclick="window.location.href='generate_permit.php?id=<?php echo $row['id']; ?>'">
+                                        <button class="download-btn"
+                                            onclick="window.location.href='generate_permit.php?id=<?php echo $row['id']; ?>'">
                                             <i class="fa-solid fa-download"></i>
                                         </button>
                                     </td>
@@ -516,27 +551,28 @@ $stmt->close();
                 <?php
                 $total_pages = ceil($total_permits / $per_page);
                 if ($total_pages > 1): ?>
-                    <div class="pagination" style="margin: 20px 0; text-align: center;">
+                    <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                         <?php if ($page > 1): ?>
                             <a href="?<?php
-                                        $params = $_GET;
-                                        $params['page'] = $page - 1;
-                                        echo http_build_query($params);
-                                        ?>" class="pagination-btn">&laquo; Prev</a>
+                            $params = $_GET;
+                            $params['page'] = $page - 1;
+                            echo http_build_query($params);
+                            ?>" class="pagination-btn">&laquo; Prev</a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?<?php
-                                        $params = $_GET;
-                                        $params['page'] = $i;
-                                        echo http_build_query($params);
-                                        ?>" class="pagination-btn<?php if ($i == $page) echo ' active'; ?>"><?php echo $i; ?></a>
+                            $params = $_GET;
+                            $params['page'] = $i;
+                            echo http_build_query($params);
+                            ?>" class="pagination-btn<?php if ($i == $page)
+                                echo ' active'; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         <?php if ($page < $total_pages): ?>
                             <a href="?<?php
-                                        $params = $_GET;
-                                        $params['page'] = $page + 1;
-                                        echo http_build_query($params);
-                                        ?>" class="pagination-btn">Next &raquo;</a>
+                            $params = $_GET;
+                            $params['page'] = $page + 1;
+                            echo http_build_query($params);
+                            ?>" class="pagination-btn">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -583,7 +619,7 @@ $stmt->close();
             const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
             toggles.forEach(toggle => {
-                toggle.addEventListener('click', function(event) {
+                toggle.addEventListener('click', function (event) {
                     event.preventDefault();
                     const dropdown = this.closest('.report-dropdown');
                     dropdown.classList.toggle('show');
@@ -650,7 +686,7 @@ $stmt->close();
             document.getElementById('ConfirmDeleteModal').style.display = 'flex';
         }
 
-        document.getElementById('confirmDeleteBtn').onclick = function() {
+        document.getElementById('confirmDeleteBtn').onclick = function () {
             // Helper to reload table body via AJAX
             function reloadTableBody() {
                 // Get current search value
@@ -677,14 +713,14 @@ $stmt->close();
 
             if (singleDeleteId) {
                 fetch('delete_selected_permits.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            permit_ids: [singleDeleteId]
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        permit_ids: [singleDeleteId]
                     })
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -698,14 +734,14 @@ $stmt->close();
                     });
             } else if (selectedToDelete.length > 0) {
                 fetch('delete_selected_permits.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            permit_ids: selectedToDelete
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        permit_ids: selectedToDelete
                     })
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -768,67 +804,74 @@ $stmt->close();
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('start_month') || urlParams.get('end_month')) {
                 document.getElementById('monthFilterContainer').style.display = 'block';
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('start_month') || urlParams.get('end_month')) {
                 document.getElementById('monthFilterContainer').style.display = 'block';
             }
         });
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.querySelector('.search-input');
             const reportsTableBody = document.getElementById('permitsTableBody');
+            const totalPermitsCount = document.getElementById('totalPermitsCount');
+            const paginationContainer = document.getElementById('paginationContainer');
 
-            if (searchInput && reportsTableBody) {
+            if (searchInput && reportsTableBody && totalPermitsCount) {
                 let searchTimeout;
-                searchInput.addEventListener('input', function() {
+                searchInput.addEventListener('input', function () {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(function() {
+                    searchTimeout = setTimeout(function () {
                         const query = searchInput.value;
-                        if (query === '') {
-                            window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
+                        if (query.trim() === '') {
+                            // If search is cleared, reload the page to restore pagination
+                            window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '').replace(/^\?$/, '');
+                            if (paginationContainer) {
+                                paginationContainer.style.display = '';
+                            }
                         } else {
-                            fetch(`my_fire_safety_reports_ajax.php?search=${encodeURIComponent(query)}`)
-                                .then(response => response.text())
-                                .then(html => {
-                                    if (html.trim() === '') {
-                                        reportsTableBody.innerHTML = '<tr><td colspan="12" style="text-align:center;">No reports found.</td></tr>';
-                                    } else {
-                                        reportsTableBody.innerHTML = html;
+                            // Always reset to page 1 when searching
+                            fetch(`my_fire_safety_reports_ajax.php?search=${encodeURIComponent(query)}&count=1&page=1`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    reportsTableBody.innerHTML = data.html;
+                                    totalPermitsCount.textContent = 'Total Reports: ' + data.count;
+                                    if (paginationContainer) {
+                                        paginationContainer.style.display = 'none';
                                     }
                                 });
                         }
-                    }, 0);
+                    }, 200); // Debounce for 200ms
                 });
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Show Confirm Logout Modal
-            document.getElementById('logoutLink').addEventListener('click', function(e) {
+            document.getElementById('logoutLink').addEventListener('click', function (e) {
                 e.preventDefault();
                 document.getElementById('logoutModal').style.display = 'flex';
                 document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
             });
 
             // Handle Confirm Logout
-            document.getElementById('confirmLogout').addEventListener('click', function() {
+            document.getElementById('confirmLogout').addEventListener('click', function () {
                 window.location.href = 'logout.php';
             });
 
             // Handle Cancel Logout
-            document.getElementById('cancelLogout').addEventListener('click', function() {
+            document.getElementById('cancelLogout').addEventListener('click', function () {
                 document.getElementById('logoutModal').style.display = 'none';
             });
         });
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             // ...existing code...
             const logoutModal = document.getElementById('logoutModal');
             if (event.target === logoutModal) {

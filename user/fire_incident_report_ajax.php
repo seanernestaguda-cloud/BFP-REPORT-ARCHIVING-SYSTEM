@@ -6,10 +6,9 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $where_clauses = ["deleted_at IS NULL"];
-$where_clauses[] = "uploader = '" . mysqli_real_escape_string($conn, $username) . "'";
-
 $params = [];
 $param_types = '';
 
@@ -25,8 +24,6 @@ $stmt = $conn->prepare("SELECT
     firefighters,
     property_damage, 
     fire_types, 
-    uploader, 
-    department,
     caller_name,
     responding_team,
     arrival_time,
@@ -35,7 +32,7 @@ $stmt = $conn->prepare("SELECT
     occupancy_type, documentation_photos, narrative_report, progress_report, final_investigation_report
 FROM fire_incident_reports 
 " . ($where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '') . "
-ORDER BY incident_date DESC
+ORDER BY report_id ASC
 LIMIT 50");
 if ($param_types) {
     $stmt->bind_param($param_types, ...$params);
@@ -46,6 +43,8 @@ $reports = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 mysqli_close($conn);
 
+$rows_html = '';
+$filtered_count = 0;
 foreach ($reports as $row) {
     $victims_count = empty($row['victims']) ? 0 : substr_count($row['victims'], ',') + 1;
     $firefighters_count = empty($row['firefighters']) ? 0 : substr_count($row['firefighters'], ',') + 1;
@@ -91,21 +90,13 @@ foreach ($reports as $row) {
             $row['victims'],
             $row['property_damage'],
             $row['fire_types'],
-            $row['uploader'],
-            $row['department'],
+            $status,
             $fire_types_display
         );
-        // Check status field explicitly and case-insensitively
-        if (strpos('complete', $search_lower) !== false && $is_complete) {
-            $match = true;
-        } elseif (strpos('in progress', $search_lower) !== false && !$is_complete) {
-            $match = true;
-        } else {
-            foreach ($search_fields as $field) {
-                if (strpos(strtolower((string) $field), $search_lower) !== false) {
-                    $match = true;
-                    break;
-                }
+        foreach ($search_fields as $field) {
+            if (strpos(strtolower((string) $field), $search_lower) !== false) {
+                $match = true;
+                break;
             }
         }
         if (!$match) {
@@ -113,31 +104,41 @@ foreach ($reports as $row) {
         }
     }
     if ($show_row) {
-        echo '<tr id="report-row' . htmlspecialchars($row['report_id']) . '">';
-        echo '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['report_id']) . '"></td>';
-        echo '<td>' . htmlspecialchars($row['report_id']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['report_title']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['fire_location_combined']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['incident_date']) . '</td>';
-        echo '<td>' . htmlspecialchars($row['establishment']) . '</td>';
-        echo '<td>' . $casualties . '</td>';
-        echo '<td>' . htmlspecialchars("₱" . $row['property_damage']) . '</td>';
-        echo '<td>' . htmlspecialchars($fire_types_display) . '</td>';
-        echo '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
-        // echo '<td>' . htmlspecialchars($row['uploader']) . '</td>';
-        // echo '<td>' . htmlspecialchars($row['department']) . '</td>';
-        echo '<td class="action-button-container">
-            <button class="view-btn" onclick="window.location.href=\'view_report.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
-                <i class="fa-solid fa-eye"></i>
-            </button>
-            <button class="delete-btn" onclick="deleteReport(' . htmlspecialchars(json_encode($row['report_id'])) . ')">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-            <button class="download-btn" onclick="window.location.href=\'generate_pdf.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">
-                <i class="fa-solid fa-download"></i>
-            </button>
-        </td>';
-        echo '</tr>';
+        $filtered_count++;
+        $rows_html .= '<tr id="report-row' . htmlspecialchars($row['report_id']) . '">';
+        $rows_html .= '<td class="select-checkbox-cell" style="display:none;"><input type="checkbox" class="select-item" value="' . htmlspecialchars($row['report_id']) . '"></td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['report_id']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['report_title']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['fire_location_combined']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['incident_date']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['establishment']) . '</td>';
+        $rows_html .= '<td>' . $casualties . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars("₱" . $row['property_damage']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($fire_types_display) . '</td>';
+        $rows_html .= '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
+        $rows_html .= '<td class="action-button-container">';
+        $rows_html .= '<button class="view-btn" onclick="window.location.href=\'view_report.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">';
+        $rows_html .= '<i class="fa-solid fa-eye"></i>';
+        $rows_html .= '</button>';
+        // $rows_html .= '<button class="delete-btn" onclick="deleteReport(' . htmlspecialchars(json_encode($row['report_id'])) . ')">';
+        // $rows_html .= '<i class="fa-solid fa-trash"></i>';
+        // $rows_html .= '</button>';
+        $rows_html .= '<button class="download-btn" onclick="window.location.href=\'generate_pdf.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">';
+        $rows_html .= '<i class="fa-solid fa-download"></i>';
+        $rows_html .= '</button>';
+        $rows_html .= '</td>';
+        $rows_html .= '</tr>';
     }
+}
+
+if (isset($_GET['count']) && $_GET['count'] == '1') {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'html' => $rows_html,
+        'count' => $filtered_count
+    ]);
+    exit;
+} else {
+    echo $rows_html;
 }
 ?>

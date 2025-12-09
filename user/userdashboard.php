@@ -442,7 +442,7 @@ $conn->close();
                             <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
                         </ul>
                     </li>
-<!-- 
+                    <!-- 
                     <li class="archive-text"><span>Maintenance</span></li>
                     <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
                     <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
@@ -555,7 +555,7 @@ $conn->close();
                                             $icon = 'fa-flask'; // chemical/combustion
                                             break;
                                         case strpos($fireType, 'open flame') !== false:
-                                            $icon = 'fa-fire-flame-curved';
+                                            $icon = 'fa-fire-burner';
                                             break;
                                         case strpos($fireType, 'lpg explosion') !== false:
                                         case strpos($fireType, 'chemicals/lpg leaking') !== false:
@@ -565,7 +565,7 @@ $conn->close();
                                             $icon = 'fa-smoking';
                                             break;
                                         case strpos($fireType, 'pyrotechnics') !== false:
-                                            $icon = 'fa-firecracker'; // not in FA, fallback
+                                            $icon = 'fa-rocket'; // not in FA, fallback
                                             break;
                                         case strpos($fireType, 'matchstick') !== false:
                                         case strpos($fireType, 'lighter') !== false:

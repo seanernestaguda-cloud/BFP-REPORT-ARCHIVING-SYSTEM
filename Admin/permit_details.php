@@ -167,8 +167,6 @@ mysqli_close($conn);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($row['permit_name']); ?></title>
     <link rel="stylesheet" href="reportstyle.css">
-    <link rel="stylesheet" href="view_permit.css">
-    <link rel="stylesheet" href="permitstyle.css">
     <link rel="stylesheet" href="modal.css">
     <link rel="stylesheet" href="../css/all.min.css">
     <link rel="stylesheet" href="../css/fontawesome.min.css">
@@ -374,6 +372,19 @@ iframe{
     border-radius: 8px;   /* match existing look */
     background: #fff;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+.narrative-preview, .narrative-report, .permit-doc-section {
+    display: block;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    box-sizing: border-box;
+}
+.narrative-preview iframe {
+    width: 100%;
+    height: 300px; /* or your desired height */
+    display: block;
 }
 </style>
 </head>

@@ -29,12 +29,27 @@ if (!$row) {
     die("Permit not found.");
 }
 
+
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'unknown';
 $log_stmt = $conn->prepare("INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'download', ?, ?)");
 $details = "Download: " . $row['permit_name'];
 $log_stmt->bind_param('sis', $username, $permit_id, $details);
 $log_stmt->execute();
 $log_stmt->close();
+
+// Fetch uploader's full name from users table
+$uploader_username = isset($row['uploader']) ? $row['uploader'] : '';
+$uploader_fullname = '';
+if (!empty($uploader_username)) {
+    $uploader_stmt = $conn->prepare("SELECT first_name, middle_name, last_name FROM users WHERE username = ? LIMIT 1");
+    $uploader_stmt->bind_param('s', $uploader_username);
+    $uploader_stmt->execute();
+    $uploader_result = $uploader_stmt->get_result();
+    if ($uploader_row = $uploader_result->fetch_assoc()) {
+        $uploader_fullname = $uploader_row['first_name'] . ' ' . $uploader_row['middle_name'] . ' ' . $uploader_row['last_name'];
+    }
+    $uploader_stmt->close();
+}
 
 
 
@@ -99,6 +114,27 @@ $tbl = '<table border="1" cellpadding="4">
 </table>';
 $pdf->writeHTML($tbl, true, false, false, false, '');
 $pdf->Ln(4);
+// Add 'Prepared By' signature block to bottom right of first page
+if ($pdf->PageNo() == 1) {
+    $rightMargin = 15; // matches your SetMargins right value
+    $blockWidth = 100;  // width of the signature block
+    $pdf->SetY(-90);   // vertical position from bottom
+    $pdf->SetX($pdf->getPageWidth() - $blockWidth - $rightMargin);
+    // Prepared By label
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->Cell($blockWidth, 8, 'Prepared By:', 0, 1, 'L');
+    // Full name underlined
+    $pdf->SetFont('helvetica', '', 12);
+    $pdf->SetX($pdf->getPageWidth() - $blockWidth - $rightMargin);
+    $pdf->Cell($blockWidth, 8, !empty($uploader_fullname) ? $uploader_fullname : '_________________________', 0, 1, 'C');
+    $pdf->SetX($pdf->getPageWidth() - $blockWidth - $rightMargin);
+    $pdf->SetFont('helvetica', '', 12);
+    $pdf->Cell($blockWidth, 0, '', 'T', 1, 'L'); // underline
+    // Signature over printed name in bold
+    $pdf->SetX($pdf->getPageWidth() - $blockWidth - $rightMargin);
+    $pdf->SetFont('helvetica', 'B', 12);
+    $pdf->Cell($blockWidth, 5, 'Signature over printed name', 0, 1, 'C');
+}
 
 $attachments = [
     'Application Form' => $row['application_form'],

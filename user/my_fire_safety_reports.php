@@ -409,7 +409,7 @@ $stmt->close();
                                     Filter</a>
                             </form>
                         </div>
-                        <form action="export_fire_safety_inspection_certificate.php" method="GET"
+                        <form action="export_my_permits.php" method="GET"
                             style="display:inline;">
                             <input type="hidden" name="start_month"
                                 value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
@@ -421,6 +421,11 @@ $stmt->close();
                                 <i class="fa-solid fa-file-excel" style="color: green;"></i>
                                 <label for="">.csv</label>
                             </button>
+                        </form>
+                        <button type="button" class="select-multi-btn" id="printTableBtn" style="margin-left: 5px;">
+                            <i class="fa-solid fa-print" style="color: #003D73;"></i>
+                            <label for="">Print</label>
+                        </button>
                         </form>
                     </div>
                     <!-- entries-right (search) -->
@@ -553,25 +558,25 @@ $stmt->close();
                     <div class="pagination" style="margin: 20px 0; text-align: center;">
                         <?php if ($page > 1): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page - 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">&laquo; Prev</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page - 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">&laquo; Prev</a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $i;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn<?php if ($i == $page)
-                                echo ' active'; ?>"><?php echo $i; ?></a>
+                                        $params = $_GET;
+                                        $params['page'] = $i;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn<?php if ($i == $page)
+                                                                        echo ' active'; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         <?php if ($page < $total_pages): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page + 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">Next &raquo;</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page + 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -615,10 +620,61 @@ $stmt->close();
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Print Table Button functionality
+            const printBtn = document.getElementById('printTableBtn');
+            if (printBtn) {
+                printBtn.addEventListener('click', function() {
+                    const table = document.querySelector('.archive-table');
+                    if (!table) return;
+                    // Clone table to avoid modifying the original
+                    const tableClone = table.cloneNode(true);
+                    // Find the Action column index from the header row
+                    let actionColIndex = -1;
+                    // Find the header row (first tr with th children)
+                    let theadRow = null;
+                    const allRows = tableClone.querySelectorAll('tr');
+                    for (let row of allRows) {
+                        if (row.querySelector('th')) {
+                            theadRow = row;
+                            break;
+                        }
+                    }
+                    if (theadRow) {
+                        Array.from(theadRow.children).forEach((th, idx) => {
+                            if (th.textContent.trim().toLowerCase() === 'action') {
+                                actionColIndex = idx;
+                            }
+                        });
+                        if (actionColIndex !== -1) {
+                            theadRow.removeChild(theadRow.children[actionColIndex]);
+                        }
+                    }
+                    // Remove Action column from all rows (header and body)
+                    tableClone.querySelectorAll('tr').forEach(row => {
+                        // Only remove if the row has enough cells
+                        if (actionColIndex !== -1 && row.children.length > actionColIndex) {
+                            row.removeChild(row.children[actionColIndex]);
+                        }
+                    });
+                    const newWin = window.open('', '', 'width=900,height=700');
+                    newWin.document.write('<html><head><title>Print Table</title>');
+                    newWin.document.write('<link rel="stylesheet" href="reportstyle.css">');
+                    newWin.document.write('</head><body >');
+                    newWin.document.write(tableClone.outerHTML);
+                    newWin.document.write('</body></html>');
+                    newWin.document.close();
+                    newWin.focus();
+                    setTimeout(() => {
+                        newWin.print();
+                    }, 500);
+                });
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
             const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
             toggles.forEach(toggle => {
-                toggle.addEventListener('click', function (event) {
+                toggle.addEventListener('click', function(event) {
                     event.preventDefault();
                     const dropdown = this.closest('.report-dropdown');
                     dropdown.classList.toggle('show');
@@ -685,17 +741,17 @@ $stmt->close();
             document.getElementById('ConfirmDeleteModal').style.display = 'flex';
         }
 
-        document.getElementById('confirmDeleteBtn').onclick = function () {
+        document.getElementById('confirmDeleteBtn').onclick = function() {
             if (singleDeleteId) {
                 fetch('delete_selected_permits.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        permit_ids: [singleDeleteId]
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            permit_ids: [singleDeleteId]
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -709,14 +765,14 @@ $stmt->close();
                     });
             } else if (selectedToDelete.length > 0) {
                 fetch('delete_selected_permits.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        permit_ids: selectedToDelete
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            permit_ids: selectedToDelete
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -805,21 +861,21 @@ $stmt->close();
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('start_month') || urlParams.get('end_month')) {
                 document.getElementById('monthFilterContainer').style.display = 'block';
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('.search-input');
             const permitsTableBody = document.getElementById('permitsTableBody');
             if (searchInput && permitsTableBody) {
                 let searchTimeout;
-                searchInput.addEventListener('input', function () {
+                searchInput.addEventListener('input', function() {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(function () {
+                    searchTimeout = setTimeout(function() {
                         const query = searchInput.value;
                         if (query === '') {
                             window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');
@@ -829,26 +885,26 @@ $stmt->close();
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Show Confirm Logout Modal
-            document.getElementById('logoutLink').addEventListener('click', function (e) {
+            document.getElementById('logoutLink').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('logoutModal').style.display = 'flex';
                 document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
             });
 
             // Handle Confirm Logout
-            document.getElementById('confirmLogout').addEventListener('click', function () {
+            document.getElementById('confirmLogout').addEventListener('click', function() {
                 window.location.href = 'logout.php';
             });
 
             // Handle Cancel Logout
-            document.getElementById('cancelLogout').addEventListener('click', function () {
+            document.getElementById('cancelLogout').addEventListener('click', function() {
                 document.getElementById('logoutModal').style.display = 'none';
             });
         });
 
-        window.onclick = function (event) {
+        window.onclick = function(event) {
             // ...existing code...
             const logoutModal = document.getElementById('logoutModal');
             if (event.target === logoutModal) {
@@ -856,16 +912,16 @@ $stmt->close();
             }
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('.search-input');
             const reportsTableBody = document.getElementById('permitsTableBody');
             const totalPermitsCount = document.getElementById('totalPermitsCount');
 
             if (searchInput && reportsTableBody && totalPermitsCount) {
                 let searchTimeout;
-                searchInput.addEventListener('input', function () {
+                searchInput.addEventListener('input', function() {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(function () {
+                    searchTimeout = setTimeout(function() {
                         const query = searchInput.value;
                         if (query === '') {
                             window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');

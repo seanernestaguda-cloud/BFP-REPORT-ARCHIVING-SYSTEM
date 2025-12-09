@@ -332,18 +332,18 @@ $stmt->close();
                                         <td><?php echo isset($row['department']) && $row['department'] !== '' ? htmlspecialchars($row['department']) : '<span style="color:#888;">N/A</span>'; ?>
                                         </td>
                                         <td class="<?php
-                                        $action = strtolower($row['action']);
-                                        if ($action === 'delete')
-                                            echo 'action-delete';
-                                        elseif ($action === 'update')
-                                            echo 'action-update';
-                                        elseif ($action === 'create')
-                                            echo 'action-create';
-                                        elseif ($action === 'download')
-                                            echo 'action-download';
-                                        elseif ($action === 'restore')
-                                            echo 'action-restore';
-                                        ?>"><?php echo htmlspecialchars($row['action']); ?></td>
+                                                    $action = strtolower($row['action']);
+                                                    if ($action === 'delete')
+                                                        echo 'action-delete';
+                                                    elseif ($action === 'update')
+                                                        echo 'action-update';
+                                                    elseif ($action === 'create')
+                                                        echo 'action-create';
+                                                    elseif ($action === 'download')
+                                                        echo 'action-download';
+                                                    elseif ($action === 'restore')
+                                                        echo 'action-restore';
+                                                    ?>"><?php echo htmlspecialchars($row['action']); ?></td>
                                         <td>
                                             <?php
                                             if (!empty($row['id'])) {
@@ -372,25 +372,25 @@ $stmt->close();
                     <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                         <?php if ($page > 1): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page - 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">&laquo; Prev</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page - 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">&laquo; Prev</a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $i;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn<?php if ($i == $page)
-                                echo ' active'; ?>"><?php echo $i; ?></a>
+                                        $params = $_GET;
+                                        $params['page'] = $i;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn<?php if ($i == $page)
+                                                            echo ' active'; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         <?php if ($page < $total_pages): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page + 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">Next &raquo;</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page + 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -400,7 +400,7 @@ $stmt->close();
                         const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                         toggles.forEach(toggle => {
-                            toggle.addEventListener('click', function (event) {
+                            toggle.addEventListener('click', function(event) {
                                 event.preventDefault();
                                 const dropdown = this.closest('.report-dropdown');
                                 dropdown.classList.toggle('show');
@@ -423,7 +423,7 @@ $stmt->close();
                             }
                         });
                     });
-                    document.addEventListener('DOMContentLoaded', function () {
+                    document.addEventListener('DOMContentLoaded', function() {
                         const searchInput = document.querySelector('.search-input');
                         const logsTableBody = document.getElementById('logsTableBody');
                         const searchForm = document.getElementById('searchForm');
@@ -433,7 +433,7 @@ $stmt->close();
                         function fetchLogs(searchValue) {
                             const xhr = new XMLHttpRequest();
                             xhr.open('GET', 'activity_logs_search.php?search=' + encodeURIComponent(searchValue), true);
-                            xhr.onload = function () {
+                            xhr.onload = function() {
                                 if (xhr.status === 200) {
                                     logsTableBody.innerHTML = xhr.responseText;
                                     if (paginationContainer) {
@@ -451,42 +451,42 @@ $stmt->close();
                         if (searchInput && logsTableBody) {
                             // Fetch logs on initial page load
                             fetchLogs(searchInput.value);
-                            searchInput.addEventListener('input', function () {
+                            searchInput.addEventListener('input', function() {
                                 clearTimeout(debounceTimer);
-                                debounceTimer = setTimeout(function () {
+                                debounceTimer = setTimeout(function() {
                                     fetchLogs(searchInput.value);
                                 }, 0); // 500ms debounce
                             });
                         }
 
                         if (searchForm) {
-                            searchForm.addEventListener('submit', function (e) {
+                            searchForm.addEventListener('submit', function(e) {
                                 e.preventDefault();
                                 fetchLogs(searchInput.value);
                             });
                         }
                     });
 
-                    document.addEventListener('DOMContentLoaded', function () {
+                    document.addEventListener('DOMContentLoaded', function() {
                         // Show Confirm Logout Modal
-                        document.getElementById('logoutLink').addEventListener('click', function (e) {
+                        document.getElementById('logoutLink').addEventListener('click', function(e) {
                             e.preventDefault();
                             document.getElementById('logoutModal').style.display = 'flex';
                             document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                         });
 
                         // Handle Confirm Logout
-                        document.getElementById('confirmLogout').addEventListener('click', function () {
+                        document.getElementById('confirmLogout').addEventListener('click', function() {
                             window.location.href = 'logout.php';
                         });
 
                         // Handle Cancel Logout
-                        document.getElementById('cancelLogout').addEventListener('click', function () {
+                        document.getElementById('cancelLogout').addEventListener('click', function() {
                             document.getElementById('logoutModal').style.display = 'none';
                         });
                     });
 
-                    window.onclick = function (event) {
+                    window.onclick = function(event) {
                         // ...existing code...
                         const logoutModal = document.getElementById('logoutModal');
                         if (event.target === logoutModal) {

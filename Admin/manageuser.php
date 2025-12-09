@@ -325,6 +325,7 @@ $result = $stmt->get_result();
                         class="create-new-button export-excel">
                         <i class="fa-solid fa-file-excel"></i> .csv
                     </button>
+                    <button onclick="printUserTable()" class="create-new-button"><i class="fa-solid fa-print"></i></button>
                 </div>
                 <hr class="section-separator full-bleed">
                 <br>
@@ -481,6 +482,46 @@ $result = $stmt->get_result();
             } else {
                 dropdown.classList.add('show');
             }
+        }
+        // Print only the user table
+        function printUserTable() {
+            var table = document.querySelector('.archive-table');
+            if (!table) return;
+            // Clone the table so we can modify it
+            var clone = table.cloneNode(true);
+            // Remove the last column (Action) from the header
+            var thead = clone.querySelector('thead');
+            if (thead) {
+                var headerRow = thead.rows[0];
+                if (headerRow && headerRow.cells.length > 0) {
+                    headerRow.deleteCell(headerRow.cells.length - 1);
+                }
+            }
+            // Remove the last cell from each body row
+            var tbody = clone.querySelector('tbody');
+            if (tbody) {
+                for (var i = 0; i < tbody.rows.length; i++) {
+                    var row = tbody.rows[i];
+                    if (row.cells.length > 0) {
+                        row.deleteCell(row.cells.length - 1);
+                    }
+                }
+            }
+            var printWindow = window.open('', '', 'height=600,width=900');
+            printWindow.document.write('<html><head><title>Print Users Table</title>');
+            printWindow.document.write('<link rel="stylesheet" href="reportstyle.css">');
+            printWindow.document.write('<link rel="stylesheet" href="modal.css">');
+            printWindow.document.write('<link rel="stylesheet" href="../css/all.min.css">');
+            printWindow.document.write('<link rel="stylesheet" href="../css/fontawesome.min.css">');
+            printWindow.document.write('<style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#003D73;color:#fff;} .archive-table img{border-radius:100%;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h2>Users Table</h2>');
+            printWindow.document.write(clone.outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
         }
         // Close all action dropdowns when clicking outside
         document.addEventListener('click', function (event) {

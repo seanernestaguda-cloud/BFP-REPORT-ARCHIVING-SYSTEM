@@ -35,7 +35,7 @@ $allowed_sort_columns = ['report_id', 'report_title', 'incident_date', 'fire_loc
 $sort_by = isset($_GET['sort_by']) && in_array($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'report_id';
 $order_by = 'ASC';
 
-$query = "SELECT report_id, report_title, street, purok, fire_location, municipality, incident_date, establishment, victims, firefighters, property_damage, fire_types, uploader, department FROM fire_incident_reports $where_sql ORDER BY $sort_by $order_by";
+$query = "SELECT report_id, report_title, street, purok, fire_location, municipality, incident_date, establishment, victims, firefighters, property_damage, fire_types, uploader, created_at FROM fire_incident_reports $where_sql ORDER BY $sort_by $order_by";
 
 // Fetch data
 if ($where_clauses) {
@@ -58,7 +58,7 @@ $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
 // Header
-$headers = ['Report ID', 'Report Title', 'Street', 'Purok', 'Barangay', 'Municipality', 'Incident Date', 'Establishment', 'Victims', 'Firefighters', 'Property Damage', 'Cause of Fire', 'Uploaded By', 'Department'];
+$headers = ['Report ID', 'Report Title', 'Street', 'Purok', 'Barangay', 'Municipality', 'Incident Date', 'Establishment', 'Victims', 'Firefighters', 'Property Damage', 'Cause of Fire', 'Uploader', 'Date Created'];
 $sheet->fromArray($headers, NULL, 'A1');
 
 // Data

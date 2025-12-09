@@ -425,9 +425,12 @@ $conn->close();
                     <li class="archive-text">
                         <p>Archives</p>
                     </li>
-                    <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire </span></a></li>
-                    <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List </span></a></li>
-                    <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a></li>
+                    <li><a href="fire_types.php"><i class="fa-solid fa-fire-flame-curved"></i><span> Causes of Fire
+                            </span></a></li>
+                    <li><a href="barangay_list.php"><i class="fa-solid fa-map-location-dot"></i><span> Barangay List
+                            </span></a></li>
+                    <li><a href="myarchives.php"><i class="fa-solid fa-box-archive"></i><span> My Archives</span></a>
+                    </li>
                     <li><a href="archives.php"><i class="fa-solid fa-fire"></i><span> Archives </span></a></li>
 
                     <li class="report-dropdown">
@@ -437,14 +440,18 @@ $conn->close();
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                         <ul class="report-dropdown-content">
-                            <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per Barangay</a></li>
-                            <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per Month </a></li>
-                            <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year to Year Comparison </a></li>
+                            <li><a href="reports_per_barangay.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                    Barangay</a></li>
+                            <li><a href="monthly_reports_chart.php"><i class="fa-solid fa-chart-column"></i> Reports per
+                                    Month </a></li>
+                            <li><a href="year_to_year_comparison.php"><i class="fa-regular fa-calendar-days"></i> Year
+                                    to Year Comparison </a></li>
                         </ul>
                     </li>
 
                     <li class="archive-text"><span>Maintenance</span></li>
-                    <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs </span></a></li>
+                    <li><a href="activity_logs.php"><i class="fa-solid fa-file-invoice"></i><span> Activity Logs
+                            </span></a></li>
                     <li><a href="departments.php"><i class="fas fa-users"></i><span> Department List </span></a></li>
                     <li><a href="manageuser.php"><i class="fas fa-users"></i><span> Manage Users </span></a></li>
                     <li><a href="setting.php"><i class="fa-solid fa-gear"></i> <span>Settings</span></a></li>
@@ -459,13 +466,17 @@ $conn->close();
                 <h2><?php echo htmlspecialchars($system_name); ?></h2>
                 <div class="header-right">
                     <div class="dropdown">
-                        <a href="#" class="user-icon" onclick="toggleDropdown(event)" style="display:flex;align-items:center;gap:0px;">
-                            <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
-                            <p><?php echo htmlspecialchars($_SESSION['username']); ?><i class="fa-solid fa-caret-down"></i></p>
+                        <a href="#" class="user-icon" onclick="toggleDropdown(event)"
+                            style="display:flex;align-items:center;gap:0px;">
+                            <img src="<?php echo htmlspecialchars($avatar); ?>" alt="Avatar"
+                                style="width:40px;height:40px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:0px;">
+                            <p><?php echo htmlspecialchars($_SESSION['username']); ?><i
+                                    class="fa-solid fa-caret-down"></i></p>
                         </a>
                         <div id="profileDropdown" class="dropdown-content">
                             <a href="myprofile.php"><i class="fa-solid fa-user"></i> View Profile</a>
-                            <a href="logout.php" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                            <a href="logout.php" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i>
+                                Logout</a>
                         </div>
                     </div>
                 </div>
@@ -555,7 +566,7 @@ $conn->close();
                                             $icon = 'fa-flask'; // chemical/combustion
                                             break;
                                         case strpos($fireType, 'open flame') !== false:
-                                            $icon = 'fa-fire-flame-curved';
+                                            $icon = 'fa-fire-burner';
                                             break;
                                         case strpos($fireType, 'lpg explosion') !== false:
                                         case strpos($fireType, 'chemicals/lpg leaking') !== false:
@@ -565,7 +576,7 @@ $conn->close();
                                             $icon = 'fa-smoking';
                                             break;
                                         case strpos($fireType, 'pyrotechnics') !== false:
-                                            $icon = 'fa-firecracker'; // not in FA, fallback
+                                            $icon = 'fa-rocket'; // not in FA, fallback
                                             break;
                                         case strpos($fireType, 'matchstick') !== false:
                                         case strpos($fireType, 'lighter') !== false:
@@ -650,7 +661,8 @@ $conn->close();
                 <div class="dashboard-card">
                     <i class="fas fa-coins"></i>
                     <h2>Total Property Damage</h2>
-                    <p class="card-number">₱<?php echo number_format((float)str_replace(',', '', $total_damage), 2, '.', ','); ?></p>
+                    <p class="card-number">
+                        ₱<?php echo number_format((float) str_replace(',', '', $total_damage), 2, '.', ','); ?></p>
 </body>
 <!-- Logout Confirmation Modal -->
 <div id="logoutModal" class="confirm-delete-modal">

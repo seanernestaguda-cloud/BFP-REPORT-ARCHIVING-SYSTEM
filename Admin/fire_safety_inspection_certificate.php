@@ -435,6 +435,10 @@ if ($where_clauses) {
                                     <label for="">.csv</label>
                                 </button>
                             </form>
+                            <button type="button" class="select-multi-btn" id="printTableBtn" onclick="printPermitsTable()" style="margin-left: 4px;">
+                                <i class="fa-solid fa-print" style="color: #003D73;"></i>
+                                <label for="">Print</label>
+                            </button>
                         </div>
                         <!-- entries-right (search) -->
                         <div class="entries-right">
@@ -458,7 +462,8 @@ if ($where_clauses) {
                             <th>Address</th>
                             <th>Date of Inspection</th>
                             <th>Uploader</th>
-                            <th>Department</th>
+                            <th>Date Created</th>
+                            <!-- <th>Department</th> -->
                             <th>Status</th>
                             <th> Action </th>
                         </tr>
@@ -485,7 +490,9 @@ if ($where_clauses) {
                                         <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($row['inspection_date']))) ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($row['uploader']); ?></td>
-                                        <td><?php echo (isset($row['department']) && trim($row['department']) !== '') ? htmlspecialchars($row['department']) : 'N/A'; ?>
+                                        <td><?php echo isset($row['created_at']) ? htmlspecialchars(date('Y-m-d H:i', strtotime($row['created_at']))) : 'N/A'; ?>
+                                        </td>
+                                        <!-- <td><?php echo (isset($row['department']) && trim($row['department']) !== '') ? htmlspecialchars($row['department']) : 'N/A'; ?> -->
                                         <td>
                                             <?php
                                             // List all required fields from your create form
@@ -563,25 +570,25 @@ if ($where_clauses) {
                         <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                             <?php if ($page > 1): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page - 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">&laquo; Prev</a>
+                                            $params = $_GET;
+                                            $params['page'] = $page - 1;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn">&laquo; Prev</a>
                             <?php endif; ?>
                             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $i;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn<?php if ($i == $page)
-                                    echo ' active'; ?>"><?php echo $i; ?></a>
+                                            $params = $_GET;
+                                            $params['page'] = $i;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn<?php if ($i == $page)
+                                                                            echo ' active'; ?>"><?php echo $i; ?></a>
                             <?php endfor; ?>
                             <?php if ($page < $total_pages): ?>
                                 <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page + 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">Next &raquo;</a>
+                                            $params = $_GET;
+                                            $params['page'] = $page + 1;
+                                            echo http_build_query($params);
+                                            ?>" class="pagination-btn">Next &raquo;</a>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -618,26 +625,64 @@ if ($where_clauses) {
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            // Print Table Button handler
+            function printPermitsTable() {
+                const table = document.querySelector('.archive-table');
+                if (!table) return;
+                // Clone the table for printing and remove the Action column by header text
+                const clone = table.cloneNode(true);
+                // Find the index of the Action column
+                const headerRow = clone.querySelector('tr');
+                let actionColIndex = -1;
+                if (headerRow) {
+                    Array.from(headerRow.children).forEach((th, idx) => {
+                        if (th.textContent.trim().toLowerCase() === 'action') {
+                            actionColIndex = idx;
+                        }
+                    });
+                }
+                // Remove the Action header cell
+                if (actionColIndex !== -1 && headerRow) {
+                    headerRow.removeChild(headerRow.children[actionColIndex]);
+                }
+                // Remove the Action cell from each body row
+                clone.querySelectorAll('tbody tr').forEach(row => {
+                    if (actionColIndex !== -1 && row.children.length > actionColIndex) {
+                        row.removeChild(row.children[actionColIndex]);
+                    }
+                });
+                const printWindow = window.open('', '', 'height=700,width=1200');
+                printWindow.document.write('<html><head><title>Print Fire Safety Inspection Table</title>');
+                printWindow.document.write('<link rel="stylesheet" href="reportstyle.css">');
+                printWindow.document.write('<style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;} th{background:#003D73;color:#fff;} }</style>');
+                printWindow.document.write('</head><body >');
+                printWindow.document.write('<h2>Fire Safety Inspection Reports</h2>');
+                printWindow.document.write(clone.outerHTML);
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+            }
+            document.addEventListener('DOMContentLoaded', function() {
                 // Show Confirm Logout Modal
-                document.getElementById('logoutLink').addEventListener('click', function (e) {
+                document.getElementById('logoutLink').addEventListener('click', function(e) {
                     e.preventDefault();
                     document.getElementById('logoutModal').style.display = 'flex';
                     document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                 });
 
                 // Handle Confirm Logout
-                document.getElementById('confirmLogout').addEventListener('click', function () {
+                document.getElementById('confirmLogout').addEventListener('click', function() {
                     window.location.href = 'logout.php';
                 });
 
                 // Handle Cancel Logout
-                document.getElementById('cancelLogout').addEventListener('click', function () {
+                document.getElementById('cancelLogout').addEventListener('click', function() {
                     document.getElementById('logoutModal').style.display = 'none';
                 });
             });
 
-            window.onclick = function (event) {
+            window.onclick = function(event) {
                 // ...existing code...
                 const logoutModal = document.getElementById('logoutModal');
                 if (event.target === logoutModal) {
@@ -649,7 +694,7 @@ if ($where_clauses) {
                 const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                 toggles.forEach(toggle => {
-                    toggle.addEventListener('click', function (event) {
+                    toggle.addEventListener('click', function(event) {
                         event.preventDefault();
                         const dropdown = this.closest('.report-dropdown');
                         dropdown.classList.toggle('show');
@@ -731,14 +776,14 @@ if ($where_clauses) {
 
             function singleDeleteHandler() {
                 fetch('delete_selected_permits.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        permit_ids: selectedToDelete
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            permit_ids: selectedToDelete
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -753,14 +798,14 @@ if ($where_clauses) {
 
             function multiDeleteHandler() {
                 fetch('delete_selected_permits.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        permit_ids: selectedToDelete
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            permit_ids: selectedToDelete
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -852,14 +897,14 @@ if ($where_clauses) {
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('start_month') || urlParams.get('end_month')) {
                     document.getElementById('monthFilterContainer').style.display = 'block';
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.querySelector('.search-input');
                 const reportsTableBody = document.getElementById('permitsTableBody');
                 const totalPermitsCount = document.getElementById('totalPermitsCount');
@@ -867,9 +912,9 @@ if ($where_clauses) {
 
                 if (searchInput && reportsTableBody && totalPermitsCount) {
                     let searchTimeout;
-                    searchInput.addEventListener('input', function () {
+                    searchInput.addEventListener('input', function() {
                         clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(function () {
+                        searchTimeout = setTimeout(function() {
                             const query = searchInput.value;
                             if (query === '') {
                                 window.location.href = window.location.pathname + window.location.search.replace(/([?&])search=[^&]*/g, '');

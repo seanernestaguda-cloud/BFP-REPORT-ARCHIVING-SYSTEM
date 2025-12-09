@@ -342,9 +342,6 @@ legend{
     background: #c0392b;
 }
 
-iframe{
-    margin-bottom: 15px;
-}
 
 .title-part {
     background: #003D73;
@@ -375,7 +372,18 @@ iframe{
     background: #fff;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
-
+.narrative-preview, .narrative-report, .permit-doc-section {
+    display: block;
+    width: 100%;
+    max-width: auto; /* or a larger value, or remove this line */
+    padding: 0;
+    box-sizing: border-box;
+}
+.narrative-preview iframe {
+    width: 100%;
+    height: 300px; /* or your desired height */
+    display: block;
+}
 </style>
 </head>
 <body>

@@ -32,12 +32,27 @@ if (!$report) {
     die("Report not found.");
 }
 
+
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'unknown';
 $log_stmt = $conn->prepare("INSERT INTO activity_logs (username, action, report_id, details) VALUES (?, 'download', ?, ?)");
 $details = "Downloaded: " . $report['report_title'];
 $log_stmt->bind_param('sis', $username, $report_id, $details);
 $log_stmt->execute();
 $log_stmt->close();
+
+// Fetch uploader's full name from users table
+$uploader_username = isset($report['uploader']) ? $report['uploader'] : '';
+$uploader_fullname = '';
+if (!empty($uploader_username)) {
+    $uploader_query = $conn->prepare("SELECT first_name, middle_name, last_name FROM users WHERE username = ? LIMIT 1");
+    $uploader_query->bind_param('s', $uploader_username);
+    $uploader_query->execute();
+    $uploader_result = $uploader_query->get_result();
+    if ($uploader_row = $uploader_result->fetch_assoc()) {
+        $uploader_fullname = $uploader_row['first_name'] . ' ' . $uploader_row['middle_name'] . ' ' . $uploader_row['last_name'];
+    }
+    $uploader_query->close();
+}
 
 
 
@@ -115,14 +130,32 @@ $pdf->Ln(4);
 $pdf->SetFont('helvetica', 'B', 13);
 $pdf->Cell(0, 8, 'Other Details', 0, 1, 'L');
 $pdf->SetFont('helvetica', '', 12);
+// Show 'Under Investigation' if fire_types is empty
+$fire_type_display = empty($report['fire_types']) ? 'Under Investigation' : htmlspecialchars($report['fire_types']);
 $tbl4 = '<table border="1" cellpadding="4">
 <tr><td width="35%"><b>Estimated Damage to Property</b></td><td width="65%">PHP ' . htmlspecialchars($report['property_damage']) . '</td></tr>
 <tr><td><b>Alarm Status</b></td><td>' . htmlspecialchars($report['alarm_status']) . '</td></tr>
 <tr><td><b>Type of Occupancy</b></td><td>' . htmlspecialchars($report['occupancy_type']) . '</td></tr>
-<tr><td><b>Cause of Fire</b></td><td>' . htmlspecialchars($report['fire_types']) . '</td></tr>
+<tr><td><b>Cause of Fire</b></td><td>' . $fire_type_display . '</td></tr>
 </table>';
 $pdf->writeHTML($tbl4, true, false, false, false, '');
 $pdf->Ln(4);
+// Move 'Prepared By' signature block higher to avoid page overflow
+$pdf->SetY(230); // Set Y to 230mm from top (LEGAL page height is 356mm)
+$pdf->SetX(140); // Adjust X for right alignment
+$pdf->SetFont('helvetica', 'B', 12);
+
+// Display uploader's full name above signature block
+$pdf->Cell(60, 8, 'Prepared By:', 0, 2, 'L');
+if (!empty($uploader_fullname)) {
+    // Underline the full name
+    $pdf->SetFont('helvetica', 'U', 12);
+    $pdf->Cell(60, 8, $uploader_fullname, 0, 2, 'L');
+    $pdf->SetFont('helvetica', '', 12);
+} else {
+    $pdf->Cell(60, 8, '_________________________', 0, 2, 'L');
+}
+$pdf->Cell(60, 8, 'Signature over printed name', 0, 2, 'L');
 
 // Section: Documentation Photos
 if (!empty($report['documentation_photos'])) {
@@ -199,4 +232,3 @@ foreach ($reports as $title => $filePath) {
 }
 // Output the PDF
 $pdf->Output("Fire_Incident_Report_{$report_id}.pdf", 'D');
-?>

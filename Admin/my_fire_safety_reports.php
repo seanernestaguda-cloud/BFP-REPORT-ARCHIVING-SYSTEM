@@ -412,19 +412,19 @@ $stmt->close();
                                     Filter</a>
                             </form>
                         </div>
-                        <form action="export_fire_safety_inspection_certificate.php" method="GET"
-                            style="display:inline;">
-                            <input type="hidden" name="start_month"
-                                value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
-                            <input type="hidden" name="end_month"
-                                value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
-                            <input type="hidden" name="sort_by"
-                                value="<?php echo isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by']) : ''; ?>">
+                        <form action="export_my_permits.php" method="GET" style="display:inline;">
+                            <input type="hidden" name="start_month" value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
+                            <input type="hidden" name="end_month" value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
+                            <input type="hidden" name="sort_by" value="<?php echo isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by']) : ''; ?>">
                             <button type="submit" class="select-multi-btn">
                                 <i class="fa-solid fa-file-excel" style="color: green;"></i>
                                 <label for="">.csv</label>
                             </button>
                         </form>
+                        <button type="button" class="select-multi-btn" id="printTableBtn" style="margin-left:4px;">
+                            <i class="fa-solid fa-print" style="color: #003D73;"></i>
+                            <label for="">Print</label>
+                        </button>
                     </div>
                     <!-- entries-right (search) -->
                     <div class="entries-right">
@@ -447,6 +447,7 @@ $stmt->close();
                         <th>Purpose</th>
                         <th>Address</th>
                         <th>Date of Inspection</th>
+                        <th>Date Created</th>
                         <!-- <th>Uploader</th>
                 <th>Department</th> -->
                         <th>Status</th>
@@ -474,6 +475,7 @@ $stmt->close();
                                     <td><?php echo htmlspecialchars($row['inspection_purpose']); ?></td>
                                     <td><?php echo htmlspecialchars($row['inspection_address']); ?></td>
                                     <td><?php echo htmlspecialchars(date("Y-m-d", strtotime($row['inspection_date']))) ?></td>
+                                    <td><?php echo htmlspecialchars($row['created_at']); ?></td>
                                     <!-- <td><?php echo htmlspecialchars($row['uploader']); ?></td>
             <td><?php echo htmlspecialchars($row['department']); ?></td> -->
                                     <td>
@@ -554,25 +556,25 @@ $stmt->close();
                     <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
                         <?php if ($page > 1): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page - 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">&laquo; Prev</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page - 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">&laquo; Prev</a>
                         <?php endif; ?>
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $i;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn<?php if ($i == $page)
-                                echo ' active'; ?>"><?php echo $i; ?></a>
+                                        $params = $_GET;
+                                        $params['page'] = $i;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn<?php if ($i == $page)
+                                                                        echo ' active'; ?>"><?php echo $i; ?></a>
                         <?php endfor; ?>
                         <?php if ($page < $total_pages): ?>
                             <a href="?<?php
-                            $params = $_GET;
-                            $params['page'] = $page + 1;
-                            echo http_build_query($params);
-                            ?>" class="pagination-btn">Next &raquo;</a>
+                                        $params = $_GET;
+                                        $params['page'] = $page + 1;
+                                        echo http_build_query($params);
+                                        ?>" class="pagination-btn">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
@@ -615,11 +617,62 @@ $stmt->close();
     </div>
 
     <script>
+        // Print button functionality (table only, no buttons and no action column)
+        document.addEventListener('DOMContentLoaded', function() {
+            const printBtn = document.getElementById('printTableBtn');
+            if (printBtn) {
+                printBtn.addEventListener('click', function() {
+                    const table = document.querySelector('.archive-table');
+                    const totalReports = document.getElementById('totalPermitsCount');
+                    if (table) {
+                        // Clone the table so we can modify it for printing
+                        const tableClone = table.cloneNode(true);
+                        // Find the index of the Action column
+                        const headerRow = tableClone.querySelector('tr');
+                        let actionColIndex = -1;
+                        if (headerRow) {
+                            Array.from(headerRow.children).forEach((th, idx) => {
+                                if (th.textContent.trim().toLowerCase() === 'action') {
+                                    actionColIndex = idx;
+                                }
+                            });
+                        }
+                        // Remove the Action header cell
+                        if (actionColIndex !== -1 && headerRow) {
+                            headerRow.removeChild(headerRow.children[actionColIndex]);
+                        }
+                        // Remove the Action cell from each body row
+                        tableClone.querySelectorAll('tbody tr').forEach(row => {
+                            if (actionColIndex !== -1 && row.children.length > actionColIndex) {
+                                row.removeChild(row.children[actionColIndex]);
+                            }
+                        });
+                        const printWindow = window.open('', '', 'height=700,width=1000');
+                        printWindow.document.write('<html><head><title>Print My Fire Safety Reports</title>');
+                        printWindow.document.write('<link rel="stylesheet" href="reportstyle.css">');
+                        printWindow.document.write('<link rel="stylesheet" href="modal.css">');
+                        printWindow.document.write('<link rel="stylesheet" href="../css/all.min.css">');
+                        printWindow.document.write('<link rel="stylesheet" href="../css/fontawesome.min.css">');
+                        printWindow.document.write('</head><body >');
+                        if (totalReports) {
+                            printWindow.document.write('<div style="font-weight:bold; color:#003D73; margin-bottom:10px;">' + totalReports.textContent + '</div>');
+                        }
+                        printWindow.document.write(tableClone.outerHTML);
+                        printWindow.document.write('</body></html>');
+                        printWindow.document.close();
+                        printWindow.focus();
+                        setTimeout(function() {
+                            printWindow.print();
+                        }, 500);
+                    }
+                });
+            }
+        });
         document.addEventListener('DOMContentLoaded', () => {
             const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
             toggles.forEach(toggle => {
-                toggle.addEventListener('click', function (event) {
+                toggle.addEventListener('click', function(event) {
                     event.preventDefault();
                     const dropdown = this.closest('.report-dropdown');
                     dropdown.classList.toggle('show');
@@ -686,7 +739,7 @@ $stmt->close();
             document.getElementById('ConfirmDeleteModal').style.display = 'flex';
         }
 
-        document.getElementById('confirmDeleteBtn').onclick = function () {
+        document.getElementById('confirmDeleteBtn').onclick = function() {
             // Helper to reload table body via AJAX
             function reloadTableBody() {
                 // Get current search value
@@ -713,14 +766,14 @@ $stmt->close();
 
             if (singleDeleteId) {
                 fetch('delete_selected_permits.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        permit_ids: [singleDeleteId]
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            permit_ids: [singleDeleteId]
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -734,14 +787,14 @@ $stmt->close();
                     });
             } else if (selectedToDelete.length > 0) {
                 fetch('delete_selected_permits.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        permit_ids: selectedToDelete
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            permit_ids: selectedToDelete
+                        })
                     })
-                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -804,20 +857,20 @@ $stmt->close();
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('start_month') || urlParams.get('end_month')) {
                 document.getElementById('monthFilterContainer').style.display = 'block';
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('start_month') || urlParams.get('end_month')) {
                 document.getElementById('monthFilterContainer').style.display = 'block';
             }
         });
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.querySelector('.search-input');
             const reportsTableBody = document.getElementById('permitsTableBody');
             const totalPermitsCount = document.getElementById('totalPermitsCount');
@@ -825,9 +878,9 @@ $stmt->close();
 
             if (searchInput && reportsTableBody && totalPermitsCount) {
                 let searchTimeout;
-                searchInput.addEventListener('input', function () {
+                searchInput.addEventListener('input', function() {
                     clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(function () {
+                    searchTimeout = setTimeout(function() {
                         const query = searchInput.value;
                         if (query.trim() === '') {
                             // If search is cleared, reload the page to restore pagination
@@ -852,26 +905,26 @@ $stmt->close();
             }
         });
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Show Confirm Logout Modal
-            document.getElementById('logoutLink').addEventListener('click', function (e) {
+            document.getElementById('logoutLink').addEventListener('click', function(e) {
                 e.preventDefault();
                 document.getElementById('logoutModal').style.display = 'flex';
                 document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
             });
 
             // Handle Confirm Logout
-            document.getElementById('confirmLogout').addEventListener('click', function () {
+            document.getElementById('confirmLogout').addEventListener('click', function() {
                 window.location.href = 'logout.php';
             });
 
             // Handle Cancel Logout
-            document.getElementById('cancelLogout').addEventListener('click', function () {
+            document.getElementById('cancelLogout').addEventListener('click', function() {
                 document.getElementById('logoutModal').style.display = 'none';
             });
         });
 
-        window.onclick = function (event) {
+        window.onclick = function(event) {
             // ...existing code...
             const logoutModal = document.getElementById('logoutModal');
             if (event.target === logoutModal) {

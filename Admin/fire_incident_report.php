@@ -143,7 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['
     exit;
 }
 
-$allowed_sort_columns = ['report_id', 'report_title', 'incident_date', 'fire_location'];
+
+$allowed_sort_columns = ['report_id', 'report_title', 'created_at', 'fire_location', 'fire_location_combined'];
 $sort_by = isset($_GET['sort_by']) && in_array($_GET['sort_by'], $allowed_sort_columns) ? $_GET['sort_by'] : 'report_id';
 $order_by = 'ASC';
 
@@ -201,6 +202,7 @@ if ($result_user && $row_user = $result_user->fetch_assoc()) {
 $stmt->close();
 
 
+
 $per_page = 10;
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
 if ($page < 1)
@@ -223,7 +225,20 @@ if ($where_clauses) {
     $total_reports = mysqli_fetch_row($result_count)[0];
 }
 
+// Calculate total pages
+$total_pages = ceil($total_reports / $per_page);
+if ($total_pages > 0 && $page > $total_pages) {
+    // Redirect to last valid page if current page is out of range
+    $params = $_GET;
+    $params['page'] = $total_pages;
+    $redirect_url = $_SERVER['PHP_SELF'] . '?' . http_build_query($params);
+    header("Location: $redirect_url");
+    exit;
+}
+
 // --- Modify main query to add LIMIT and OFFSET ---
+
+$order_column = ($sort_by === 'fire_location') ? 'fire_location_combined' : $sort_by;
 $query = "SELECT 
     report_id, 
     report_title, 
@@ -245,7 +260,7 @@ $query = "SELECT
     occupancy_type, documentation_photos, narrative_report, progress_report, final_investigation_report
 FROM fire_incident_reports 
 $where_sql
-ORDER BY $sort_by $order_by
+ORDER BY $order_column $order_by
 LIMIT ? OFFSET ?";
 
 // Use prepared statement if filtering
@@ -564,7 +579,8 @@ mysqli_close($conn);
                     <h3>Fire Incident Reports</h3>
                     <p>List of Fire Incidents</p>
                     <br>
-                    <p style="font-weight:bold; color:#003D73; margin-bottom:10px;">Total Reports:
+                    <p id="totalReportsCount" style="font-weight:bold; color:#003D73; margin-bottom:10px;">Total
+                        Reports:
                         <?php echo number_format($total_reports); ?>
                     </p>
                     <!-- <hr class="section-separator full-bleed">
@@ -604,11 +620,10 @@ mysqli_close($conn);
                                         style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">ID</a>
                                     <a href="?sort_by=report_title" class="select-multi-btn"
                                         style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Title</a>
-                                    <a href="?sort_by=incident_date" class="select-multi-btn"
-                                        style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Time
-                                        & Date</a>
+                                    <a href="?sort_by=created_at" class="select-multi-btn"
+                                        style="width:100%; text-align:left; border-radius:0; border-bottom:1px solid #eee; text-decoration: none;">Date Created</a>
                                     <a href="?sort_by=fire_location" class="select-multi-btn"
-                                        style="width:100%; text-align:left; border-radius:0; text-decoration: none;">Barangay</a>
+                                        style="width:100%; text-align:left; border-radius:0; text-decoration: none;">Location</a>
                                 </div>
                             </div>
                             <button id="toggleMonthFilterBtn" class="select-multi-btn" type="button"
@@ -634,17 +649,19 @@ mysqli_close($conn);
 
                             </div>
                             <form action="export_fire_reports.php" method="GET" style="display:inline;">
-                                <input type="hidden" name="start_month"
-                                    value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
-                                <input type="hidden" name="end_month"
-                                    value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
-                                <input type="hidden" name="sort_by"
-                                    value="<?php echo isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by']) : ''; ?>">
+                                <input type="hidden" name="search" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                                <input type="hidden" name="start_month" value="<?php echo isset($_GET['start_month']) ? htmlspecialchars($_GET['start_month']) : ''; ?>">
+                                <input type="hidden" name="end_month" value="<?php echo isset($_GET['end_month']) ? htmlspecialchars($_GET['end_month']) : ''; ?>">
+                                <input type="hidden" name="sort_by" value="<?php echo isset($_GET['sort_by']) ? htmlspecialchars($_GET['sort_by']) : 'report_id'; ?>">
                                 <button type="submit" class="select-multi-btn">
                                     <i class="fa-solid fa-file-excel" style="color: green;"></i>
                                     <label for="">.csv</label>
                                 </button>
                             </form>
+                            <button type="button" class="select-multi-btn" id="printReportsBtn" onclick="printReportsTable()" style="margin-left: 4px;">
+                                <i class="fa-solid fa-print" style="color: #003D73;"></i>
+                                <label for="">Print</label>
+                            </button>
                         </div>
 
                         <div class="entries-right">
@@ -659,141 +676,142 @@ mysqli_close($conn);
                         </div>
 
                     </div>
-<div class="table-container">
-                    <table class="archive-table">
-                        <thead>
-                            <tr>
-                                <th class="select-checkbox-header" style="display:none;">
-                                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
-                                <th> Report ID </th>
-                                <th>Report Title</th>
-                                <th>Location</th>
-                                <th>Time and Date of Incident</th>
-                                <th>Establishment</th>
-                                <th>Casualties</th>
-                                <th>Damage to Property</th>
-                                <th>Cause of Fire</th>
-                                <th>Uploader</th>
-                                <!-- <th>Department</th> -->
-                                <th>Date Created</th>
-                                <th>Status</th>
-                                <th>Action</th>
-
-                            </tr>
-                        </thead>
-                        <tbody id="reportsTableBody">
-                            <?php
-                            $any_row_shown = false;
-                            foreach ($reports as $row):
-                                $any_row_shown = true;
-                                ?>
-                                <tr id="report-row<?php echo $row['report_id']; ?>">
-                                    <td class="select-checkbox-cell" style="display:none;">
-                                        <input type="checkbox" class="select-item"
-                                            value="<?php echo htmlspecialchars($row['report_id']); ?>">
-                                    </td>
-                                    <td><?php echo htmlspecialchars($row['report_id']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['report_title']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['fire_location_combined']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['incident_date']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['establishment']); ?></td>
-                                    <td>
-                                        <?php
-                                        $victims_count = empty($row['victims']) ? 0 : substr_count($row['victims'], ',') + 1;
-                                        $firefighters_count = empty($row['firefighters']) ? 0 : substr_count($row['firefighters'], ',') + 1;
-                                        echo $victims_count + $firefighters_count;
-                                        ?>
-                                    </td>
-                                    <td><?php echo htmlspecialchars("₱" . $row['property_damage']); ?></td>
-                                    <td><?php echo empty($row['fire_types']) ? 'Under Investigation' : htmlspecialchars($row['fire_types']); ?>
-                                    </td>
-                                    <td><?php echo htmlspecialchars($row['uploader']); ?></td>
-                                    <!-- <td><?php echo !empty($row['department']) ? htmlspecialchars($row['department']) : 'N/A'; ?> -->
-                                    </td>
-                                    <td><?php echo !empty($row['created_at']) ? htmlspecialchars($row['created_at']) : 'N/A'; ?>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $required_fields = [
-                                            $row['report_title'],
-                                            $row['caller_name'],
-                                            $row['responding_team'],
-                                            $row['fire_location_combined'],
-                                            $row['incident_date'],
-                                            $row['arrival_time'],
-                                            $row['fireout_time'],
-                                            $row['establishment'],
-                                            $row['alarm_status'],
-                                            $row['occupancy_type'],
-                                            $row['property_damage'],
-                                            $row['fire_types'],
-                                            $row['documentation_photos'],
-                                            $row['narrative_report'],
-                                            $row['progress_report'],
-                                            $row['final_investigation_report']
-                                        ];
-                                        $is_complete = true;
-                                        foreach ($required_fields as $field) {
-                                            if (!isset($field) || trim($field) === '' || $field === ', , , ') {
-                                                $is_complete = false;
-                                                break;
-                                            }
-                                        }
-                                        echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>';
-                                        ?>
-                                    </td>
-                                    <td class="action-button-container">
-                                        <button class="view-btn"
-                                            onclick="window.location.href='view_report.php?report_id=<?php echo $row['report_id']; ?>'">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="delete-btn" onclick="deleteReport(<?php echo $row['report_id']; ?>)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                        <button class="download-btn"
-                                            onclick="window.location.href='generate_pdf.php?report_id=<?php echo $row['report_id']; ?>'">
-                                            <i class="fa-solid fa-download"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                            <?php if (!$any_row_shown): ?>
+                    <div class="table-container">
+                        <table class="archive-table">
+                            <thead>
                                 <tr>
-                                    <td colspan="13" style="text-align:center;">No reports found.</td>
+                                    <th class="select-checkbox-header" style="display:none;">
+                                        <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)" />
+                                    <th> Report ID </th>
+                                    <th>Report Title</th>
+                                    <th>Location</th>
+                                    <th>Time and Date of Fire</th>
+                                    <th>Establishment</th>
+                                    <th>Casualties</th>
+                                    <th>Damage to Property</th>
+                                    <th>Cause of Fire</th>
+                                    <th>Uploader</th>
+                                    <!-- <th>Department</th> -->
+                                    <th>Date Created</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+
                                 </tr>
-                            <?php endif; ?>
-                        </tbody>
+                            </thead>
+                            <tbody id="reportsTableBody">
+                                <?php
+                                $any_row_shown = false;
+                                foreach ($reports as $row):
+                                    $any_row_shown = true;
+                                ?>
+                                    <tr id="report-row<?php echo $row['report_id']; ?>">
+                                        <td class="select-checkbox-cell" style="display:none;">
+                                            <input type="checkbox" class="select-item"
+                                                value="<?php echo htmlspecialchars($row['report_id']); ?>">
+                                        </td>
+                                        <td><?php echo htmlspecialchars($row['report_id']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['report_title']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['fire_location_combined']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['created_at']); ?></td>
+                                        <td><?php echo htmlspecialchars($row['establishment']); ?></td>
+                                        <td>
+                                            <?php
+                                            $victims_count = empty($row['victims']) ? 0 : substr_count($row['victims'], ',') + 1;
+                                            $firefighters_count = empty($row['firefighters']) ? 0 : substr_count($row['firefighters'], ',') + 1;
+                                            echo $victims_count + $firefighters_count;
+                                            ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars("₱" . $row['property_damage']); ?></td>
+                                        <td><?php echo empty($row['fire_types']) ? 'Under Investigation' : htmlspecialchars($row['fire_types']); ?>
+                                        </td>
+                                        <td><?php echo htmlspecialchars($row['uploader']); ?></td>
+                                        <!-- <td><?php echo !empty($row['department']) ? htmlspecialchars($row['department']) : 'N/A'; ?> -->
+                                        </td>
+                                        <td><?php echo !empty($row['created_at']) ? htmlspecialchars($row['created_at']) : 'N/A'; ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $required_fields = [
+                                                $row['report_title'],
+                                                $row['caller_name'],
+                                                $row['responding_team'],
+                                                $row['fire_location_combined'],
+                                                $row['incident_date'],
+                                                $row['arrival_time'],
+                                                $row['fireout_time'],
+                                                $row['establishment'],
+                                                $row['alarm_status'],
+                                                $row['occupancy_type'],
+                                                $row['property_damage'],
+                                                $row['fire_types'],
+                                                $row['documentation_photos'],
+                                                $row['narrative_report'],
+                                                $row['progress_report'],
+                                                $row['final_investigation_report']
+                                            ];
+                                            $is_complete = true;
+                                            foreach ($required_fields as $field) {
+                                                if (!isset($field) || trim($field) === '' || $field === ', , , ') {
+                                                    $is_complete = false;
+                                                    break;
+                                                }
+                                            }
+                                            echo $is_complete ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>';
+                                            ?>
+                                        </td>
+                                        <td class="action-button-container">
+                                            <button class="view-btn"
+                                                onclick="window.location.href='view_report.php?report_id=<?php echo $row['report_id']; ?>'">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                            <button class="delete-btn"
+                                                onclick="deleteReport(<?php echo $row['report_id']; ?>)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            <button class="download-btn"
+                                                onclick="window.location.href='generate_pdf.php?report_id=<?php echo $row['report_id']; ?>'">
+                                                <i class="fa-solid fa-download"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <?php if (!$any_row_shown): ?>
+                                    <tr>
+                                        <td colspan="13" style="text-align:center;">No reports found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
 
-                    </table>
+                        </table>
 
-                    <?php
-                    $total_pages = ceil($total_reports / $per_page);
-                    if ($total_pages > 1): ?>
-                        <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
-                            <?php if ($page > 1): ?>
-                                <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page - 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">&laquo; Prev</a>
-                            <?php endif; ?>
-                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                                <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $i;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn<?php if ($i == $page)
-                                    echo ' active'; ?>"><?php echo $i; ?></a>
-                            <?php endfor; ?>
-                            <?php if ($page < $total_pages): ?>
-                                <a href="?<?php
-                                $params = $_GET;
-                                $params['page'] = $page + 1;
-                                echo http_build_query($params);
-                                ?>" class="pagination-btn">Next &raquo;</a>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
+                        <?php
+                        $total_pages = ceil($total_reports / $per_page);
+                        if ($total_pages > 1): ?>
+                            <div id="paginationContainer" class="pagination" style="margin: 20px 0; text-align: center;">
+                                <?php if ($page > 1): ?>
+                                    <a href="?<?php
+                                                $params = $_GET;
+                                                $params['page'] = $page - 1;
+                                                echo http_build_query($params);
+                                                ?>" class="pagination-btn">&laquo; Prev</a>
+                                <?php endif; ?>
+                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                    <a href="?<?php
+                                                $params = $_GET;
+                                                $params['page'] = $i;
+                                                echo http_build_query($params);
+                                                ?>" class="pagination-btn<?php if ($i == $page)
+                                                                                echo ' active'; ?>"><?php echo $i; ?></a>
+                                <?php endfor; ?>
+                                <?php if ($page < $total_pages): ?>
+                                    <a href="?<?php
+                                                $params = $_GET;
+                                                $params['page'] = $page + 1;
+                                                echo http_build_query($params);
+                                                ?>" class="pagination-btn">Next &raquo;</a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
                 </section>
             </div>
         </div>
@@ -847,7 +865,7 @@ mysqli_close($conn);
                 const toggles = document.querySelectorAll('.report-dropdown-toggle');
 
                 toggles.forEach(toggle => {
-                    toggle.addEventListener('click', function (event) {
+                    toggle.addEventListener('click', function(event) {
                         event.preventDefault();
                         const dropdown = this.closest('.report-dropdown');
                         dropdown.classList.toggle('show');
@@ -945,38 +963,23 @@ mysqli_close($conn);
 
             // Confirm delete handler for both single and multi delete
 
-            document.getElementById('confirmDeleteBtn').onclick = function () {
-                const refreshTable = () => {
-                    // Gather current search/filter params from URL
-                    const urlParams = new URLSearchParams(window.location.search);
-                    let ajaxUrl = 'fire_incident_report_ajax.php?';
-                    ajaxUrl += urlParams.toString();
-                    const reportsTableBody = document.getElementById('reportsTableBody');
-                    fetch(ajaxUrl)
-                        .then(response => response.text())
-                        .then(html => {
-                            if (html.trim() === '') {
-                                reportsTableBody.innerHTML = '<tr><td colspan="13" style="text-align:center;">No reports found.</td></tr>';
-                            } else {
-                                reportsTableBody.innerHTML = html;
-                            }
-                        });
-                };
-
+            document.getElementById('confirmDeleteBtn').onclick = function() {
                 if (singleDeleteId) {
                     // Single delete
                     fetch('delete_report.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: 'report_id=' + encodeURIComponent(singleDeleteId)
-                    })
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'report_id=' + encodeURIComponent(singleDeleteId)
+                        })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
                                 openSuccessModal();
-                                refreshTable();
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1200);
                             } else {
                                 alert('Error deleting report: ' + (data.error || 'Unknown error'));
                             }
@@ -986,19 +989,21 @@ mysqli_close($conn);
                 } else if (selectedToDelete.length > 0) {
                     // Multi delete
                     fetch('delete_selected_reports.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            report_ids: selectedToDelete
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                report_ids: selectedToDelete
+                            })
                         })
-                    })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
                                 openSuccessModal();
-                                refreshTable();
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1200);
                             } else {
                                 alert('Error deleting reports.');
                             }
@@ -1045,42 +1050,59 @@ mysqli_close($conn);
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('start_month') || urlParams.get('end_month')) {
                     document.getElementById('monthFilterContainer').style.display = 'block';
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.querySelector('.search-input');
                 const reportsTableBody = document.getElementById('reportsTableBody');
                 const paginationContainer = document.getElementById('paginationContainer');
+                const totalReportsElem = document.getElementById('totalReportsCount');
 
                 if (searchInput && reportsTableBody) {
                     let searchTimeout;
-                    searchInput.addEventListener('input', function () {
+                    searchInput.addEventListener('input', function() {
                         clearTimeout(searchTimeout);
-                        searchTimeout = setTimeout(function () {
+                        searchTimeout = setTimeout(function() {
                             const searchValue = searchInput.value;
                             if (searchValue.trim() === '') {
                                 // If search is cleared, reload the page to show all data
                                 if (paginationContainer) paginationContainer.style.display = '';
-                                window.location.href = window.location.pathname + window.location.search.replace(/([&?])search=[^&]*(&|$)/, function (match, p1, p2) {
+                                window.location.href = window.location.pathname + window.location.search.replace(/([&?])search=[^&]*(&|$)/, function(match, p1, p2) {
                                     // Remove search param from query string
                                     if (p2) return p1;
                                     return '';
                                 });
+                                if (totalReportsElem) {
+                                    // Restore original count from PHP
+                                    totalReportsElem.innerHTML = 'Total Reports: <?php echo number_format($total_reports); ?>';
+                                }
                             } else {
                                 if (paginationContainer) paginationContainer.style.display = 'none';
                                 const xhr = new XMLHttpRequest();
-                                xhr.open('GET', 'fire_incident_report_ajax.php?search=' + encodeURIComponent(searchValue), true);
-                                xhr.onload = function () {
+                                xhr.open('GET', 'fire_incident_report_ajax.php?search=' + encodeURIComponent(searchValue) + '&count=1', true);
+                                xhr.onload = function() {
                                     if (xhr.status === 200) {
-                                        if (xhr.responseText.trim() === '') {
-                                            reportsTableBody.innerHTML = '<tr><td colspan="13" style="text-align:center;">No reports found.</td></tr>';
+                                        let response;
+                                        try {
+                                            response = JSON.parse(xhr.responseText);
+                                        } catch (e) {
+                                            response = null;
+                                        }
+                                        if (response && typeof response.html !== 'undefined' && typeof response.count !== 'undefined') {
+                                            reportsTableBody.innerHTML = response.html || '<tr><td colspan="13" style="text-align:center;">No reports found.</td></tr>';
+                                            if (totalReportsElem) {
+                                                totalReportsElem.innerHTML = 'Total Reports: ' + response.count;
+                                            }
                                         } else {
-                                            reportsTableBody.innerHTML = xhr.responseText;
+                                            reportsTableBody.innerHTML = '<tr><td colspan="13" style="text-align:center;">No reports found.</td></tr>';
+                                            if (totalReportsElem) {
+                                                totalReportsElem.innerHTML = 'Total Reports: 0';
+                                            }
                                         }
                                     }
                                 };
@@ -1089,7 +1111,7 @@ mysqli_close($conn);
                         }, 300);
                     });
                     // Prevent Enter key from submitting the form
-                    searchInput.addEventListener('keydown', function (e) {
+                    searchInput.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter') {
                             e.preventDefault();
                         }
@@ -1097,32 +1119,82 @@ mysqli_close($conn);
                 }
             });
 
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 // Show Confirm Logout Modal
-                document.getElementById('logoutLink').addEventListener('click', function (e) {
+                document.getElementById('logoutLink').addEventListener('click', function(e) {
                     e.preventDefault();
                     document.getElementById('logoutModal').style.display = 'flex';
                     document.getElementById('profileDropdown').classList.remove('show'); // <-- Add this line
                 });
 
                 // Handle Confirm Logout
-                document.getElementById('confirmLogout').addEventListener('click', function () {
+                document.getElementById('confirmLogout').addEventListener('click', function() {
                     window.location.href = 'logout.php';
                 });
 
                 // Handle Cancel Logout
-                document.getElementById('cancelLogout').addEventListener('click', function () {
+                document.getElementById('cancelLogout').addEventListener('click', function() {
                     document.getElementById('logoutModal').style.display = 'none';
                 });
             });
 
-            window.onclick = function (event) {
+            window.onclick = function(event) {
                 // ...existing code...
                 const logoutModal = document.getElementById('logoutModal');
                 if (event.target === logoutModal) {
                     logoutModal.style.display = 'none';
                 }
             };
+
+            function printReportsTable() {
+                const table = document.querySelector('.archive-table');
+                if (!table) return;
+                // Clone the table so we don't affect the original
+                const tableClone = table.cloneNode(true);
+                // Remove the Action column header
+                const headerRow = tableClone.querySelector('thead tr');
+                if (headerRow) {
+                    // Find the index of the Action column
+                    let actionIdx = -1;
+                    headerRow.querySelectorAll('th').forEach((th, idx) => {
+                        if (th.textContent.trim().toLowerCase() === 'action') {
+                            actionIdx = idx;
+                            th.remove();
+                        }
+                    });
+                    // Remove the select-checkbox-header if present
+                    headerRow.querySelectorAll('th').forEach((th) => {
+                        if (th.classList.contains('select-checkbox-header')) {
+                            th.remove();
+                        }
+                    });
+                    // Remove the Action cell from each row
+                    if (actionIdx !== -1) {
+                        tableClone.querySelectorAll('tbody tr').forEach(tr => {
+                            const cells = tr.querySelectorAll('td');
+                            if (cells.length > actionIdx) {
+                                cells[actionIdx].remove();
+                            }
+                            // Remove the select-checkbox-cell if present
+                            if (cells.length && cells[0].classList.contains('select-checkbox-cell')) {
+                                cells[0].remove();
+                            }
+                        });
+                    }
+                }
+                const printWindow = window.open('', '', 'height=700,width=1000');
+                printWindow.document.write('<html><head><title>Print Fire Incident Reports</title>');
+                printWindow.document.write('<link rel="stylesheet" href="reportstyle.css">');
+                printWindow.document.write('<style>body{font-family:sans-serif;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #ccc;padding:8px;} th{background:#003D73;color:#fff;} }</style>');
+                printWindow.document.write('</head><body >');
+                printWindow.document.write('<h2>Fire Incident Reports</h2>');
+                printWindow.document.write(tableClone.outerHTML);
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+                printWindow.close();
+            }
         </script>
 </body>
 

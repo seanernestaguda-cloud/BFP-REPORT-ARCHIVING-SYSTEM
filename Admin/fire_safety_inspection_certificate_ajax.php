@@ -89,7 +89,8 @@ foreach ($permits as $row) {
         $row['inspection_address'],
         $row['inspection_date'],
         $row['uploader'],
-        $row['department'],
+        $row['created_at'],
+        // $row['department'],
         $status
     );
 
@@ -120,7 +121,8 @@ foreach ($permits as $row) {
         $rows_html .= '<td>' . htmlspecialchars($row['inspection_address']) . '</td>';
         $rows_html .= '<td>' . htmlspecialchars($row['inspection_date']) . '</td>';
         $rows_html .= '<td>' . htmlspecialchars($row['uploader']) . '</td>';
-        $rows_html .= '<td>' . (isset($row['department']) && trim($row['department']) !== '' ? htmlspecialchars($row['department']) : 'N/A') . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['created_at']) . '</td>';
+        // $rows_html .= '<td>' . (isset($row['department']) && trim($row['department']) !== '' ? htmlspecialchars($row['department']) : 'N/A') . '</td>';
         $rows_html .= '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
         $rows_html .= '<td class="action-button-container">';
         $rows_html .= '<button class="view-btn" onclick="window.location.href=\'view_permit.php?id=' . htmlspecialchars($row['id']) . '\'">';

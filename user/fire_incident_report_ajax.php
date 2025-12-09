@@ -24,6 +24,9 @@ $stmt = $conn->prepare("SELECT
     firefighters,
     property_damage, 
     fire_types, 
+    uploader, 
+    department, 
+    created_at, 
     caller_name,
     responding_team,
     arrival_time,
@@ -62,6 +65,9 @@ foreach ($reports as $row) {
         $row['occupancy_type'],
         $row['property_damage'],
         $row['fire_types'],
+        $row['uploader'],
+        // $row['department'],
+        $row['created_at'],
         $row['documentation_photos'],
         $row['narrative_report'],
         $row['progress_report'],
@@ -90,6 +96,9 @@ foreach ($reports as $row) {
             $row['victims'],
             $row['property_damage'],
             $row['fire_types'],
+            $row['uploader'],
+            // $row['department'],
+            $row['created_at'],
             $status,
             $fire_types_display
         );
@@ -115,6 +124,9 @@ foreach ($reports as $row) {
         $rows_html .= '<td>' . $casualties . '</td>';
         $rows_html .= '<td>' . htmlspecialchars("₱" . $row['property_damage']) . '</td>';
         $rows_html .= '<td>' . htmlspecialchars($fire_types_display) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['uploader']) . '</td>';
+        // $rows_html .= '<td>' . htmlspecialchars(string: $row['department']) . '</td>';
+        $rows_html .= '<td>' . htmlspecialchars($row['created_at']) . '</td>';
         $rows_html .= '<td>' . ($status === 'Complete' ? '<span style="color:green;">Complete</span>' : '<span style="color:orange;">In Progress</span>') . '</td>';
         $rows_html .= '<td class="action-button-container">';
         $rows_html .= '<button class="view-btn" onclick="window.location.href=\'view_report.php?report_id=' . htmlspecialchars($row['report_id']) . '\'">';

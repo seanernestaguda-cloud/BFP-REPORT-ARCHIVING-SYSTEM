@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 08, 2025 at 06:57 PM
+-- Generation Time: Dec 09, 2025 at 05:32 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,248 +43,14 @@ CREATE TABLE `activity_logs` (
 --
 
 INSERT INTO `activity_logs` (`log_id`, `username`, `user_type`, `action`, `report_id`, `id`, `timestamp`, `details`) VALUES
-(1, 'user', NULL, 'delete', 20, NULL, '2025-12-07 23:45:36', 'Deleted Report: Fire at Poblacion Matalam'),
-(2, 'admin123', 'admin', 'create', 30, NULL, '2025-12-07 23:51:14', 'Created report: Fire at Matalams'),
-(3, 'admin123', NULL, 'delete', 16, NULL, '2025-12-07 23:51:59', 'Deleted Fire Safety Inspection Report: Inspection 2'),
-(4, 'admin123', NULL, 'delete', 11, NULL, '2025-12-07 23:52:49', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(5, 'admin123', NULL, 'delete', 29, NULL, '2025-12-07 23:56:28', 'Delete Report: Fire at Matalams'),
-(6, 'admin123', 'admin', 'create', 31, NULL, '2025-12-08 00:04:00', 'Created report: Fire at Matalams'),
-(7, 'admin123', 'admin', 'create', 32, NULL, '2025-12-08 00:11:04', 'Created report: Fire at Matalams'),
-(8, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:12:59', 'Restored: Fire at Matalams'),
-(9, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:14:25', 'Restored: Fire at Matalams'),
-(10, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:16:05', 'Restored: Fire at Matalams'),
-(11, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:17:08', 'Restored: Fire at Matalams'),
-(12, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:18:08', 'Restored: Fire at Matalams'),
-(13, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:18:48', 'Restored: Fire at Matalams'),
-(14, 'admin123', NULL, 'delete', 32, NULL, '2025-12-08 00:18:52', 'Deleted Report: Fire at Matalams'),
-(15, 'admin123', NULL, 'restore', 32, NULL, '2025-12-08 00:20:01', 'Restored: Fire at Matalams'),
-(16, 'admin123', NULL, 'delete', 32, NULL, '2025-12-08 00:20:05', 'Delete Report: Fire at Matalams'),
-(17, 'admin123', 'admin', 'restore', 32, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Matalams'),
-(18, 'admin123', 'admin', 'restore', 31, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Matalams'),
-(19, 'admin123', 'admin', 'restore', 11, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Dalapitan Apartment'),
-(20, 'admin123', 'admin', 'restore', 18, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Matalams'),
-(21, 'admin123', 'admin', 'restore', 29, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Matalams'),
-(22, 'admin123', 'admin', 'restore', NULL, 11, '2025-12-08 00:22:02', 'Restored Fire Inspection Report: Mel & Jade'),
-(23, 'admin123', 'admin', 'restore', NULL, 16, '2025-12-08 00:22:02', 'Restored Fire Inspection Report: Inspection 2'),
-(24, 'admin123', 'admin', 'restore', 30, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Matalams'),
-(25, 'admin123', 'admin', 'restore', 21, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Matalams'),
-(26, 'admin123', 'admin', 'restore', 20, NULL, '2025-12-08 00:22:02', 'Restored Fire Incident Report: Fire at Poblacion Matalam'),
-(27, 'admin123', 'admin', 'restore', 26, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(28, 'admin123', 'admin', 'restore', 28, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(29, 'admin123', 'admin', 'restore', 27, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(30, 'admin123', 'admin', 'restore', NULL, 13, '2025-12-08 00:22:41', 'Restored Fire Inspection Report: Mel & Jade'),
-(31, 'admin123', 'admin', 'restore', NULL, 4, '2025-12-08 00:22:41', 'Restored Fire Inspection Report: Inspection 1'),
-(32, 'admin123', 'admin', 'restore', 25, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(33, 'admin123', 'admin', 'restore', 24, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(34, 'admin123', 'admin', 'restore', 19, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(35, 'admin123', 'admin', 'restore', 22, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Arakan'),
-(36, 'admin123', 'admin', 'restore', 17, NULL, '2025-12-08 00:22:41', 'Restored Fire Incident Report: Fire at Matalams'),
-(37, 'admin123', 'admin', 'restore', 23, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(38, 'admin123', 'admin', 'restore', NULL, 10, '2025-12-08 00:22:49', 'Restored Fire Inspection Report: Mel & Jade'),
-(39, 'admin123', 'admin', 'restore', NULL, 15, '2025-12-08 00:22:49', 'Restored Fire Inspection Report: Inspection 1'),
-(40, 'admin123', 'admin', 'restore', 15, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(41, 'admin123', 'admin', 'restore', 16, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(42, 'admin123', 'admin', 'restore', 14, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(43, 'admin123', 'admin', 'restore', 13, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(44, 'admin123', 'admin', 'restore', 10, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(45, 'admin123', 'admin', 'restore', 12, NULL, '2025-12-08 00:22:49', 'Restored Fire Incident Report: Fire at Matalams'),
-(46, 'admin123', NULL, 'delete', 21, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(47, 'admin123', NULL, 'delete', 22, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Arakan'),
-(48, 'admin123', NULL, 'delete', 24, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(49, 'admin123', NULL, 'delete', 25, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(50, 'admin123', NULL, 'delete', 26, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(51, 'admin123', NULL, 'delete', 27, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(52, 'admin123', NULL, 'delete', 28, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(53, 'admin123', NULL, 'delete', 29, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(54, 'admin123', NULL, 'delete', 30, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(55, 'admin123', NULL, 'delete', 31, NULL, '2025-12-08 00:25:12', 'Delete Report: Fire at Matalams'),
-(56, 'admin123', 'admin', 'restore', 22, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Arakan'),
-(57, 'admin123', 'admin', 'restore', 28, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(58, 'admin123', 'admin', 'restore', 26, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(59, 'admin123', 'admin', 'restore', 31, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(60, 'admin123', 'admin', 'restore', 24, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(61, 'admin123', 'admin', 'restore', 29, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(62, 'admin123', 'admin', 'restore', 21, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(63, 'admin123', 'admin', 'restore', 27, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(64, 'admin123', 'admin', 'restore', 25, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(65, 'admin123', 'admin', 'restore', 30, NULL, '2025-12-08 00:25:28', 'Restored Fire Incident Report: Fire at Matalams'),
-(66, 'admin123', NULL, 'delete', 21, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(67, 'admin123', NULL, 'delete', 22, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Arakan'),
-(68, 'admin123', NULL, 'delete', 24, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(69, 'admin123', NULL, 'delete', 25, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(70, 'admin123', NULL, 'delete', 26, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(71, 'admin123', NULL, 'delete', 27, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(72, 'admin123', NULL, 'delete', 28, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(73, 'admin123', NULL, 'delete', 29, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(74, 'admin123', NULL, 'delete', 30, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(75, 'admin123', NULL, 'delete', 31, NULL, '2025-12-08 00:25:37', 'Delete Report: Fire at Matalams'),
-(76, 'admin123', NULL, 'delete', 16, NULL, '2025-12-08 00:26:22', 'Deleted Fire Safety Inspection Report: Inspection 2'),
-(77, 'admin123', NULL, 'delete', 32, NULL, '2025-12-08 00:27:34', 'Delete Report: Fire at Matalams'),
-(78, 'admin123', NULL, 'restore', NULL, 16, '2025-12-08 00:27:51', 'Restored: Inspection 2'),
-(79, 'admin123', NULL, 'delete', 16, NULL, '2025-12-08 00:27:55', 'Deleted Fire Safety Inspection Report: Inspection 2'),
-(80, 'admin123', NULL, 'restore', NULL, 16, '2025-12-08 00:28:05', 'Restored: Inspection 2'),
-(81, 'admin123', NULL, 'delete', 16, NULL, '2025-12-08 00:28:09', 'Deleted Fire Safety Inspection Report: Inspection 2'),
-(82, 'admin123', NULL, 'delete', 10, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(83, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Dalapitan Apartment'),
-(84, 'admin123', NULL, 'delete', 12, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(85, 'admin123', NULL, 'delete', 13, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(86, 'admin123', NULL, 'delete', 14, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(87, 'admin123', NULL, 'delete', 15, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(88, 'admin123', NULL, 'delete', 16, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(89, 'admin123', NULL, 'delete', 17, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(90, 'admin123', NULL, 'delete', 18, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(91, 'admin123', NULL, 'delete', 19, NULL, '2025-12-08 00:28:53', 'Delete Report: Fire at Matalams'),
-(92, 'admin123', NULL, 'delete', 20, NULL, '2025-12-08 00:29:02', 'Delete Report: Fire at Poblacion Matalam'),
-(93, 'admin123', NULL, 'delete', 23, NULL, '2025-12-08 00:29:02', 'Delete Report: Fire at Matalams'),
-(94, 'admin123', 'admin', 'restore', 20, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Poblacion Matalam'),
-(95, 'admin123', 'admin', 'restore', 23, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(96, 'admin123', 'admin', 'restore', 11, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Dalapitan Apartment'),
-(97, 'admin123', 'admin', 'restore', 16, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(98, 'admin123', 'admin', 'restore', 14, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(99, 'admin123', 'admin', 'restore', 19, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(100, 'admin123', 'admin', 'restore', 12, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(101, 'admin123', 'admin', 'restore', 17, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(102, 'admin123', 'admin', 'restore', 10, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(103, 'admin123', 'admin', 'restore', 15, NULL, '2025-12-08 00:29:17', 'Restored Fire Incident Report: Fire at Matalams'),
-(104, 'admin123', NULL, 'delete', 10, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(105, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Dalapitan Apartment'),
-(106, 'admin123', NULL, 'delete', 12, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(107, 'admin123', NULL, 'delete', 14, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(108, 'admin123', NULL, 'delete', 15, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(109, 'admin123', NULL, 'delete', 16, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(110, 'admin123', NULL, 'delete', 17, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(111, 'admin123', NULL, 'delete', 19, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(112, 'admin123', NULL, 'delete', 20, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Poblacion Matalam'),
-(113, 'admin123', NULL, 'delete', 23, NULL, '2025-12-08 00:29:27', 'Delete Report: Fire at Matalams'),
-(114, 'admin123', NULL, 'restore', 11, NULL, '2025-12-08 00:29:42', 'Restored: Fire at Dalapitan Apartment'),
-(115, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:29:46', 'Deleted Report: Fire at Dalapitan Apartment'),
-(116, 'admin123', NULL, 'restore', 11, NULL, '2025-12-08 00:30:28', 'Restored: Fire at Dalapitan Apartment'),
-(117, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:30:33', 'Deleted Report: Fire at Dalapitan Apartment'),
-(118, 'admin123', NULL, 'restore', 11, NULL, '2025-12-08 00:31:18', 'Restored: Fire at Dalapitan Apartment'),
-(119, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:31:23', 'Deleted Report: Fire at Dalapitan Apartment'),
-(120, 'admin123', NULL, 'restore', 11, NULL, '2025-12-08 00:32:13', 'Restored: Fire at Dalapitan Apartment'),
-(121, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:32:18', 'Deleted Report: Fire at Dalapitan Apartment'),
-(122, 'admin123', NULL, 'restore', 11, NULL, '2025-12-08 00:32:31', 'Restored: Fire at Dalapitan Apartment'),
-(123, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:32:35', 'Deleted Report: Fire at Dalapitan Apartment'),
-(124, 'admin123', NULL, 'restore', 11, NULL, '2025-12-08 00:33:18', 'Restored: Fire at Dalapitan Apartment'),
-(125, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:33:23', 'Deleted Report: Fire at Dalapitan Apartment'),
-(126, 'admin123', NULL, 'delete', 4, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Inspection 1'),
-(127, 'admin123', NULL, 'delete', 8, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(128, 'admin123', NULL, 'delete', 9, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(129, 'admin123', NULL, 'delete', 10, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(130, 'admin123', NULL, 'delete', 11, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(131, 'admin123', NULL, 'delete', 12, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(132, 'admin123', NULL, 'delete', 13, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Mel & Jade'),
-(133, 'admin123', NULL, 'delete', 14, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Inspection 1'),
-(134, 'admin123', NULL, 'delete', 15, NULL, '2025-12-08 00:34:22', 'Deleted Fire Safety Inspection Report: Inspection 1'),
-(135, 'admin123', 'admin', 'restore', NULL, 4, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Inspection 1'),
-(136, 'admin123', 'admin', 'restore', NULL, 12, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Mel & Jade'),
-(137, 'admin123', 'admin', 'restore', NULL, 10, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Mel & Jade'),
-(138, 'admin123', 'admin', 'restore', NULL, 15, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Inspection 1'),
-(139, 'admin123', 'admin', 'restore', NULL, 8, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Mel & Jade'),
-(140, 'admin123', 'admin', 'restore', NULL, 13, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Mel & Jade'),
-(141, 'admin123', 'admin', 'restore', NULL, 11, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Mel & Jade'),
-(142, 'admin123', 'admin', 'restore', NULL, 9, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Mel & Jade'),
-(143, 'admin123', 'admin', 'restore', NULL, 14, '2025-12-08 00:34:34', 'Restored Fire Inspection Report: Inspection 1'),
-(144, 'admin123', 'admin', 'restore', 11, NULL, '2025-12-08 00:34:34', 'Restored Fire Incident Report: Fire at Dalapitan Apartment'),
-(145, 'admin123', 'admin', 'restore', 12, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(146, 'admin123', 'admin', 'restore', 17, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(147, 'admin123', 'admin', 'restore', 15, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(148, 'admin123', 'admin', 'restore', 20, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Poblacion Matalam'),
-(149, 'admin123', 'admin', 'restore', 23, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(150, 'admin123', 'admin', 'restore', 10, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(151, 'admin123', 'admin', 'restore', 16, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(152, 'admin123', 'admin', 'restore', 14, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(153, 'admin123', 'admin', 'restore', 19, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(154, 'admin123', 'admin', 'restore', 13, NULL, '2025-12-08 00:34:38', 'Restored Fire Incident Report: Fire at Matalams'),
-(155, 'admin123', 'admin', 'restore', 18, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(156, 'admin123', 'admin', 'restore', NULL, 16, '2025-12-08 00:34:43', 'Restored Fire Inspection Report: Inspection 2'),
-(157, 'admin123', 'admin', 'restore', 32, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(158, 'admin123', 'admin', 'restore', 21, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(159, 'admin123', 'admin', 'restore', 27, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(160, 'admin123', 'admin', 'restore', 25, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(161, 'admin123', 'admin', 'restore', 30, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(162, 'admin123', 'admin', 'restore', 22, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Arakan'),
-(163, 'admin123', 'admin', 'restore', 28, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(164, 'admin123', 'admin', 'restore', 26, NULL, '2025-12-08 00:34:43', 'Restored Fire Incident Report: Fire at Matalams'),
-(165, 'admin123', NULL, 'delete', 16, NULL, '2025-12-08 00:35:40', 'Deleted Fire Safety Inspection Report: Inspection 2'),
-(166, 'user', NULL, 'delete', 11, NULL, '2025-12-08 00:39:28', 'Delete Report: Fire at Dalapitan Apartment'),
-(167, 'user', NULL, 'delete', 20, NULL, '2025-12-08 00:39:28', 'Delete Report: Fire at Poblacion Matalam'),
-(168, 'admin123', NULL, 'restore', 20, NULL, '2025-12-08 00:40:47', 'Restored: Fire at Poblacion Matalam'),
-(169, 'user', NULL, 'delete', 20, NULL, '2025-12-08 00:40:55', 'Deleted Report: Fire at Poblacion Matalam'),
-(170, 'user', NULL, 'delete', 14, NULL, '2025-12-08 00:42:16', 'Deleted Fire Safety Inspection Report: Inspection 1'),
-(171, 'admin123', NULL, 'create', 17, NULL, '2025-12-08 00:43:31', 'Created Fire Safety Inspection Report: Inspection 1'),
-(172, 'admin123', NULL, 'download', 4, NULL, '2025-12-08 00:44:17', 'Download: Inspection 1'),
-(173, 'admin123', NULL, 'download', 8, NULL, '2025-12-08 00:44:17', 'Download: Mel & Jade'),
-(174, 'admin123', NULL, 'download', 9, NULL, '2025-12-08 00:44:17', 'Download: Mel & Jade'),
-(175, 'admin123', NULL, 'download', 10, NULL, '2025-12-08 00:44:18', 'Download: Mel & Jade'),
-(176, 'admin123', NULL, 'download', 12, NULL, '2025-12-08 00:44:18', 'Download: Mel & Jade'),
-(177, 'admin123', NULL, 'download', 11, NULL, '2025-12-08 00:44:18', 'Download: Mel & Jade'),
-(178, 'admin123', NULL, 'download', 13, NULL, '2025-12-08 00:44:18', 'Download: Mel & Jade'),
-(179, 'admin123', NULL, 'download', 15, NULL, '2025-12-08 00:44:18', 'Download: Inspection 1'),
-(180, 'admin123', NULL, 'download', 17, NULL, '2025-12-08 00:44:19', 'Download: Inspection 1'),
-(181, 'user', NULL, 'create', 33, NULL, '2025-12-08 00:47:16', 'Created report: Fire at Matalams'),
-(182, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:41:05', 'Downloaded: Fire at Matalams'),
-(183, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:42:19', 'Downloaded: Fire at Matalams'),
-(184, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:42:24', 'Downloaded: Fire at Matalams'),
-(185, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:42:54', 'Downloaded: Fire at Matalams'),
-(186, 'admin123', NULL, 'download', 22, NULL, '2025-12-08 21:43:07', 'Downloaded: Fire at Arakan'),
-(187, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:43:53', 'Downloaded: Fire at Matalams'),
-(188, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:45:36', 'Downloaded: Fire at Matalams'),
-(189, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:49:53', 'Downloaded: Fire at Matalams'),
-(190, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:51:23', 'Downloaded: Fire at Matalams'),
-(191, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:52:19', 'Downloaded: Fire at Matalams'),
-(192, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:56:27', 'Downloaded: Fire at Matalams'),
-(193, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 21:57:21', 'Downloaded: Fire at Matalams'),
-(194, 'user', NULL, 'download', 33, NULL, '2025-12-08 22:00:20', 'Downloaded: Fire at Matalams'),
-(195, 'user', NULL, 'download', 10, NULL, '2025-12-08 22:00:34', 'Downloaded: Fire at Matalams'),
-(196, 'admin123', NULL, 'download', 17, NULL, '2025-12-08 22:02:55', 'Download: Inspection 1'),
-(197, 'admin123', NULL, 'download', 17, NULL, '2025-12-08 22:03:39', 'Download: Inspection 1'),
-(198, 'admin123', NULL, 'download', 8, NULL, '2025-12-08 22:04:08', 'Download: Mel & Jade'),
-(199, 'admin123', NULL, 'download', 4, NULL, '2025-12-08 22:05:21', 'Download: Inspection 1'),
-(200, 'admin123', NULL, 'download', 4, NULL, '2025-12-08 22:07:07', 'Download: Inspection 1'),
-(201, 'admin123', NULL, 'download', 4, NULL, '2025-12-08 22:08:05', 'Download: Inspection 1'),
-(202, 'admin123', NULL, 'download', 12, NULL, '2025-12-08 22:09:10', 'Downloaded: Fire at Matalams'),
-(203, 'admin123', NULL, 'download', 10, NULL, '2025-12-08 22:09:10', 'Downloaded: Fire at Matalams'),
-(204, 'admin123', NULL, 'download', 16, NULL, '2025-12-08 22:09:10', 'Downloaded: Fire at Matalams'),
-(205, 'admin123', NULL, 'download', 15, NULL, '2025-12-08 22:09:10', 'Downloaded: Fire at Matalams'),
-(206, 'admin123', NULL, 'download', 13, NULL, '2025-12-08 22:09:10', 'Downloaded: Fire at Matalams'),
-(207, 'admin123', NULL, 'download', 14, NULL, '2025-12-08 22:09:10', 'Downloaded: Fire at Matalams'),
-(208, 'admin123', NULL, 'download', 17, NULL, '2025-12-08 22:09:11', 'Downloaded: Fire at Matalams'),
-(209, 'admin123', NULL, 'download', 18, NULL, '2025-12-08 22:09:11', 'Downloaded: Fire at Matalams'),
-(210, 'admin123', NULL, 'download', 19, NULL, '2025-12-08 22:09:11', 'Downloaded: Fire at Matalams'),
-(211, 'admin123', NULL, 'download', 21, NULL, '2025-12-08 22:09:11', 'Downloaded: Fire at Matalams'),
-(212, 'admin123', NULL, 'download', 8, NULL, '2025-12-08 22:09:26', 'Download: Mel & Jade'),
-(213, 'admin123', NULL, 'download', 11, NULL, '2025-12-08 22:09:26', 'Download: Mel & Jade'),
-(214, 'admin123', NULL, 'download', 12, NULL, '2025-12-08 22:09:26', 'Download: Mel & Jade'),
-(215, 'admin123', NULL, 'download', 4, NULL, '2025-12-08 22:09:26', 'Download: Inspection 1'),
-(216, 'admin123', NULL, 'download', 10, NULL, '2025-12-08 22:09:26', 'Download: Mel & Jade'),
-(217, 'admin123', NULL, 'download', 9, NULL, '2025-12-08 22:09:26', 'Download: Mel & Jade'),
-(218, 'admin123', NULL, 'download', 13, NULL, '2025-12-08 22:09:27', 'Download: Mel & Jade'),
-(219, 'admin123', NULL, 'download', 15, NULL, '2025-12-08 22:09:27', 'Download: Inspection 1'),
-(220, 'admin123', NULL, 'download', 17, NULL, '2025-12-08 22:09:27', 'Download: Inspection 1'),
-(221, 'admin123', NULL, 'download', 4, NULL, '2025-12-08 22:09:51', 'Download: Inspection 1'),
-(222, 'admin123', NULL, 'download', 10, NULL, '2025-12-08 22:11:46', 'Downloaded: Fire at Matalams'),
-(223, 'admin123', NULL, 'download', 10, NULL, '2025-12-08 22:12:23', 'Downloaded: Fire at Matalams'),
-(224, 'admin123', 'admin', 'create', 34, NULL, '2025-12-08 22:24:12', 'Created report: Fire at Matalams'),
-(225, 'admin123', 'admin', 'create', 35, NULL, '2025-12-08 22:25:47', 'Created report: Fire at Patadon West Farm'),
-(226, 'admin123', NULL, 'update', 22, NULL, '2025-12-08 22:27:28', 'Updated Fire Incident Report: Fire at Arakan'),
-(227, 'admin123', NULL, 'update', 26, NULL, '2025-12-08 22:28:18', 'Updated Fire Incident Report: Fire at Matalams'),
-(228, 'admin123', NULL, 'update', 35, NULL, '2025-12-08 22:38:41', 'Updated Fire Incident Report: Fire at Patadon West Farm'),
-(229, 'admin123', NULL, 'create', 18, NULL, '2025-12-08 22:51:03', 'Created Fire Safety Inspection Report: Inspection 1'),
-(230, 'user', NULL, 'download', 10, NULL, '2025-12-08 22:59:52', 'Downloaded: Fire at Matalams'),
-(231, 'user', NULL, 'download', 4, NULL, '2025-12-08 23:00:06', 'Download: Inspection 1'),
-(232, 'user', NULL, 'delete', 33, NULL, '2025-12-08 23:03:28', 'Deleted Report: Fire at Matalams'),
-(233, 'user', NULL, 'create', 19, NULL, '2025-12-08 23:05:46', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(234, 'admin123', 'admin', 'create', 36, NULL, '2025-12-08 23:27:24', 'Created report: Fire at Patadon West Farm'),
-(235, 'admin123', NULL, 'create', 20, NULL, '2025-12-08 23:28:24', 'Created Fire Safety Inspection Report: Inspection 1'),
-(236, 'admin123', NULL, 'create', 17, NULL, '2025-12-08 23:41:26', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(237, 'admin123', NULL, 'create', 18, NULL, '2025-12-08 23:41:54', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(238, 'admin123', NULL, 'create', 19, NULL, '2025-12-08 23:42:21', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
-(239, 'admin123', 'admin', 'restore', 33, NULL, '2025-12-08 23:56:36', 'Restored Fire Incident Report: Fire at Matalams'),
-(240, 'admin123', 'admin', 'restore', NULL, 10, '2025-12-08 23:56:36', 'Restored Fire Inspection Report: Mel & Jade'),
-(241, 'admin123', 'admin', 'restore', NULL, 15, '2025-12-08 23:56:36', 'Restored Fire Inspection Report: Inspection 1'),
-(242, 'admin123', 'admin', 'create', 37, NULL, '2025-12-09 00:19:11', 'Created report: Fire at Patadon West Farm');
+(1, 'admin123', 'admin', 'create', 1, NULL, '2025-12-09 22:56:15', 'Created report: Fire at Patadon West Farm'),
+(2, 'admin123', NULL, 'create', 1, NULL, '2025-12-09 23:05:56', 'Created Fire Safety Inspection Report: Mel & Jade'),
+(3, 'admin123', 'admin', 'create', 2, NULL, '2025-12-09 23:15:11', 'Created report: Fire at Patadon West Farm'),
+(4, 'admin123', 'admin', 'create', 3, NULL, '2025-12-09 23:17:13', 'Created report: Fire at Patadon West Farm'),
+(5, 'admin123', NULL, 'create', 2, NULL, '2025-12-09 23:19:22', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
+(6, 'user', NULL, 'create', 4, NULL, '2025-12-09 23:30:57', 'Created report: Fire at Patadon West Farm'),
+(7, 'user', NULL, 'create', 3, NULL, '2025-12-09 23:34:59', 'Created Fire Safety Inspection Report: Hardware Inspection 1'),
+(8, 'user', NULL, 'update', 3, NULL, '2025-12-09 23:56:04', 'Updated Fire Safety Inspection Report: Hardware Inspection 1');
 
 -- --------------------------------------------------------
 
@@ -418,29 +184,10 @@ CREATE TABLE `fire_incident_reports` (
 --
 
 INSERT INTO `fire_incident_reports` (`report_id`, `report_title`, `fire_location`, `street`, `purok`, `municipality`, `incident_date`, `establishment`, `victims`, `firefighters`, `property_damage`, `fire_types`, `uploader`, `department`, `caller_name`, `responding_team`, `arrival_time`, `fireout_time`, `alarm_status`, `occupancy_type`, `documentation_photos`, `narrative_report`, `progress_report`, `final_investigation_report`, `deleted`, `deleted_at`, `created_at`) VALUES
-(10, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-05 20:20:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '20:20', '20:20', '1st Alarm', 'Residential', '../uploads/1764937277_fire 1 - Copy.jpg,../uploads/1764937277_fire 1.jpg,../uploads/1764937277_fire 2 - Copy.jpg,../uploads/1764937277_fire 2.jpg,../uploads/1764937277_fire3 - Copy.jpg,../uploads/1764937277_fire3.jpg', '../uploads/1764937277_Spot Investigation Report Sample.pdf', '../uploads/1764937277_progress_Progress Investigation Report.pdf', '../uploads/1764937277_final_Final Investigation Report.pdf', 0, NULL, '2025-12-09 00:26:50'),
-(12, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-05 21:11:00', 'Warehouse', '', '', '2,000', '', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '21:11', '21:11', '1st Alarm', 'Commercial', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(13, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-05 21:12:00', 'Warehouse', '', '', '1,000,000', '', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '21:12', '21:12', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(14, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-05 21:15:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '21:15', '21:15', '1st Alarm', 'Residential', '../uploads/1764995271_fire 1 - Copy.jpg', '../uploads/1764995271_Application Form (BFP).pdf', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(15, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-05 21:16:00', 'Warehouse', '', '', '1,000,000.01', 'Airplane crash', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '21:16', '21:16', '1st Alarm', 'Commercial', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(16, 'Fire at Matalams', 'Kibudoc', 'Matalam Hardware', 'Purok 5', 'Matalam', '2025-12-05 21:32:00', 'Warehouse', '', '', '1,000,000.00', '', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '21:32', '21:32', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(17, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-05 21:42:00', 'Warehouse', '', '', '1,000,000', '', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '21:42', '21:42', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(18, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-06 12:29:00', 'Warehouse', '', '', '1,000,000', 'Bomb explosion', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '12:29', '12:29', '1st Alarm', 'Residential', '../uploads/1764995475_fire 1 - Copy.jpg', '../uploads/1764995475_Final Fire Investigation Report.pdf', '../uploads/1764998384_Progress Investigation Report.pdf', '../uploads/1764998384_Final Investigation Report.pdf', 0, NULL, '2025-12-09 00:26:50'),
-(19, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-06 12:35:00', 'Warehouse', '', '', '1,000,000', 'Electrical appliances', 'me1', 'Administrative', 'Sean Ernest Aguda', 'Team A', '12:35', '12:35', '1st Alarm', 'Vehicular', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(21, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-06 20:26:00', 'Warehouses', '', '', '1,000,000', 'Airplane crash', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '20:26', '20:26', '1st Alarm', 'Residential', '../uploads/1765024028_fire 1 - Copy.jpg,../uploads/1765024028_fire 1.jpg,../uploads/1765024028_fire 2 - Copy.jpg,../uploads/1765024028_fire 2.jpg,../uploads/1765024028_fire3 - Copy.jpg,../uploads/1765024028_fire3.jpg', '../uploads/1765024028_Spot Investigation Report Sample.pdf', '../uploads/1765024028_Progress Investigation Report.pdf', '../uploads/1765024028_Final Investigation Report.pdf', 0, NULL, '2025-12-09 00:26:50'),
-(22, 'Fire at Arakan', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-06 20:29:00', 'Warehouse', '', '', '1,000,000', 'Electrical machineries', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team B', '20:29', '20:29', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(23, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-06 22:28:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'admin', NULL, 'Sean Ernest Aguda', 'Team A', '22:28', '22:28', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(25, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-07 11:50:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '11:50', '11:50', '1st Alarm', 'Industrial', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(26, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-07 11:50:00', 'Warehouse', '', '', '1,000,000', 'Incendiary device/mechanism or ignited flammable liquids', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '11:50', '11:50', '1st Alarm', 'Institutional', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(27, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-07 11:51:00', 'Warehouse', '', '', '1,000,000', '', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '11:51', '11:51', '1st Alarm', 'Others', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(28, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-07 12:27:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '12:27', '12:27', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(30, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-07 23:48:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '23:48', '23:48', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(32, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-08 00:10:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:10', '00:10', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(33, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-08 00:47:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'user', 'Operation', 'Sean Ernest Aguda', 'Team A', '00:47', '00:47', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(34, 'Fire at Matalams', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2024-11-08 22:23:00', 'Warehouse', '', '', '1,000,000', '', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '22:23', '22:24', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(35, 'Fire at Patadon West Farm', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-11-08 22:25:00', 'Warehouse', '', '', '1,000,000', 'Lighted cigarette butt', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '22:25', '22:25', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(36, 'Fire at Patadon West Farm', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-08 23:26:00', 'Warehouse', '', '', '1,000,000', 'Lighted matchstick or lighter', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '23:26', '23:27', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50'),
-(37, 'Fire at Patadon West Farm', 'Arakan', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-08 00:18:00', 'Warehouse', '', '', '1,000,000', 'Open flame due to torch or sulo', 'admin123', 'Administrative', 'Sean Ernest Aguda', 'Team A', '00:18', '00:18', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 00:26:50');
+(1, 'Fire at Patadon West Farm', 'Patadon West', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-12-09 22:55:00', 'Warehouse', '', '', '1,000,000', '', 'admin123', 'Administrative', 'Carlos Dizon', 'Team A', '22:56', '22:56', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 22:56:15'),
+(2, 'Fire at Patadon West Farm', 'Patadon West', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-10-10 23:13:00', 'Warehouse', '', '', '1,000,000', '', 'admin123', 'Administrative', 'Carlos Dizon', 'Team A', '23:13', '23:13', '1st Alarm', 'Residential', '../uploads/1765293311_fire 1 - Copy.jpg,../uploads/1765293311_fire 1.jpg,../uploads/1765293311_fire 2 - Copy.jpg,../uploads/1765293311_fire 2.jpg,../uploads/1765293311_fire3 - Copy.jpg,../uploads/1765293311_fire3.jpg', '../uploads/1765293311_Spot Investigation Report Sample.pdf', '../uploads/1765293311_progress_Progress Investigation Report.pdf', '../uploads/1765293311_final_Final Investigation Report.pdf', 0, NULL, '2025-12-09 23:15:11'),
+(3, 'Fire at Patadon West Farm', 'Patadon West', 'Matalam Hardware', 'Purok 4', 'Matalam', '2001-09-11 15:00:00', 'Warehouse', '', '', '1,000,000', 'Airplane crash', 'admin123', 'Administrative', 'Carlos Dizon', 'Team A', '15:15', '18:50', '1st Alarm', 'Residential', '../uploads/1765293433_fire 1 - Copy.jpg,../uploads/1765293433_fire 1.jpg,../uploads/1765293433_fire 2 - Copy.jpg,../uploads/1765293433_fire 2.jpg,../uploads/1765293433_fire3 - Copy.jpg,../uploads/1765293433_fire3.jpg', '../uploads/1765293433_Spot Investigation Report Sample.pdf', '../uploads/1765293433_progress_Progress Investigation Report.pdf', '../uploads/1765293433_final_Final Investigation Report.pdf', 0, NULL, '2025-12-09 23:17:13'),
+(4, 'Fire at Patadon West Farm', 'Patadon West', 'Matalam Hardware', 'Purok 4', 'Matalam', '2025-08-19 23:25:00', 'Warehouse', '', '', '1,000,000', 'Pyrotechnics', 'user', 'Operation', 'Carlos Dizon', 'Team A', '23:25', '12:25', '1st Alarm', 'Residential', '', '', '', '', 0, NULL, '2025-12-09 23:30:57');
 
 -- --------------------------------------------------------
 
@@ -483,30 +230,20 @@ CREATE TABLE `fire_safety_inspection_certificate` (
   `fire_safety_inspection_checklist` varchar(255) DEFAULT NULL,
   `occupancy_permit` varchar(255) DEFAULT NULL,
   `business_permit` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `deleted_at` datetime DEFAULT NULL,
   `uploader` varchar(255) NOT NULL,
-  `department` varchar(255) NOT NULL
+  `department` varchar(255) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `fire_safety_inspection_certificate`
 --
 
-INSERT INTO `fire_safety_inspection_certificate` (`id`, `permit_name`, `inspection_establishment`, `owner`, `inspection_address`, `inspection_date`, `establishment_type`, `inspection_purpose`, `fire_alarms`, `fire_extinguishers`, `emergency_exits`, `sprinkler_systems`, `fire_drills`, `exit_signs`, `electrical_wiring`, `emergency_evacuations`, `inspected_by`, `contact_person`, `contact_number`, `number_of_occupants`, `nature_of_business`, `number_of_floors`, `floor_area`, `classification_of_hazards`, `building_construction`, `possible_problems`, `hazardous_materials`, `application_form`, `proof_of_ownership`, `building_plans`, `fire_safety_inspection_certificate`, `fire_safety_inspection_checklist`, `occupancy_permit`, `business_permit`, `created_at`, `deleted_at`, `uploader`, `department`) VALUES
-(4, 'Inspection 1', 'Mel & Jade Buy & Sell', 'Mel & Jade', 'Poblacion, Matalam, Cotabato', '2025-09-15', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'John Doe', 'Mel & Jade', '09777461096', 10, 'Agriculture', 1, '750 sqm', 'Class_A', 'concrete', 'Narrow Road\r\nNo Fire Hydrants Nearby', 'Wood\r\nPaper\r\nPlastic', '../uploads/20251130171516_Application Form (BFP).pdf', '../uploads/20251130171516_Proof of Ownership.pdf', '../uploads/20251130171516_Building Plans.pdf', '../uploads/20251130171516_FSIC-Sample.pdf', '../uploads/20251130171516_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130171516_FSIC-Sample.pdf', '../uploads/20251130171516_Tax Assessment.pdf', '2025-11-30 08:15:16', NULL, 'admin', 'N/A'),
-(8, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', 'wood', 'wood', '../uploads/692c7fb4e45f9_Application Form (BFP).pdf', '../uploads/692c7f5302d57_Proof of Ownership.pdf', '../uploads/692c7f53031e9_Application Form (BFP).pdf', '../uploads/692c7f53038b7_FSIC-Sample.pdf', '../uploads/692c7f5303544_Fire-Safety-Inspection-Checklist.pdf', '../uploads/692c7f5303bd9_FSIC-Sample.pdf', '../uploads/692c7f5303f66_Tax Assessment.pdf', '2025-11-30 09:01:17', NULL, 'me1', 'Administrative'),
-(9, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-06', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', 'none', 'none\r\n', '../uploads/20251130181039_Application Form (BFP).pdf', '../uploads/20251130181039_Proof of Ownership.pdf', '../uploads/20251130181039_Building Plans.pdf', '../uploads/20251130181039_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130181039_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130181039_FSIC-Sample.pdf', '../uploads/20251130181039_Tax Assessment.pdf', '2025-11-30 09:10:39', NULL, 'sean', 'Administrative'),
-(10, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', '1', '2', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-30 09:38:18', NULL, 'me1', 'Administrative'),
-(11, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_A', 'concrete', '34', '45', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-11-30 09:39:10', NULL, 'sean', 'Administrative'),
-(12, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '09777461096', 2, 'None', 5, '750', 'Class_B', 'concrete', 'Narrow Road', 'Wood', '../uploads/20251130184842_Application Form (BFP).pdf', '../uploads/20251130184842_Proof of Ownership.pdf', '../uploads/20251130184842_Building Plans.pdf', '../uploads/20251130184842_FSIC-Sample.pdf', '../uploads/20251130184842_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251130184842_FSIC-Sample.pdf', '../uploads/20251130184842_Tax Assessment.pdf', '2025-11-30 09:48:42', NULL, 'sean', 'Administrative'),
-(13, 'Mel & Jade', 'Matalam Hardware', 'Jon ', 'Matalam Hardware', '2025-12-01', 'commercial', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Jon', '1234567890', 2, 'None', 5, '750', 'Class_A', 'concrete', 'Narrow Road\r\nToo Many houses', 'Wood\r\npaper\r\nplastic', '../uploads/20251201133025_Application Form (BFP).pdf', '../uploads/20251201133025_Proof of Ownership.pdf', '../uploads/20251201133025_Building Plans.pdf', '../uploads/20251201133025_FSIC-Sample.pdf', '../uploads/20251201133025_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251201133025_FSIC-Sample.pdf', '../uploads/20251201133025_FSIC-Sample.pdf', '2025-12-01 04:30:25', NULL, 'admin', 'N/A'),
-(14, 'Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-12-06', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750 sqm', 'Class_A', 'concrete', 'Narrow Road', 'Wood', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-05 22:00:58', NULL, 'user', 'Operation'),
-(15, 'Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-12-06', 'commercial', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750 sqm', 'Class_A', 'concrete', 'None', 'wood', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-05 22:19:42', NULL, 'me1', 'Administrative'),
-(16, 'Inspection 2', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-12-06', 'industrial', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750 sqm', 'Class_A', 'concrete', 'none', 'wood\r\n', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-06 06:16:30', NULL, 'admin123', 'Administrative'),
-(17, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-12-06', 'residential', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750 sqm', 'Class_A', 'concrete', 'wood', 'none', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-08 15:41:26', NULL, 'admin123', 'Administrative'),
-(18, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-12-06', 'residential', 'complaint', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750 sqm', 'Class_A', 'concrete', 'none', 'wood', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-08 15:41:54', NULL, 'admin123', 'Administrative'),
-(19, 'Hardware Inspection 1', 'Matalam Hardware', 'Sean Ernest Aguda', 'Poblacion, Matalam, Cotabato', '2025-12-06', 'residential', 'compliance', 0, 0, 0, 0, 0, 0, 0, 0, 'Sean Ernest Aguda III', 'Sean Ernest Aguda', '09777461096', 2, 'None', 5, '750 sqm', 'Class_A', 'concrete', 'none', 'wood', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-08 15:42:21', NULL, 'admin123', 'Administrative');
+INSERT INTO `fire_safety_inspection_certificate` (`id`, `permit_name`, `inspection_establishment`, `owner`, `inspection_address`, `inspection_date`, `establishment_type`, `inspection_purpose`, `fire_alarms`, `fire_extinguishers`, `emergency_exits`, `sprinkler_systems`, `fire_drills`, `exit_signs`, `electrical_wiring`, `emergency_evacuations`, `inspected_by`, `contact_person`, `contact_number`, `number_of_occupants`, `nature_of_business`, `number_of_floors`, `floor_area`, `classification_of_hazards`, `building_construction`, `possible_problems`, `hazardous_materials`, `application_form`, `proof_of_ownership`, `building_plans`, `fire_safety_inspection_certificate`, `fire_safety_inspection_checklist`, `occupancy_permit`, `business_permit`, `deleted_at`, `uploader`, `department`, `created_at`) VALUES
+(1, 'Mel & Jade', 'Warehouse', 'Ana Lopez', 'Warehouse', '2025-12-09', 'healthcare', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Mark Villanueva', 'Carlos Dizon', '5555555', 2, 'None', 2, '750 sqm', 'Class_A', 'concrete', 'None', 'Wood', '../uploads/20251209160556_Application Form (BFP).pdf', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin123', 'Administrative', '2025-12-09 23:05:56'),
+(2, 'Hardware Inspection 1', 'Warehouse', 'Ana Lopez', 'Warehouse', '2025-12-09', 'commercial', 'compliance', 0, 0, 0, 0, 0, 0, 0, 0, 'Mark Villanueva', 'Carlos Dizon', '5555555', 2, 'None', 2, '750 sqm', 'Class_A', 'concrete', 'Narrow Road\r\nToo Crowded', 'Paper\r\nPlastic\r\nWood', '../uploads/20251209161922_Application Form (BFP).pdf', '../uploads/20251209161922_Proof of Ownership.pdf', '../uploads/20251209161922_Building Plans.pdf', '../uploads/20251209161922_FSIC-Sample.pdf', '../uploads/20251209161922_Fire-Safety-Inspection-Checklist.pdf', '../uploads/20251209161922_FSIC-Sample.pdf', '../uploads/20251209161922_Tax Assessment.pdf', NULL, 'admin123', 'Administrative', '2025-12-09 23:19:22'),
+(3, 'Hardware Inspection 1', 'Warehouse', 'Ana Lopez', 'Warehouse', '2025-12-09', 'industrial', 'routine', 0, 0, 0, 0, 0, 0, 0, 0, 'Mark Villanueva', 'Carlos Dizon', '5555555', 2, 'None', 2, '750 sqm', 'Class_A', 'concrete', 'Too Narrow, Too Crowded', 'Plastic, wood, paper', '../uploads/69384693ef687_Application Form (BFP).pdf', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user', 'Operation', '2025-12-09 23:34:59');
 
 -- --------------------------------------------------------
 
@@ -611,10 +348,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `avatar`, `first_name`, `middle_name`, `last_name`, `birthday`, `address`, `username`, `gender`, `password`, `department`, `contact`, `user_type`, `created_at`, `updated_at`, `verified`, `status`) VALUES
-(125, '', 'User', 'User', 'User', '2025-12-05', 'Poblacion, Matalam, Cotabato', 'user', 'male', '$2y$10$tqn3wqfLZRH5kZ6Vzn2fy.BV25Dbr5mTZE6hV23iCNwkm85I72Dnu', 'Operation', '09777461096', 'staff', '2025-12-05 12:23:09', '2025-12-06 12:19:11', 0, 'verified'),
+(125, '', 'User', 'User', 'User', '2025-12-05', 'Poblacion, Matalam, Cotabato', 'user', 'male', '$2y$10$tqn3wqfLZRH5kZ6Vzn2fy.BV25Dbr5mTZE6hV23iCNwkm85I72Dnu', 'Operation', '09777461096', 'staff', '2025-12-05 12:23:09', '2025-12-09 15:24:31', 0, 'verified'),
 (127, '', 'admin123', 'admin123', 'admin123', '2025-12-06', 'admin', 'admin123', '', '$2y$10$OuHGKATpLL6g5f0/Q4XTV.gk5x63tveBLGWDbG6WnKASGkZRD/nCa', 'Administrative', '1234567890', 'admin', '2025-12-06 11:17:03', '2025-12-07 04:37:27', 0, 'verified'),
-(128, '', 'John', '', 'Doe', '2025-12-06', 'USA', 'jdoe', '', '$2y$10$PuoteSQLM5D85o8rrwwOvOFqQDh86E08WAiJdFV4W.L89WLMsIdEu', 'Operation', '5112512', 'admin', '2025-12-06 11:26:54', '2025-12-06 11:49:44', 0, 'verified'),
-(130, '', 'admin admin admin', '', 'admin', '2025-12-07', 'Matalam Hardware', 'admin456', '', '$2y$10$3MrJ0T0yaO.ud1WPe48xHuFT3fY6lT4mW60n.9Yt1REYzDFANOPsu', 'Administrative', '1234567890', 'admin', '2025-12-07 02:34:09', '2025-12-07 02:34:09', 0, 'not verified');
+(130, '', 'admin admin admin', '', 'admin', '2025-12-07', 'Matalam Hardware', 'admin456', '', '$2y$10$3MrJ0T0yaO.ud1WPe48xHuFT3fY6lT4mW60n.9Yt1REYzDFANOPsu', 'Administrative', '1234567890', 'admin', '2025-12-07 02:34:09', '2025-12-07 02:34:09', 0, 'not verified'),
+(131, NULL, 'John', 'Mar', 'Doe', '1995-12-25', 'Poblacion, Matalam, Cotabato', 'john doe', 'Male', '$2y$10$DC3pVFhPl4OYJXniH7f83uZZW0PI/.BvGHqt4E92LtPg8jQPJ/2je', 'Fire Safety and Prevention', '1234567890', 'staff', '2025-12-09 04:33:52', '2025-12-09 04:34:23', 0, 'verified');
 
 --
 -- Indexes for dumped tables
@@ -689,7 +426,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=243;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `admins`
@@ -713,13 +450,13 @@ ALTER TABLE `departments`
 -- AUTO_INCREMENT for table `fire_incident_reports`
 --
 ALTER TABLE `fire_incident_reports`
-  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `fire_safety_inspection_certificate`
 --
 ALTER TABLE `fire_safety_inspection_certificate`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `fire_types`
@@ -743,7 +480,7 @@ ALTER TABLE `system_settings`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=131;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
